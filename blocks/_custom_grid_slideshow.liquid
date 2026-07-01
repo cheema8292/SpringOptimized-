@@ -1,0 +1,213 @@
+{{ 'slideshow.css' | asset_url | stylesheet_tag }}
+
+{% capture slides %}
+    {% content_for 'blocks' %}
+  {% endcapture %}
+{% render 'slide-show',
+  blocks: block.blocks,
+  slides: slides,
+  effect: block.settings.animation_style,
+  autoplay: block.settings.auto_rotate,
+  delay: block.settings.change_slides_every,
+  roundedCorner: block.settings.rounded_corners,
+  blockSize: block.blocks.size,
+  section_id: block.id,
+  navigation: block.settings.navigation,
+  pagination_color: block.settings.pagination_color
+%}
+
+<style>
+  #shopify-block-{{ block.id }} {
+    --row:{{ block.settings.desktop_row }};
+    --column:{{ block.settings.desktop_column }}
+   }
+   @media only screen and (max-width: 767px) {
+    #shopify-block-{{ block.id }} {
+       {% if section.settings.enable_mobile_swipe %}
+    --row:1;
+    --column:1;
+    {% else %}
+   --row:{{ block.settings.mobile_row }};
+      --column:{{ block.settings.mobile_column }};
+    {% endif %}
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "t:sections.custom-grid.blocks.slideshow.name",
+  "class": "custom-grid-item",
+  "blocks": [
+    {
+      "type": "_custom_grid_slide"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.custom-grid.settings.row_column.header"
+    },
+    {
+      "type": "range",
+      "label": "t:sections.custom-grid.settings.row_column.column_width.label",
+      "id": "desktop_column",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "label": "t:sections.custom-grid.settings.row_column.row_width.label",
+      "id": "desktop_row",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "radio",
+      "label": "t:sections.custom-grid.settings.row_column.mobile_column_width.label",
+      "id": "mobile_column",
+      "options": [
+        {
+          "label": "1",
+          "value": "1"
+        },
+        {
+          "label": "2",
+          "value": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "radio",
+      "label": "t:sections.custom-grid.settings.row_column.mobile_row_width.label",
+      "id": "mobile_row",
+      "options": [
+        {
+          "label": "1",
+          "value": "1"
+        },
+        {
+          "label": "2",
+          "value": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.custom-grid.blocks.slideshow.settings.slide.label"
+    },
+    {
+      "type": "select",
+      "label": "t:sections.custom-grid.blocks.slideshow.settings.slide.animation_style.label",
+      "id": "animation_style",
+      "default": "slide",
+      "options": [
+        {
+          "label": "t:sections.custom-grid.blocks.slideshow.settings.slide.animation_style.option_0.label",
+          "value": "fade"
+        },
+        {
+          "label": "t:sections.custom-grid.blocks.slideshow.settings.slide.animation_style.option_1.label",
+          "value": "slide"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "label": "t:sections.custom-grid.blocks.slideshow.settings.slide.auto_rotate.label",
+      "id": "auto_rotate",
+      "default": false
+    },
+    {
+      "type": "range",
+      "label": "t:sections.custom-grid.blocks.slideshow.settings.slide.change_slides_every.label",
+      "id": "change_slides_every",
+      "default": 5,
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "visible_if": "{{ block.settings.auto_rotate }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.custom-grid.blocks.slideshow.settings.Pagination.label"
+    },
+    {
+      "type": "select",
+      "label": "Navigation",
+      "id": "navigation",
+      "default": "floation-arrows-with-progress-bar",
+      "options": [
+        {
+          "label": "None",
+          "value": "none"
+        },
+        {
+          "label": "Arrows",
+          "value": "arrows"
+        },
+        {
+          "label": "Floating arrows",
+          "value": "floation-arrows"
+        },
+        {
+          "label": "Dots",
+          "value": "dots"
+        },
+        {
+          "label": "Progress bar",
+          "value": "progress-bar"
+        },
+        {
+          "label": "Arrows with dots",
+          "value": "arrows-with-dots"
+        },
+        {
+          "label": "Arrows with progress bar",
+          "value": "arrows-with-progress-bar"
+        },
+        {
+          "label": "Floating arrows with progress bar",
+          "value": "floation-arrows-with-progress-bar"
+        },
+        {
+          "label": "Floating arrows with dots",
+          "value": "floation-arrows-with-dots"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "pagination_color",
+      "label": "t:sections.custom-grid.blocks.slideshow.settings.Pagination.settings.color.label",
+      "options": [
+        {
+          "label": "t:sections.custom-grid.blocks.slideshow.settings.Pagination.settings.color.option_1.label",
+          "value": "light"
+        },
+        {
+          "label": "t:sections.custom-grid.blocks.slideshow.settings.Pagination.settings.color.option_0.label",
+          "value": "dark"
+        }
+      ],
+      "default": "dark"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.custom-grid.blocks.slideshow.name",
+      "blocks": [
+        {
+          "type": "_custom_grid_slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

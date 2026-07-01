@@ -1,0 +1,74 @@
+{% liquid
+  assign product_form_id = 'ProductForm-' | append: section.id | append: '-' | append: product.id
+%}
+<drawer-section-view
+  class="drawer drawer-right drawer-regular drawer-fixed drawer-quick-view {{ section.settings.color_scheme }}"
+  data-section-id="{{ section.id }}"
+  quick-view-drawer
+  tabindex="0"
+>
+  <div class="drawer-backdrop" drawer-close></div>
+  <div class="drawer-inner">
+    <div class="drawer-contentwrap color-scheme">
+      <div class="drawer-content">
+        <div class="drawer-head text-right">
+          <button class="drawer-close-btn" aria-label="Close" drawer-close-button>
+            {% render 'svg-icons', icon_type: 'cross-icon' %}
+          </button>
+        </div>
+        <div class="drawer-body">
+          <div class="{% if source == 'quick-view'%}quick-view-content{% elsif source == 'main-product'%}main-product-view product-{{ section.settings.media_width }}{% endif %}">
+            <product-info
+              class="product-info-container"
+              id="product-info-{{ section.id }}-{{ product.id }}"
+              data-section-id="{{ section.id }}"
+              data-section="{{ section.id }}"
+              data-product-id="{{ product.id }}"
+              data-update-url="false"
+              data-url="{{ product.url }}"
+            >
+              {% if product != null %}
+                <div class="product-gallery-wrapper" id="Product-gallery-{{ section.id  }}-{{ product.id }}">
+                  {% render 'product-gallery-media',
+                    section: section,
+                    product_form_id: product_form_id,
+                    source: source,
+                    product: product
+                  %}
+                </div>
+              {% else %}
+                {%- liquid
+                  assign image_ratio = section.settings.aspect_ratio
+                  if section.settings.aspect_ratio == 'adapt_to_first_image'
+                    assign image_ratio = '1/1'
+                  endif
+                  if section.settings.aspect_ratio == 'auto'
+                    assign image_ratio = 1
+                  endif
+                %}
+                <div class="product-gallery-wrapper">
+                  <div class="product-media-wrapper">
+                    <div class="product-media-gallery">
+                      <div class="media-card media-adapt" style="--imageRatio: {{ image_ratio }};">
+                        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+
+              <div class="product-blocks" id="ProductInfo-{{ section.id }}">
+                {% render 'product-info',
+                  blocks: section.blocks,
+                  product_form_id: product_form_id,
+                  source: source,
+                  product: product
+                %}
+              </div>
+            </product-info>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</drawer-section-view>

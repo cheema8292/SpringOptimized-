@@ -1,0 +1,124 @@
+<style>
+  .mobile-menu-submenu{
+    --overlayTextColor:{{ block.settings.tab_promo_color_text }};
+  {% if block.settings.enable_overlay %}
+      {% if block.overlay_style == 'gradient' %}
+        --imageOverlay: {{ block.settings.overlay_gradient }};
+      {% else %}
+        --imageOverlay: rgba({{ block.settings.overlay_solid.rgba }});
+      {% endif %}
+    {% endif %}
+  }
+</style>
+<div class="mobile-menu-submenu height-100 mobile-tabs-megamenu ">
+  <div class="mobile-menu-submenu-back" data-back-to-menu>
+    <button aria-label="Back">
+      {% render 'svg-icons', icon_type: 'angle-left' %}
+    </button>
+    <span class="{{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+      {{ link.title }}
+    </span>
+  </div>
+  <ul class="mobile-submenu-list">
+    {% for innerLink in block.settings.menu.links %}
+      {% if innerLink.links.size > 0 %}
+        {% liquid
+          assign is_inner_chlid_menu = false
+          if innerLink.links.size > 0
+            assign is_inner_chlid_menu = true
+          endif
+        %}
+        <li
+          class="mobile-menu-item"
+          {% if is_inner_chlid_menu %}
+            data-menu-item
+          {% endif %}
+        >
+          {% if is_inner_chlid_menu %}
+            <details class="mobile-menu-item-inner">
+              <summary class="mobile-image-mega-menu-heading">
+                <span class="mobile-menu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+                  {{- innerLink.title }}
+                  {% if innerLink.links.size > 0 %}
+                    {% render 'svg-icons', icon_type: 'angle-down' %}
+                  {% endif -%}
+                </span>
+              </summary>
+              <div class="mobile-image-inner-mega-menu inner-submenu height-100">
+                <ul class="mobile-submenu-list inner-submenu-list">
+                  {% for innerChildLink in innerLink.links %}
+                    <li class="mobile-menu-item">
+                      <a
+                        href="{{ innerChildLink.url }}"
+                        class="mobile-menu-link {{ settings.header_third_level_menus_size }} {{ settings.header_third_level_menus_font }}-font"
+                      >
+                        {{- innerChildLink.title }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </details>
+          {% else %}
+            <a
+              href="{{ innerLink.url }}"
+              class="mobile-menu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font"
+            >
+              {{- innerLink.title -}}
+            </a>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+  {% if block.settings.tab_promo_image != blank %}
+    <div class="mobile-mega-menu-promo check">
+      {% if block.settings.tab_promo_link != blank %}
+        <a href="{{ block.settings.tab_promo_link }}" class="header-promotion-banner-item mega-menu-item">
+      {% else %}
+        <div class="header-promotion-banner-item mega-menu-item test5">
+      {% endif %}
+      <div class="header-promotion-banner-media">
+        <div class="media-card media-adapt media-card-overlay" style="--imageRatio:1;">
+          {% liquid
+            assign default_alt = 'Tab mega menu'
+            assign image_alt = block.settings.tab_promo_image.alt | default: default_alt
+            assign image_sizes = '(max-width: 600px) 100vw, 540px'
+            assign image_widths = '180,360,540'
+          %}
+          {{
+            block.settings.tab_promo_image
+            | image_url: width: 540, format: 'webp'
+            | image_tag:
+              sizes: image_sizes,
+              widths: image_widths,
+              decoding: 'async',
+              loading: 'lazy',
+              fetchpriority: 'auto',
+              class: 'hamburger-promotion-media-image',
+              alt: image_alt
+          }}
+        </div>
+      </div>
+      {%- if block.settings.tab_promo_heading != blank or block.settings.tab_promo_description != blank -%}
+        <div class="header-promotion-banner-content-wrapper">
+          {%- if block.settings.tab_promo_heading != blank -%}
+            <h6 class="header-promotion-banner-heading overlay-text {{ block.settings.tab_promo_heading_size }}">
+              {{ block.settings.tab_promo_heading }}
+            </h6>
+          {%- endif -%}
+          {%- if block.settings.tab_promo_description != blank -%}
+            <p class="header-promotion-banner-desc overlay-text {{ block.settings.tab_promo_description_size }}">
+              {{ block.settings.tab_promo_description }}
+            </p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      {% if block.settings.tab_promo_link != blank %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

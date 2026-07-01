@@ -1,0 +1,23 @@
+ <form action="{{ routes.search_url }}" method="get" role="search" class="search-input-box">
+  <input type="hidden" name="type" value="product">
+              <span class="svg-wrapper">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path d="M19 19L15.5967 15.5963M18.0385 9.5202C18.0385 14.2258 14.2243 18.0405 9.5192 18.0405C4.8142 18.0405 1 14.2258 1 9.5202C1 4.81464 4.8142 1 9.5192 1C14.2243 1 18.0385 4.81464 18.0385 9.5202Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+              </span>
+               <label class="visually-hidden" for="search-input__box">Search</label>
+              <input
+                id="search-input__box"
+                class="form-control"
+                type="search"
+                name="q"
+                placeholder="Search..."
+                aria-label="Search"
+                data-input-search
+              >
+              <button type="reset" value="Reset" class="text-small text-underline hidden" data-search-clear=""  aria-label="Clear search input">Clear</button>
+           
+            </form>

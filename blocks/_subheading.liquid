@@ -1,0 +1,38 @@
+<style>
+    #shopify-block-{{block.id}}{
+   --overlayTextColor:rgba({{ block.settings.subheading_color.rgba }});
+
+  }
+</style>
+{% if block.settings.subheading != blank %}
+  <div class="overlay-text rich-text-description rte text">
+    <p>
+      {{ block.settings.subheading | replace: '<a', '<a class="text-underline"' }}
+    </p>
+  </div>
+{% endif %}
+{% schema %}
+{
+  "name": "t:sections.all.headers.subheading",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "subheading",
+      "label": "t:sections.all.headers.subheading",
+      "default": "Add subheading"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "t:sections.all.headers.color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.all.headers.subheading",
+      "category": "Basic"
+    }
+  ]
+}
+{% endschema %}

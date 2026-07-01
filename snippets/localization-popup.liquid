@@ -1,0 +1,36 @@
+<div id="shopify-section-localization" class="localization-popup {{ settings.internalization_color_scheme }}">
+  <template data-type="localization-terms">
+    <div class="popup position-center" is="localization-popover" aria-label="Localization popup" role="dialog">
+      <div class="page-overlay"></div>
+      <div class="popup-dialog width-small">
+        <div class="popup-content">
+          <div class="localization-form-wrapper width-100">
+            <div class="localization-heading-box">
+              <div class="localization-inner-heading-wrapper">
+                <button class="popup-back hidden" aria-label="Back" localization-back-btn>
+                 <span class="svg-wrapper">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                   <path d="M16.5832 9H1.4165" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   <path d="M8.99984 16.5837L1.4165 9.00032L8.99984 1.41699" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                 </span>
+               </button>
+               <h6 class="localization-heading h5 heading-font" localization-popup-heading >Localization options</h6>
+              </div>
+              <button class="popup-close" aria-label="Close" localization-close-btn>
+                <span class="svg-wrapper">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                    <path
+                      d="M10.0681 9.36073C10.1134 9.40602 10.1493 9.45979 10.1738 9.51896C10.1983 9.57814 10.2109 9.64156 10.2109 9.70561C10.2109 9.76966 10.1983 9.83309 10.1738 9.89226C10.1493 9.95144 10.1134 10.0052 10.0681 10.0505C10.0228 10.0958 9.96902 10.1317 9.90984 10.1562C9.85067 10.1807 9.78724 10.1934 9.72319 10.1934C9.65914 10.1934 9.59572 10.1807 9.53654 10.1562C9.47736 10.1317 9.4236 10.0958 9.3783 10.0505L5.33594 6.00752L1.29357 10.0505C1.2021 10.142 1.07804 10.1934 0.948681 10.1934C0.819324 10.1934 0.695264 10.142 0.603794 10.0505C0.512325 9.95903 0.460938 9.83497 0.460938 9.70561C0.460937 9.57625 0.512325 9.4522 0.603794 9.36073L4.64677 5.31836L0.603794 1.27599C0.512325 1.18452 0.460938 1.06046 0.460938 0.931103C0.460938 0.801745 0.512325 0.677686 0.603794 0.586216C0.695264 0.494746 0.819324 0.443359 0.948681 0.443359C1.07804 0.443359 1.2021 0.494746 1.29357 0.586216L5.33594 4.62919L9.3783 0.586216C9.46977 0.494746 9.59383 0.443359 9.72319 0.443359C9.85255 0.443359 9.97661 0.494746 10.0681 0.586216C10.1595 0.677686 10.2109 0.801745 10.2109 0.931103C10.2109 1.06046 10.1595 1.18452 10.0681 1.27599L6.0251 5.31836L10.0681 9.36073Z"
+                      fill="currentColor" />
+                  </svg>
+                </span>
+              </button>
+            </div>
+            {% render 'localization-form' %}
+          </div>
+        </div>
+      </div>
+    </div> 
+  </template>
+</div> 

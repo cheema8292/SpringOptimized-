@@ -1,0 +1,52 @@
+{{ 'breadcrumb.css' | asset_url | stylesheet_tag }}
+<nav class="breadcrumbs">
+  <a href="{{ routes.root_url }}">Home</a>
+
+  {% assign sep = '<span class="breadcrumbs-sep">/</span>' %}
+
+  {% if template contains 'page' %}
+    {{ sep }}
+    <span>{{ page.title | strip_html }}</span>
+
+  {% elsif template contains 'product' %}
+    {% if collection.url %}
+      {{ sep }}
+      <span>{{ collection.title | strip_html | truncatewords: 5 | link_to: collection.url }}</span>
+    {% endif %}
+    {{ sep }}
+    <span class="breadcrumbs-last">{{ product.title | strip_html | truncatewords: 5 }}</span>
+
+  {% elsif template contains 'collection' and collection.handle %}
+    {% if current_tags %}
+      {{ sep }}
+      <span>
+        {{ collection.title | strip_html | truncatewords: 5 | link_to: collection.url }}
+        <span>{{ current_tags | join: ' + ' }}</span>
+      </span>
+    {% else %}
+      {{ sep }}
+      <span class="breadcrumbs-last">{{ collection.title | strip_html | truncatewords: 5 }}</span>
+    {% endif %}
+
+  {% elsif template == 'blog' %}
+    {% if current_tags %}
+      {{ sep }}
+      {{ blog.title | link_to: blog.url }}
+      {{ sep }}
+      <span class="breadcrumbs-last">{{ current_tags | join: ' + ' }}</span>
+    {% else %}
+      {{ sep }}
+      <span class="breadcrumbs-last">{{ blog.title | strip_html }}</span>
+    {% endif %}
+
+  {% elsif template == 'article' %}
+    {{ sep }}
+    <span>{{ blog.title | strip_html | link_to: blog.url }}</span>
+    {{ sep }}
+    <span class="breadcrumbs-last">{{ 'blogs.article.blog' | t }}</span>
+
+  {% else %}
+    {{ sep }}
+    <span class="breadcrumbs-last">{{ page_title }}</span>
+  {% endif %}
+</nav>

@@ -1,0 +1,397 @@
+{% comment %} {%- assign product_form_id = 'product-form-' | append: section.id -%} {% endcomment %}
+{% if blocks.size > 0 %}
+  {% for block in blocks %}
+    {%- case block.type -%}
+      {%- when '@app' -%}
+        <div class="product-app-block" {{ block.shopify_attributes }}>
+          {% render block %}
+        </div>
+      {% when 'color_swatches' %}
+        <div class="color_swatch__main">
+          {% if product.metafields.custom.product_swatches.value != blank %}
+<div class="product-color-swatches">
+
+  <div class="swatch-title">
+    COLOR:
+    <span class="active-color">
+      {% comment %} {{ product.metafields.custom.swatch_text.value }} {% endcomment %}
+    </span>
+  </div>
+
+  <div class="swatch-list">
+
+    {%- comment -%} Show current product first {%- endcomment -%}
+    <a 
+      href="{{ product.url }}"
+      class="swatch-item is-active"
+      title="{{ product.metafields.custom.swatch_text.value }}"
+    >
+      <span 
+        class="swatch-circle"
+      >{{ product.metafields.custom.swatch_text.value }}</span>
+    </a>
+
+    {%- comment -%} Then show linked products except current {%- endcomment -%}
+    {% for swatch_product in product.metafields.custom.product_swatches.value %}
+      
+      {% if swatch_product.handle != product.handle %}
+        <a 
+          href="{{ swatch_product.url }}"
+          class="swatch-item"
+          title="{{ swatch_product.metafields.custom.swatch_text.value }}"
+        >
+          <span 
+            class="swatch-circle"
+          
+          >{{ swatch_product.metafields.custom.swatch_text.value }}</span>
+        </a>
+      {% endif %}
+
+    {% endfor %}
+
+  </div>
+</div>
+{% endif %}
+
+</div>
+
+<style>
+  .product-color-swatches {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.swatch-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  margin-bottom: 0px;
+  font-weight: 600;
+  line-height: 1;
+    height: max-content;
+}
+
+.active-color {
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+.swatch-list {
+  display: flex;
+  gap: 5px;
+}
+
+.swatch-item {
+  display: block;
+  border-radius: 8px;
+  padding: 0px;
+  border: 1px solid transparent;
+  transition: 0.2s ease;
+}
+
+.swatch-item.is-active {
+  background: #000;
+    color: #fff;
+}
+.swatch-item:hover{
+  background: #000;
+    color: #fff!important;
+}
+
+.swatch-circle {
+  padding: 4px 12px;
+  border-radius: 3px;
+  min-width: 63px;
+  display: block;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.1);
+  text-align: center;
+}
+
+</style>
+        </div>
+        {% when 'discount_text' %}
+        {% assign promo_tag_text = product.metafields.custom.discount_text %}
+{% if promo_tag_text !=blank %}
+        <div class="discont__blk" style="background: {{ block.settings.text_color }};">
+          {{ promo_tag_text | metafield_tag }}
+        </div>
+      {% endif %}
+      {%- when 'vendor' -%}
+        <div class="product-block product-block-vendor" product-vendor {{ block.shopify_attributes }}>
+          <span class="product-vendor-title text">
+            {%- if product.vendor != blank -%}
+              {{ product.vendor }}
+            {% else %}
+              {{ 'products.product.vendor' | t }}
+            {%- endif -%}
+          </span>
+        </div>
+        {% when 'icon_with_text' %}
+  <div class="icon-with-text icon-with-text--new">
+    {% for i in (1..3) %}
+      {% assign icon_id = 'icon_' | append: i %}
+      {% assign text_id = 'text_' | append: i %}
+
+      {% assign icon = block.settings[icon_id] %}
+      {% assign txt  = block.settings[text_id] %}
+
+      {% if icon != blank or txt != blank %}
+        <div class="icon-with-text__row" style="display:flex; gap:12px; align-items:center;">
+          {% if icon != blank %}
+            <img
+              src="{{ icon | image_url: width: 80 }}"
+              alt="{{ icon.alt | escape }}"
+              loading="lazy"
+              width="36"
+              height="36"
+              style="object-fit:contain;"
+            >
+          {% endif %}
+          {% if txt != blank %}
+            <div class="icon-with-text__text">{{ txt | escape }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+      {%- when 'title' -%}
+        {% assign anchor_tag = false %}
+        {% if source == 'feature-product' or source == 'quick-view' %}
+          {% assign anchor_tag = true %}
+        {% endif %}
+        <div class="product-block product-block-title" product-title {{ block.shopify_attributes }}>
+          {% if product != blank and anchor_tag == true %}
+            <a
+              href="{{ product.url }}"
+              class="product-title {{ block.settings.title_size }} heading-font {% if product != blank  and anchor_tag == true %}product-title-link{% endif %}"
+            >
+          {% elsif anchor_tag == true %}
+            <div
+              class="product-title {{ block.settings.title_size }} heading-font {% if product != blank  and anchor_tag == true %}product-title-link{% endif %}"
+            >
+          {% else %}
+            <{{ block.settings.title_tag }}
+              class="product-title {{ block.settings.title_size }} heading-font {% if product != blank  and anchor_tag == true %}product-title-link{% endif %}"
+            >
+          {% endif %}
+          {% if product != blank %}
+            {{ product.title | escape | default: 'Example product title' }}
+          {% else %}
+            {{ 'onboarding.product_title' | t }}
+          {% endif %}
+          {% if product != blank and anchor_tag == true %}
+            </a>
+          {% elsif anchor_tag == true %}
+            </div>
+          {% else %}
+            </{{ block.settings.title_tag }}>
+          {% endif %}
+        </div>
+      {%- when 'description' -%}
+        {%- if product.description != blank -%}
+          <div
+            class="product-block product-block-desc rte {{ block.settings.description_size }}"
+            product-description
+            {{ block.shopify_attributes }}
+          >
+            {{
+              product.description
+              | replace: '<table', '<div class="table-responsive"><table'
+              | replace: '</table>', '</table></div>'
+            }}
+          </div>
+        {%- endif -%}
+      {% when 'custom_text' %}
+        {% if block.settings.text_description != blank %}
+          <div class="product-block product-block-custom-text" product-custom-text {{ block.shopify_attributes }}>
+            <p class="{{ block.settings.text_size }}">
+              {{ block.settings.text_description | replace: '<a', '<a class="text-underline"' }}
+            </p>
+          </div>
+        {% endif %}
+      {%- when 'custom_liquid' -%}
+        {% if block.settings.custom_liquid != blank %}
+          <div class="product-block product-custom-liquid" {{ block.shopify_attributes }}>
+            <div id="ProductCustomCode-{{ section.id }}-{{ product.id }}">
+              {{ block.settings.custom_liquid }}
+            </div>
+          </div>
+        {% endif %}
+      {%- when 'price' -%}
+        <div class="product-block product-block-price" product-price {{ block.shopify_attributes }}>
+          <div id="Price-{{ section.id  }}-{{ product.id }}">
+            {% render 'product-card-price',
+              product: product,
+              block: block,
+              section: section,
+              use_variant: true,
+              source: source,
+              price_font: block.settings.price_font
+            %}
+          </div>
+        </div>
+      {%- when 'sku' -%}
+        <div class="product-block product-block-sku" product-sku {{ block.shopify_attributes }}>
+          {% if product != blank %}
+            <p class="product-sku" id="Sku-{{ section.id }}-{{ product.id }}">
+              {{ product.selected_or_first_available_variant.sku }}
+            </p>
+          {% else %}
+            <p class="product-sku" id="Sku-{{ section.id }}-{{ product.id }}">
+              {{ 'products.product.sku' | t }}
+            </p>
+          {% endif %}
+        </div>
+      {%- when 'variant_picker' -%}
+        {% render 'product-variant-picker',
+          section: section,
+          block: block,
+          product: product,
+          product_form_id: product_form_id
+        %}
+      {%- when 'complementary' -%}
+        {% render 'complementary-product',
+          section: section,
+          block: block,
+          product: product,
+          product_form_id: product_form_id
+        %}
+      {%- when 'quantity_picker' -%}
+        {% render 'product-quantity',
+          section: section,
+          block: block,
+          product: product,
+          product_form_id: product_form_id
+        %}
+      {%- when 'buy_buttons' -%}
+        <div id="ProductBuyButtons-{{ section.id }}-{{ product.id }}" {{ block.shopify_attributes }}>
+          {% render 'buy-buttons', section: section, block: block, product: product, product_form_id: product_form_id %}
+        </div>
+      {%- when 'payment_installments' -%}
+        {% if product != blank %}
+          <div
+            class="product-block product-block-payment-installments product-form-installment"
+            {{ block.shopify_attributes }}
+          >
+            {%- assign product_form_installment_id = 'main-product-form-installment-' | append: section.id -%}
+            {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
+              <input
+                type="hidden"
+                name="id"
+                value="{{ product.selected_or_first_available_variant.id }}"
+              >
+              {{ form | payment_terms }}
+            {%- endform -%}
+          </div>
+        {% endif %}
+      {%- when 'icon-with-text' -%}
+        {% capture icon_with_text %}  
+            <div class="product-block product-block-icon-with-text" {{ block.shopify_attributes }} product-icon-text>
+              <ul class="icon-with-text">
+                  {%- for i in (1..3) -%}
+                    {%- liquid 
+                      assign image = 'image_' | append: i 
+                      assign image = block.settings[image] 
+                      
+                      assign icon = 'icon_' | append: i 
+                      assign icon = block.settings[icon] 
+
+                      assign heading = 'heading_' | append: i
+                      assign heading = block.settings[heading] 
+
+                      assign choose_from = 'choose_from_'| append: i
+                      assign choose_from_setting = block.settings[choose_from] 
+                    -%}
+                    <li class="icon-with-text-item">
+                      {% if choose_from_setting == 'custom-icon' %}
+                        {% if image != blank %}
+                          <span class="custom-icons-icon">
+                            {% liquid              
+                              assign default_alt =  'Icon - ' | append: i
+                              assign image_alt = image.alt | default:  default_alt            
+                              assign image_sizes = '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, 100vw'
+                              assign image_widths = '320, 440, 560, 680, 800, 920, 1040, 1160, 1200'
+                            %}
+                            {{ image | image_url: width: 1200, format: 'webp' | image_tag: 
+                              sizes: image_sizes, 
+                              widths: image_widths, 
+                              decoding: 'async', 
+                              loading: 'lazy',
+                              fetchpriority: 'auto',
+                              class: 'product-icon-with-text-image',
+                              alt: image_alt
+                            }}
+                          </span>
+                        {% endif %}
+                      {% elsif choose_from_setting == 'list' %}
+                        <span class="svg-wrapper">
+                            {% render 'svg-list-icons', icon_type: icon, extra_class: '' %}
+                        </span>
+                      {% endif %}
+                      {% if heading != blank %}
+                        <span class="icon-with-text-title {{ block.settings.icon_text_size }} {{ block.settings.icon_text_font }}">{{ heading | replace: '<a', '<a class="text-underline"' }}</span>
+                      {% endif %}
+                    </li>
+                  {%- endfor -%}
+              </ul>
+            </div>
+          {% endcapture %}
+        {%- if icon_with_text != blank -%}
+          {{ icon_with_text }}
+        {%- endif -%}
+      {%- when 'share' -%}
+        {%- liquid
+          assign share_url = product.selected_variant.url | default: product.url | prepend: request.origin
+          assign share_image = product.selected_variant.featured_image | default: product.featured_image
+          assign share_label = 'general.social.share_label' | t
+        -%}
+        {% if settings.share_type == 'link' %}
+          {% comment %}
+            <div class="product-block product-block-social-icons" product-share-buttons {{ block.shopify_attributes }}>
+              {% render 'share-button', block: block, share_link: share_url %}
+            </div>
+          {% endcomment %}
+        {% else %}
+          {% capture social_share %}
+            {% render 'social-share-icons',
+                block: block,
+                share_link: share_url,
+                share_image: share_image,
+                share_label: share_label,
+                share_title: product.title,
+                source: source
+            %}
+          {% endcapture %}
+          {%- if social_share != blank -%}
+            <div class="product-block product-block-social-icons" product-share-buttons {{ block.shopify_attributes }}>
+              {{ social_share }}
+            </div>
+          {%- endif -%}
+        {% endif %}
+      {%- when 'payment_icons' -%}
+        {%- unless shop.enabled_payment_types == empty -%}
+          <div class="product-block product-block-payment-icons" {{ block.shopify_attributes }}>
+            <ul class="payment-icons">
+              {% for type in shop.enabled_payment_types %}
+                <li class="payment-icon-item">
+                  <span class="svg-wrapper">
+                    {{ type | payment_type_svg_tag: class: 'icon' }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {%- endunless -%}
+      {%- when 'inventory' -%}
+        {% render 'product-inventory', block: block, product: product, section: section %}
+      {%- when 'pickup_availability' -%}
+        {% render 'pickup-availability', block: block, product: product, section: section %}
+      {%- when 'collapsible_row' -%}
+        {% render 'product-collapsible', block: block, product: product, section: section %}
+      {%- when 'seprater' -%}
+        <div class="seprater" {{ block.shopify_attributes }}><span class="hidden"></span></div>
+    {% endcase %}
+  {% endfor %}
+{% endif %}

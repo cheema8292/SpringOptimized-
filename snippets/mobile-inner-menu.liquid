@@ -1,0 +1,54 @@
+    <div class="mobile-menu-submenu height-100">
+                        <div class="mobile-menu-submenu-back" data-back-to-menu>
+                          <button aria-label="Back">
+                            {% render 'svg-icons', icon_type: 'angle-left' %}
+                          </button>
+                          <span class="{{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+                            {{ link.title }}
+                          </span>
+                        </div>
+                        <ul class="mobile-submenu-list">
+                          {% for innerLink in link.links %}
+                            {% liquid
+                              assign is_inner_chlid_menu = false
+                              if innerLink.links.size > 0
+                                assign is_inner_chlid_menu = true
+                              endif
+                            %}
+                            <li
+                              class="mobile-menu-item"
+                              {% if is_inner_chlid_menu %} 
+                                data-menu-item
+                              {% endif %}
+                            >
+                            {% if is_inner_chlid_menu %}
+                               <details class="mobile-menu-item-inner">
+                                <summary class="mobile-image-mega-menu-heading">
+                                  <span class="mobile-menu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+                                    {{- innerLink.title }}
+                                    {% if innerLink.links.size > 0 %}
+                                  {% render 'svg-icons', icon_type: 'angle-down' %}
+                                {% endif -%}
+                                  </span>
+                                </summary>
+                                 {% if innerLink.links.size > 0 %}
+                                <div class="mobile-image-inner-mega-menu inner-submenu height-100">
+                                  <ul class="mobile-submenu-list inner-submenu-list">
+                                    {% for innerChildLink in innerLink.links %}
+                                      <li class="mobile-menu-item">
+                                        <a href="{{ innerChildLink.url }}" class="mobile-menu-link {{ settings.header_third_level_menus_size }} {{ settings.header_third_level_menus_font }}-font">
+                                          {{- innerChildLink.title }}
+                                        </a> 
+                                      </li>
+                                    {% endfor %}
+                                  </ul>
+                                </div>
+                              {% endif %}
+                               </details>
+                              {% else %}
+                                <a href="{{ innerLink.url }}" class="mobile-menu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">{{- innerLink.title }}</a>
+                            {% endif %}
+                            </li>
+                          {% endfor %}
+                        </ul>
+  </div>

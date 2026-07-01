@@ -1,0 +1,237 @@
+<style>
+  #shopify-block-{{ block.id }} {
+    --countdown-box-bg-color:{{ block.settings.background }};
+    --countdown-box-color:{{ block.settings.text }};
+    --countdown-box-border-color:{{ block.settings.border }};
+    --countdown-box-units-color:{{ block.settings.units }};
+  }
+</style>
+{{ 'countdown-timer-main.css' | asset_url | stylesheet_tag }}
+{% if block.settings.style == 'digital' %}
+  <countdown-timer
+    id="countdown-time-{{ block.id }}"
+    class="countdown-time-inner border-top border-bottom"
+    data-type="{{ block.settings.countdown_type }}"
+    data-duration="{{ block.settings.evergreen_duration }}"
+    data-due-date="{{ block.settings.end_date }}"
+  >
+    <div class="countdown-time-block">
+      <div class="countdown-time-day heading-font {{ block.settings.description_size }}" data-timer-day="">00</div>
+      <span class="countdown-time-unit text-uppercase heading-font {{ block.settings.unit_size }}">days</span>
+    </div>
+    <div class="countdown-time-block">
+      <div class="countdown-time-hour heading-font {{ block.settings.description_size }}" data-timer-hour="">00</div>
+      <span class="countdown-time-unit text-uppercase heading-font {{ block.settings.unit_size }}">hrs</span>
+    </div>
+    <div class="countdown-time-block">
+      <div class="countdown-time-minute heading-font {{ block.settings.description_size }}" data-timer-minute="">  00</div>
+      <span class="countdown-time-unit text-uppercase heading-font {{ block.settings.unit_size }}">mins</span>
+    </div>
+    <div class="countdown-time-block">
+      <div class="countdown-time-sec heading-font {{ block.settings.description_size }}" data-timer-second="">00</div>
+      <span class="countdown-time-unit text-uppercase heading-font {{ block.settings.unit_size }}">secs</span>
+    </div>
+  </countdown-timer>
+  {% if block.settings.text_show_on_expiry != blank %}
+    <p class="{{ block.settings.description_size }} hidden" exipre-text>
+      {{ block.settings.text_show_on_expiry }}
+    </p>
+  {% endif %}
+
+{% else %}
+  {% if block.settings.countdown_type == 'evergreen' or block.settings.end_date != blank %}
+    {% render 'flipdown-countdown',
+      end_date: block.settings.end_date,
+      countdown_type: block.settings.countdown_type,
+      evergreen_duration: block.settings.evergreen_duration,
+      description_size: block.settings.description_size
+    %}
+  {% endif %}
+  {% if block.settings.text_show_on_expiry != blank %}
+    <p class="{{ block.settings.description_size }} hidden" exipre-text>
+      {{ block.settings.text_show_on_expiry }}
+    </p>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.countdown-timer.blocks.countdown_timer.name",
+  "class": "countdown-time-timer",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.style.label",
+      "options": [
+        {
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.style.option_0.label",
+          "value": "digital"
+        },
+        {
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.style.option_1.label",
+          "value": "animated"
+        }
+      ],
+      "default": "digital"
+    },
+    {
+      "type": "select",
+      "id": "countdown_type",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.countdown_type.label",
+      "default": "evergreen",
+      "options": [
+        {
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.countdown_type.option_0.label",
+          "value": "evergreen"
+        },
+        {
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.countdown_type.option_1.label",
+          "value": "fixed_time"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.countdown_type.option_1.end_date",
+      "info": "t:sections.countdown-timer.blocks.countdown_timer.settings.countdown_type.option_1.info",
+      "visible_if": "{{ block.settings.countdown_type == 'fixed_time' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:sections.countdown-timer.blocks.countdown_timer.settings.countdown_type.option_1.paragraph",
+      "visible_if": "{{ block.settings.countdown_type == 'fixed_time' }}"
+    },
+    {
+      "type": "text",
+      "id": "text_show_on_expiry",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.text_show_on_expiry.label",
+      "visible_if": "{{ block.settings.countdown_type == 'fixed_time' }}"
+    },
+    {
+      "type": "select",
+      "id": "evergreen_duration",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.evergreen_duration.label",
+      "default": "every_2_hrs",
+      "options": [
+        {
+          "value": "every_2_hrs",
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.evergreen_duration.option_0.label"
+        },
+        {
+          "value": "every_6_hrs",
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.evergreen_duration.option_1.label"
+        },
+        {
+          "value": "every_12_hrs",
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.evergreen_duration.option_2.label"
+        },
+        {
+          "value": "every_24_hrs",
+          "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.evergreen_duration.option_3.label"
+        },
+        {
+          "value": "every_week",
+          "label": "Every week"
+        },
+        {
+          "value": "every_month",
+          "label": "Every month"
+        }
+      ],
+      "visible_if": "{{ block.settings.countdown_type == 'evergreen' }}"
+    },
+    {
+      "type": "select",
+      "id": "description_size",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.number_size.label",
+      "visible_if": "{{ block.settings.style == 'digital' }}",
+      "options": [
+        {
+          "value": "text-xlarge",
+          "label": "t:sections.all.settings.description_size.options.text-xlarge"
+        },
+        {
+          "value": "text-large",
+          "label": "t:sections.all.settings.description_size.options.text-large"
+        },
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        }
+      ],
+      "default": "text-xlarge"
+    },
+        {
+      "type": "select",
+      "id": "unit_size",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.unit_size.label",
+      "visible_if": "{{ block.settings.style == 'digital' }}",
+      "options": [  
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        },
+        {
+          "value": "text-xsmall",
+          "label": "t:sections.all.settings.description_size.options.text-xsmall"
+        }
+      ],
+      "default": "text-small"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.commom_colors.header"
+    },
+    {
+      "type": "color",
+      "id": "border",
+      "label": "t:sections.all.settings.commom_colors.settings.border",
+      "default": "#ffffff",
+      "visible_if": "{{ block.settings.style == 'digital' }}"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "t:sections.all.settings.commom_colors.settings.background",
+      "default": "#ffffff",
+      "visible_if": "{{ block.settings.style == 'animated' }}"
+    },
+    {
+      "type": "color",
+      "id": "text",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.number_size.name",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "units",
+      "label": "t:sections.countdown-timer.blocks.countdown_timer.settings.unit_size.name",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,225 @@
+{{ 'blog-post.css' | asset_url | stylesheet_tag }}
+{{ 'blog-card.css' | asset_url | stylesheet_tag }}
+{%- if predictive_search.performed -%}
+  {%- if predictive_search.resources.queries.size > 0 or predictive_search.resources.collections.size > 0 -%}
+    <div class="predictive-search-suggestion" predictive-search-suggestion>
+      <div class="predictive-search-suggestion-box">
+        <span class="predictive-search-label heading-font text">Suggestions</span>
+        <ul class="predictive-search-suggestion-inner">
+          {%- for query in predictive_search.resources.queries -%}
+            <li>
+              <a href="{{ query.url }}">{{ query.text }} </a>
+            </li>
+          {% endfor %}
+          {%- for collection in predictive_search.resources.collections -%}
+            <li>
+              <a href="{{ collection.url }}">{{ collection.title | escape }} </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+  {%- endif -%}
+  <div class="predictive-search-result-tabs hidden" predictive-search-result-tab>
+    {% if predictive_search.resources.products.size > 0
+      or predictive_search.resources.collections.size > 0
+      or predictive_search.resources.pages.size > 0
+      or predictive_search.resources.articles.size > 0
+    %}
+      <tabs-wrapper>
+        <ul class="tab-nav-wrapper">
+          {% assign active_set = false %}
+
+          {% if predictive_search.resources.products.size > 0 %}
+            <li class="tab-nav-item">
+              <a
+                class="tab-nav-link text-small {% unless active_set %}active{% endunless %}"
+                href="#"
+                tab-heading
+                data-tab="productsTab"
+              >
+                Products
+              </a>
+            </li>
+            {% assign active_set = true %}
+          {% endif %}
+
+          {% if predictive_search.resources.collections.size > 0 %}
+            <li class="tab-nav-item">
+              <a
+                class="tab-nav-link text-small {% unless active_set %}active{% endunless %}"
+                href="#"
+                tab-heading
+                data-tab="collectionsTab"
+              >
+                Collections
+              </a>
+            </li>
+            {% assign active_set = true %}
+          {% endif %}
+
+          {% if predictive_search.resources.pages.size > 0 %}
+            <li class="tab-nav-item">
+              <a
+                class="tab-nav-link text-small {% unless active_set %}active{% endunless %}"
+                href="#"
+                tab-heading
+                data-tab="pagesTab"
+              >
+                Pages
+              </a>
+            </li>
+            {% assign active_set = true %}
+          {% endif %}
+
+          {% if predictive_search.resources.articles.size > 0 %}
+            <li class="tab-nav-item">
+              <a
+                class="tab-nav-link text-small {% unless active_set %}active{% endunless %}"
+                href="#"
+                tab-heading
+                data-tab="articlesTab"
+              >
+                Articles
+              </a>
+            </li>
+            {% assign active_set = true %}
+          {% endif %}
+        </ul>
+
+        <div class="predictive-search-tabcontent">
+          {% assign active_content = false %}
+          {%- if predictive_search.resources.products.size > 0 -%}
+            <div
+              tab-id="productsTab"
+              tab-data
+              class="predictive-search-tab-item {% unless active_content %}active{% endunless %} {% if predictive_search.resources.products.size == 0 %}empty-card{% endif %}"
+            >
+              <div class="card-list-view">
+                {%- for product in predictive_search.resources.products -%}
+                  {% render 'horizontal-product-card', product: product %}
+                {% endfor %}
+              </div>
+              <div class="search-blog-button">
+                <a
+                  href="{{ routes.search_url }}?type=product&q={{ predictive_search.terms }}"
+                  class="button full-button"
+                >
+                  <span class="button-text {{ section.settings.button_style }}">View All</span>
+                  <span class="button-icon">
+                    {% render 'svg-icons', icon_type: 'arrow-right' %}
+                  </span>
+                </a>
+              </div>
+            </div>
+            {% assign active_content = true %}
+          {% endif %}
+          {% if predictive_search.resources.collections.size > 0 %}
+            <div
+              tab-id="collectionsTab"
+              tab-data
+              class="predictive-search-tab-item  {% unless active_content %}active{% endunless %} {% if predictive_search.resources.collections.size == 0 %}empty-card{% endif %}"
+            >
+              <div class="search-collection-tab-list">
+                <div class="search-collection-list-grid overlay-content">
+                  {% for collection in predictive_search.resources.collections %}
+                    {% liquid
+                      assign aspect_ratio_image = settings.search_collection_aspect_ratio
+                      if aspect_ratio_image == 'auto' and collection.featured_image != blank
+                        assign aspect_ratio_image = collection.featured_image.aspect_ratio
+                      elsif aspect_ratio_image == 'auto'
+                        assign aspect_ratio_image = '1/1'
+                      endif
+                    %}
+                    {% render 'collection-card',
+                      collection: collection,
+                      section: section,
+                      image_size: aspect_ratio_image,
+                      placeholder_image: 'collection-apparel-1',
+                      extra_class: ''
+                    %}
+                  {% endfor %}
+                </div>
+                <div class="search-blog-button">
+                  <a
+                    href="{{ routes.search_url }}?type=product&q={{ predictive_search.terms }}"
+                    class="button full-button"
+                  >
+                    <span class="button-text {{ section.settings.button_style }}">View All</span>
+                    <span class="button-icon">
+                      {% render 'svg-icons', icon_type: 'arrow-right' %}
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% assign active_content = true %}
+          {% endif %}
+
+          {% if predictive_search.resources.pages.size > 0 %}
+            <div
+              tab-id="pagesTab"
+              tab-data
+              class="predictive-search-tab-item  {% unless active_content %}active{% endunless %} {% if predictive_search.resources.pages.size == 0 %}empty-card{% endif %}"
+            >
+              <ul class="search-tab-page-list">
+                {% for page in predictive_search.resources.pages %}
+                  <li class="search-tab-page-item">
+                    <a href="{{ page.url }}" class="search-tab-page-link text">{{ page.title }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+              <div class="search-blog-button">
+                <a
+                  href="{{ routes.search_url }}?type=page&q={{ predictive_search.terms }}"
+                  class="button full-button"
+                >
+                  <span class="button-text {{ section.settings.button_style }}">View All</span>
+                  <span class="button-icon">
+                    {% render 'svg-icons', icon_type: 'arrow-right' %}
+                  </span>
+                </a>
+              </div>
+            </div>
+            {% assign active_content = true %}
+          {% endif %}
+          {% if predictive_search.resources.articles.size > 0 %}
+            <div
+              tab-id="articlesTab"
+              tab-data
+              class="predictive-search-tab-item  {% unless active_content %}active{% endunless %} {% if predictive_search.resources.articles == blank %}empty-card{% endif %}"
+            >
+              <div class="search-blog-tab-wrapper">
+                <div class="search-blog-tab-list">
+                  {% for article in predictive_search.resources.articles %}
+                    {% render 'blog-card',
+                      article_data: article,
+                      item_index: forloop.index,
+                      source_page: 'main-blog-predictive',
+                      predictive_search: true,
+                      image_ratio: 1
+                    %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="search-blog-button">
+                <a
+                  href="{{ routes.search_url }}?type=article&q={{ predictive_search.terms }}"
+                  class="button full-button"
+                >
+                  <span class="button-text {{ section.settings.button_style }}">View All</span>
+                  <span class="button-icon">
+                    {% render 'svg-icons', icon_type: 'arrow-right' %}
+                  </span>
+                </a>
+              </div>
+            </div>
+            {% assign active_content = true %}
+          {% endif %}
+        </div>
+      </tabs-wrapper>
+    {% else %}
+      {% render 'empty-card', source: 'predictive-search', terms: predictive_search.terms %}
+    {% endif %}
+  </div>
+{%- endif -%}

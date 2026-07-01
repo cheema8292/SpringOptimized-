@@ -1,0 +1,374 @@
+{% comment %}
+  Section: Feature Card Grid (Like "THE MAGIC OF ALPACA")
+  - Centered card container
+  - Top image
+  - Heading
+  - Feature grid (blocks)
+  - Fully customizable in Theme Customizer
+{% endcomment %}
+
+<section
+  id="moa-{{ section.id }}"
+  class="moa"
+  style="
+    --moa-bg: {{ section.settings.section_bg }};
+    --moa-card: {{ section.settings.card_bg }};
+    --moa-text: {{ section.settings.text_color }};
+    --moa-muted: {{ section.settings.muted_color }};
+    --moa-border: {{ section.settings.border_color }};
+    --moa-radius: {{ section.settings.card_radius }}px;
+    --moa-inner-radius: {{ section.settings.inner_radius }}px;
+    --moa-shadow: {{ section.settings.card_shadow }};
+    --moa-max: {{ section.settings.max_width }}px;
+    --moa-py: {{ section.settings.padding_y }}px;
+    --moa-px: {{ section.settings.padding_x }}px;
+    --moa-gap: {{ section.settings.grid_gap }}px;
+    --moa-h: {{ section.settings.heading_size }}px;
+    --moa-h-m: {{ section.settings.heading_size_mobile }}px;
+    --moa-title: {{ section.settings.feature_title_size }}px;
+    --moa-title-m: {{ section.settings.feature_title_size_mobile }}px;
+    --moa-body: {{ section.settings.feature_body_size }}px;
+    --moa-body-m: {{ section.settings.feature_body_size_mobile }}px;
+    --moa-icon: {{ section.settings.icon_size }}px;
+    --moa-img-radius: {{ section.settings.image_radius }}px;
+  "
+>
+  <div class="moa__wrap">
+    <div class="moa__card">
+      {% if section.settings.heading != blank %}
+        <h2 class="moa__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+
+      {% if section.settings.top_image != blank %}
+        <div class="moa__media" style="aspect-ratio: {{ section.settings.image_aspect_ratio }};">
+          <img
+            class="moa__img"
+            src="{{ section.settings.top_image | image_url: width: 1400 }}"
+            srcset="
+              {{ section.settings.top_image | image_url: width: 600 }} 600w,
+              {{ section.settings.top_image | image_url: width: 900 }} 900w,
+              {{ section.settings.top_image | image_url: width: 1400 }} 1400w
+            "
+            sizes="(min-width: 990px) {{ section.settings.max_width }}px, 92vw"
+            alt="{{ section.settings.top_image_alt | escape }}"
+            loading="lazy"
+          >
+        </div>
+      {% endif %}
+
+      {% if section.settings.subheading != blank %}
+        <p class="moa__sub">{{ section.settings.subheading }}</p>
+      {% endif %}
+
+      <div
+        class="moa__grid"
+        style="
+          --cols-d: {{ section.settings.columns_desktop }};
+          --cols-m: {{ section.settings.columns_mobile }};
+        "
+        role="list"
+      >
+        {% for block in section.blocks %}
+          <div class="moa__item" role="listitem" {{ block.shopify_attributes }}>
+            <div class="moa__item-head">
+              {% if block.settings.icon_image != blank %}
+                <img
+                  class="moa__icon"
+                  src="{{ block.settings.icon_image | image_url: width: 96 }}"
+                  alt="{{ block.settings.icon_alt | escape }}"
+                  loading="lazy"
+                  width="{{ section.settings.icon_size }}"
+                  height="{{ section.settings.icon_size }}"
+                >
+              {% else %}
+                <span class="moa__icon moa__icon--placeholder" aria-hidden="true"></span>
+              {% endif %}
+
+              {% if block.settings.title != blank %}
+                <div class="moa__item-title">{{ block.settings.title }}</div>
+              {% endif %}
+            </div>
+
+            {% if block.settings.text != blank %}
+              <div class="moa__item-text">{{ block.settings.text }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if section.settings.show_button and section.settings.button_label != blank %}
+        <div class="moa__cta">
+          <a class="moa__btn" href="{{ section.settings.button_link | default: '#' }}">
+            {{ section.settings.button_label }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+  <style>
+    #moa-{{ section.id }}{
+      background: var(--moa-bg);
+      padding: var(--moa-py) var(--moa-px);
+      color: var(--moa-text);
+    }
+
+    #moa-{{ section.id }} .moa__wrap{
+      max-width: var(--moa-max);
+      margin: 0 auto;
+    }
+
+    #moa-{{ section.id }} .moa__card{
+      background: var(--moa-card);
+      border: 1px solid var(--moa-border);
+      border-radius: var(--moa-radius);
+      box-shadow: var(--moa-shadow);
+      padding: clamp(14px, 2.2vw, 20px);
+    }
+
+    #moa-{{ section.id }} .moa__heading{
+      margin: 0 0 12px;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      font-size: var(--moa-h);
+      line-height: 1.1;
+    }
+
+    #moa-{{ section.id }} .moa__media{
+      width: 100%;
+      border-radius: var(--moa-img-radius);
+      overflow: hidden;
+      background: rgba(0,0,0,.06);
+      margin-bottom: 12px;
+    }
+
+    #moa-{{ section.id }} .moa__img{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    #moa-{{ section.id }} .moa__sub{
+      margin: 0 0 12px;
+      text-align: center;
+      color: var(--moa-muted);
+      font-size: {{ section.settings.subheading_size }}px;
+      line-height: 1.5;
+    }
+
+    #moa-{{ section.id }} .moa__grid{
+      display: grid;
+      grid-template-columns: repeat(var(--cols-d), minmax(0, 1fr));
+      gap: var(--moa-gap);
+      margin-top: 10px;
+    }
+
+    #moa-{{ section.id }} .moa__item{
+      border: 1px solid var(--moa-border);
+      border-radius: var(--moa-inner-radius);
+      padding: 14px;
+      background: {{ section.settings.feature_card_bg }};
+    }
+
+    #moa-{{ section.id }} .moa__item-head{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    #moa-{{ section.id }} .moa__icon{
+      width: var(--moa-icon);
+      height: var(--moa-icon);
+      object-fit: contain;
+      display: block;
+      flex: 0 0 auto;
+    }
+
+    #moa-{{ section.id }} .moa__icon--placeholder{
+      border-radius: 8px;
+      background: rgba(0,0,0,.08);
+    }
+
+    #moa-{{ section.id }} .moa__item-title{
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      font-size: var(--moa-title);
+      line-height: 1.15;
+    }
+
+    #moa-{{ section.id }} .moa__item-text{
+      color: var(--moa-muted);
+      font-size: var(--moa-body);
+      line-height: 1.45;
+    }
+
+    #moa-{{ section.id }} .moa__cta{
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    #moa-{{ section.id }} .moa__btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 26px;
+      border-radius: 999px;
+      background: {{ section.settings.button_bg }};
+      color: {{ section.settings.button_text }};
+      text-decoration: none;
+      font-weight: 700;
+      line-height: 1;
+      transition: transform .15s ease, filter .15s ease;
+    }
+
+    #moa-{{ section.id }} .moa__btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(0.96);
+    }
+
+    @media (max-width: 749px){
+      #moa-{{ section.id }}{
+        padding: {{ section.settings.padding_y_mobile }}px {{ section.settings.padding_x_mobile }}px;
+      }
+
+      #moa-{{ section.id }} .moa__heading{
+        font-size: var(--moa-h-m);
+      }
+
+      #moa-{{ section.id }} .moa__grid{
+        grid-template-columns: repeat(var(--cols-m), minmax(0, 1fr));
+      }
+
+      #moa-{{ section.id }} .moa__item-title{
+        font-size: var(--moa-title-m);
+      }
+
+      #moa-{{ section.id }} .moa__item-text{
+        font-size: var(--moa-body-m);
+      }
+
+      #moa-{{ section.id }} .moa__sub{
+        font-size: {{ section.settings.subheading_size_mobile }}px;
+      }
+      .moa__item{
+    padding: 14px 8px!important;
+    }
+    .moa__icon{
+        width: 28px!important;
+    height: 28px!important;
+    }
+    }
+  </style>
+
+  {% schema %}
+  {
+    "name": "Feature Card Grid",
+    "settings": [
+      { "type": "header", "content": "Content" },
+      { "type": "text", "id": "heading", "label": "Heading", "default": "THE MAGIC OF ALPACA" },
+      { "type": "range", "id": "heading_size", "label": "Heading size (Desktop px)", "min": 16, "max": 56, "step": 1, "default": 26 },
+      { "type": "range", "id": "heading_size_mobile", "label": "Heading size (Mobile px)", "min": 14, "max": 42, "step": 1, "default": 20 },
+
+      { "type": "text", "id": "subheading", "label": "Subheading (optional)" },
+      { "type": "range", "id": "subheading_size", "label": "Subheading size (Desktop px)", "min": 12, "max": 22, "step": 1, "default": 14 },
+      { "type": "range", "id": "subheading_size_mobile", "label": "Subheading size (Mobile px)", "min": 11, "max": 20, "step": 1, "default": 13 },
+
+      { "type": "header", "content": "Top Image" },
+      { "type": "image_picker", "id": "top_image", "label": "Top image" },
+      { "type": "text", "id": "top_image_alt", "label": "Top image alt text", "default": "Alpaca" },
+      {
+        "type": "select",
+        "id": "image_aspect_ratio",
+        "label": "Image aspect ratio",
+        "default": "16/9",
+        "options": [
+          { "value": "1/1", "label": "1:1" },
+          { "value": "4/3", "label": "4:3" },
+          { "value": "16/9", "label": "16:9" },
+          { "value": "3/2", "label": "3:2" }
+        ]
+      },
+      { "type": "range", "id": "image_radius", "label": "Image radius (px)", "min": 0, "max": 30, "step": 1, "default": 12 },
+
+      { "type": "header", "content": "Layout" },
+      { "type": "range", "id": "max_width", "label": "Container max width (px)", "min": 320, "max": 1400, "step": 20, "default": 520 },
+      { "type": "range", "id": "padding_y", "label": "Section padding Y (Desktop px)", "min": 0, "max": 120, "step": 4, "default": 24 },
+      { "type": "range", "id": "padding_x", "label": "Section padding X (Desktop px)", "min": 0, "max": 80, "step": 4, "default": 16 },
+      { "type": "range", "id": "padding_y_mobile", "label": "Section padding Y (Mobile px)", "min": 0, "max": 100, "step": 4, "default": 16 },
+      { "type": "range", "id": "padding_x_mobile", "label": "Section padding X (Mobile px)", "min": 0, "max": 40, "step": 2, "default": 14 },
+
+      { "type": "range", "id": "columns_desktop", "label": "Columns (Desktop)", "min": 1, "max": 3, "step": 1, "default": 2 },
+      { "type": "range", "id": "columns_mobile", "label": "Columns (Mobile)", "min": 1, "max": 3, "step": 1, "default": 2 },
+      { "type": "range", "id": "grid_gap", "label": "Grid gap (px)", "min": 6, "max": 28, "step": 1, "default": 10 },
+
+      { "type": "range", "id": "card_radius", "label": "Outer card radius (px)", "min": 0, "max": 40, "step": 1, "default": 18 },
+      { "type": "range", "id": "inner_radius", "label": "Feature card radius (px)", "min": 0, "max": 28, "step": 1, "default": 12 },
+
+      {
+        "type": "select",
+        "id": "card_shadow",
+        "label": "Outer card shadow",
+        "default": "0 18px 45px rgba(0,0,0,0.18)",
+        "options": [
+          { "value": "none", "label": "None" },
+          { "value": "0 10px 26px rgba(0,0,0,0.12)", "label": "Soft" },
+          { "value": "0 18px 45px rgba(0,0,0,0.18)", "label": "Medium" },
+          { "value": "0 24px 60px rgba(0,0,0,0.22)", "label": "Strong" }
+        ]
+      },
+
+      { "type": "header", "content": "Typography" },
+      { "type": "range", "id": "feature_title_size", "label": "Feature title size (Desktop px)", "min": 10, "max": 22, "step": 1, "default": 12 },
+      { "type": "range", "id": "feature_title_size_mobile", "label": "Feature title size (Mobile px)", "min": 10, "max": 20, "step": 1, "default": 11 },
+      { "type": "range", "id": "feature_body_size", "label": "Feature text size (Desktop px)", "min": 11, "max": 20, "step": 1, "default": 12 },
+      { "type": "range", "id": "feature_body_size_mobile", "label": "Feature text size (Mobile px)", "min": 11, "max": 18, "step": 1, "default": 12 },
+
+      { "type": "header", "content": "Colors" },
+      { "type": "color", "id": "section_bg", "label": "Section background", "default": "#0B0F14" },
+      { "type": "color", "id": "card_bg", "label": "Outer card background", "default": "#FFFFFF" },
+      { "type": "color", "id": "feature_card_bg", "label": "Feature card background", "default": "#FFFFFF" },
+      { "type": "color", "id": "text_color", "label": "Heading/Text color", "default": "#0F172A" },
+      { "type": "color", "id": "muted_color", "label": "Body text color", "default": "#475569" },
+      { "type": "color", "id": "border_color", "label": "Border color", "default": "#E5E7EB" },
+
+      { "type": "header", "content": "Icons & CTA" },
+      { "type": "range", "id": "icon_size", "label": "Icon size (px)", "min": 16, "max": 44, "step": 1, "default": 22 },
+
+      { "type": "checkbox", "id": "show_button", "label": "Show button", "default": false },
+      { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop now" },
+      { "type": "url", "id": "button_link", "label": "Button link" },
+      { "type": "color", "id": "button_bg", "label": "Button background", "default": "#0F172A" },
+      { "type": "color", "id": "button_text", "label": "Button text color", "default": "#FFFFFF" }
+    ],
+    "blocks": [
+      {
+        "type": "feature",
+        "name": "Feature card",
+        "settings": [
+          { "type": "image_picker", "id": "icon_image", "label": "Icon image" },
+          { "type": "text", "id": "icon_alt", "label": "Icon alt text", "default": "Icon" },
+          { "type": "text", "id": "title", "label": "Title", "default": "TEMPERATURE REGULATING" },
+          { "type": "textarea", "id": "text", "label": "Description", "default": "Naturally insulating, alpaca fibers keep you warm in the cold and cool in the heat." }
+        ]
+      }
+    ],
+    "max_blocks": 10,
+    "presets": [
+      {
+        "name": "Feature Card Grid",
+        "blocks": [
+          { "type": "feature", "settings": { "title": "TEMPERATURE REGULATING", "text": "Naturally insulating, alpaca fibers keep you warm in the cold and cool in the heat." } },
+          { "type": "feature", "settings": { "title": "SUPER SOFT & COMFY", "text": "Not itchy — alpaca feels smooth and plush, cloud-like feel." } },
+          { "type": "feature", "settings": { "title": "MOISTURE-WICKING", "text": "Alpaca wicks away moisture, keeping you dry and blister-free." } },
+          { "type": "feature", "settings": { "title": "BREATHABLE & ODORLESS", "text": "Alpaca naturally resists bacterial growth, so you can wear them longer." } }
+        ]
+      }
+    ]
+  }
+  {% endschema %}
+

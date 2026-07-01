@@ -1,0 +1,331 @@
+{{ 'video-banner.css' | asset_url | stylesheet_tag }}
+
+{% comment %}
+  accepts
+    {%  render 'video',
+      rounded_corners: section.settings.rounded_corners,
+      desktop_video: section.settings.desktop_video,
+      desktop_video_url: section.settings.desktop_url,
+      mobile_video: section.settings.mobile_video,
+      mobile_video_url: section.settings.mobile_url,
+      content_visibility: section.settings.content_visibility,
+      desktop_cover_image: section.settings.desktop_cover_image,
+      mobile_cover_image: section.settings.mobile_cover_image,
+      button_text: section.settings.play_btn_text,
+      desktop_alt_text: section.settings.desktop_alt_text,
+      mobile_alt_text: section.settings.mobile_alt_text,
+      autoplay: section.settings.autoplay,
+      loop: section.settings.loop,
+      control: control,
+      blocks: blocks,
+      content_alignment: section.settings.content_alignment,
+      content_position: section.settings.content_position,
+      isHeight: false,
+      loading:loading
+    %}
+{% endcomment %}
+
+{% liquid
+  if desktop_video
+    assign video_id = desktop_video.id
+  elsif desktop_video == blank and desktop_video_url != blank
+    assign video_id = desktop_video_url.id
+  endif
+
+  assign play_video_translation = 'products.product.media.play_video' | t
+  assign poster_default_alt = 'Video poster image' | escape
+
+  assign fetch_priority = 'auto'
+  if loading == 'eager'
+    assign fetch_priority = 'high'
+  endif
+%}
+
+<deferred-media-video
+  class="video-banner-media media-card-overlay media-wrapper d-none md-block {%  if rounded_corners == "all" %}{{  rounded_corners_type }}{% endif %} {%  if isHeight %} height-100 {% endif %}"
+  data-media-id="{{ video_id }}"
+  data-type="{% if desktop_video == null %}{{ desktop_video_url.type }}{% else %}video {% endif %}"
+  data-autoplay="{{ autoplay }}"
+  data-loop="{{ loop }}"
+  data-control="{{ control }}"
+  data-content-visibility="{{ content_visibility }}"
+>
+  <div
+    class="media-card {%  if isHeight %} media-fixed {% else %} media-fixed-height{% endif %}"
+    style="--imageRatio:45%"
+    {% if settings.image_animation_type != 'none' %}
+      animate-element="true"
+      data-animate="{{ settings.image_animation_type }}"
+      data-zoom-initial="1.1"
+      data-zoom-final="1.0"
+      data-zoom-duration="1.5"
+      data-zoom-ease="power3.out"
+      data-delay="0.3"
+    {% endif %}
+  >
+    <template>
+      {% if desktop_video == null and desktop_video_url != null %}
+        {%- liquid
+          if loop
+            assign enable_loop = '&loop=1&playlist=' | append: video_id
+          endif
+
+          assign mute_param = ''
+          if autoplay
+            if desktop_video_url.type == 'youtube'
+              assign mute_param = '&mute=1'
+            elsif desktop_video_url.type == 'vimeo'
+              assign mute_param = '&muted=1'
+            endif
+          endif
+
+          if desktop_video_url.type == 'youtube' or desktop_video_url.type == 'vimeo'
+            assign controls_param = '&controls=' | append: control | replace: 'true', '1' | replace: 'false', '0'
+          else
+            assign controls_param = ''
+          endif
+        -%}
+
+        {% if desktop_video_url.type == 'youtube' %}
+          <iframe
+            class="js-youtube"
+            src="https://www.youtube.com/embed/{{ video_id }}?enablejsapi=1&autoplay=1{{ mute_param }}{{ enable_loop }}{{ controls_param }}"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+        {% elsif desktop_video_url.type == 'vimeo' %}
+          <iframe
+            src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1{{ mute_param }}{{ enable_loop }}{{ controls_param }}"
+            class="js-vimeo"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            frameborder="0"
+          ></iframe>
+        {% endif %}
+      {% else %}
+        {{
+          desktop_video
+          | video_tag: image_size: '1100x', autoplay: autoplay, loop: loop, controls: control, muted: true
+        }}
+      {% endif %}
+    </template>
+    <div
+      play-pause-btn
+      class="video-poster-button width-100 height-100 d-flex {{ content_alignment }} {{ content_position }}"
+      aria-label="Play video"
+    >
+      {% liquid
+        assign poster = desktop_cover_image
+        if poster == blank
+          if desktop_video != null
+            assign poster = desktop_video.preview_image
+          endif
+        endif
+      %}
+
+      {% if poster != blank %}
+        {%- liquid
+          assign desktop_alt_text = desktop_alt_text
+          if template == 'product' and desktop_alt_text == blank
+            assign desktop_alt_text = play_video_translation | append: ': ' | append: product.title | escape
+          endif
+          if desktop_alt_text == blank
+            assign desktop_alt_text = play_video_translation | default: ''
+          endif
+        -%}
+        {% assign desktop_image_alt = poster.alt | default: poster_default_alt %}
+        {{
+          poster
+          | image_url: width: 3840, format: 'webp'
+          | image_tag:
+            sizes: '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, (max-width: 1367px) 100vw, (max-width: 1599px) 100vw, 100vw',
+            widths: '375, 550, 750, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600, 3840',
+            decoding: 'async',
+            class: 'd-none md-block',
+            loading: loading,
+            fetchpriority: fetch_priority,
+            alt: desktop_image_alt
+        }}
+      {% else %}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+      <div class="video-hero-content rich-text-block pos-relative">
+        {{ blocks }}
+        {% if desktop_video != blank or desktop_video_url != blank %}
+          <button class="video-play-btn is-backdrop" aria-label="Video play" play-btn>
+            {% render 'svg-icons', icon_type: 'video-play' %}
+            {% if button_text != blank %}
+              <span class="video-play-btn-text text-large">{{ button_text }}</span>
+            {% endif %}
+          </button>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if type == 'custom_grid' %}
+      <button
+        class="video-play-pause-button pos-absolute top-right width-100 height-100 d-flex {{ content_alignment }} {{ content_position }} hidden"
+        toggle-btn
+        aria-label="Video play button"
+      >
+        {% render 'svg-icons', icon_type: 'custom-grid-play', extra_class: 'custom-grid-play hidden' %}
+        {% render 'svg-icons', icon_type: 'custom-grid-pause', extra_class: 'custom-grid-pause' %}
+      </button>
+    {% endif %}
+  </div>
+</deferred-media-video>
+
+{% liquid
+  assign check_mobile_video = false
+  if mobile_video
+    assign check_mobile_video = true
+    assign mobile_video_id = mobile_video.id
+    assign active_video = mobile_video
+    assign active_video_url = null
+  elsif mobile_video == blank and mobile_video_url != blank
+    assign check_mobile_video = true
+    assign mobile_video_id = mobile_video_url.id
+    assign active_video = null
+    assign active_video_url = mobile_video_url
+  elsif desktop_video
+    assign mobile_video_id = desktop_video.id
+    assign active_video = desktop_video
+    assign active_video_url = null
+  elsif desktop_video == blank and desktop_video_url != blank
+    assign mobile_video_id = desktop_video_url.id
+    assign active_video = null
+    assign active_video_url = desktop_video_url
+  endif
+%}
+
+<deferred-media-video
+  class="video-banner-media media-card-overlay media-wrapper d-block md-none {% if rounded_corners == "all" %}layout-rounded{% endif %} {% if isHeight %} height-100 {% endif %}"
+  data-media-id="{{ mobile_video_id }}"
+  data-type="{% if active_video == null %}{{ active_video_url.type }}{% else %}video{% endif %}"
+  data-autoplay="{{ autoplay }}"
+  data-loop="{{ loop }}"
+  data-control="{{ control }}"
+  data-content-visibility="{{ content_visibility }}"
+>
+  <div
+    class="media-card {% if isHeight %} media-fixed {% else %} media-fixed-height{% endif %}"
+    style="--imageRatio:45%"
+  >
+    <template>
+      {% if active_video == null and active_video_url != null %}
+        {%- liquid
+          if loop
+            assign enable_loop = '&loop=1&playlist=' | append: mobile_video_id
+          endif
+
+          assign mute_param = ''
+          if autoplay
+            if active_video_url.type == 'youtube'
+              assign mute_param = '&mute=1'
+            elsif active_video_url.type == 'vimeo'
+              assign mute_param = '&muted=1'
+            endif
+          endif
+
+          if active_video_url.type == 'youtube' or active_video_url.type == 'vimeo'
+            assign controls_param = '&controls=' | append: control | replace: 'true', '1' | replace: 'false', '0'
+          else
+            assign controls_param = ''
+          endif
+        -%}
+
+        {% if active_video_url.type == 'youtube' %}
+          <iframe
+            class="js-youtube"
+            src="https://www.youtube.com/embed/{{ mobile_video_id }}?enablejsapi=1&autoplay=1{{ mute_param }}{{ enable_loop }}{{ controls_param }}"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            frameborder="0"
+          ></iframe>
+        {% elsif active_video_url.type == 'vimeo' %}
+          <iframe
+            src="https://player.vimeo.com/video/{{ mobile_video_id }}?autoplay=1{{ mute_param }}{{ enable_loop }}{{ controls_param }}"
+            class="js-vimeo"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            frameborder="0"
+          ></iframe>
+        {% endif %}
+      {% else %}
+        {{
+          active_video
+          | video_tag: image_size: '800x', autoplay: autoplay, loop: loop, controls: control, muted: true
+        }}
+      {% endif %}
+    </template>
+    <button
+      play-pause-btn
+      class="video-poster-button width-100 height-100 d-flex {{ mobile_content_alignment }} {{ mobile_content_position }}"
+      aria-label="Video Button"
+    >
+      {% liquid
+        if check_mobile_video
+          assign poster = mobile_cover_image
+        else
+          assign poster = desktop_cover_image
+        endif
+        if poster == blank
+          if active_video != null
+            assign poster = active_video.preview_image
+          endif
+        endif
+      %}
+
+      {% if poster != blank %}
+        {%- liquid
+          assign mobile_alt_text = mobile_alt_text
+          if template == 'product' and mobile_alt_text == blank
+            assign mobile_alt_text = play_video_translation | append: ': ' | append: product.title | escape
+          endif
+          if mobile_alt_text == blank
+            assign mobile_alt_text = play_video_translation | default: ''
+          endif
+        -%}
+        {%- assign mobile_image_alt = poster.alt | default: poster_default_alt -%}
+        {{
+          poster
+          | image_url: width: 1440, format: 'webp'
+          | image_tag:
+            sizes: '(max-width: 767px) 100vw',
+            widths: '320, 480, 640, 750, 828, 1200, 1440',
+            decoding: 'async',
+            loading: loading,
+            fetchpriority: 'auto',
+            class: 'd-block md-none',
+            alt: mobile_image_alt
+        }}
+      {% else %}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+      <div class="video-hero-content rich-text-block pos-relative">
+        {{ blocks }}
+        {% if active_video != blank or active_video_url != blank %}
+          <span class="video-play-btn is-backdrop" play-btn>
+            {% render 'svg-icons', icon_type: 'video-play' %}
+            {% if button_text != blank %}
+              <span class="video-play-btn-text text-large">{{ button_text }}</span>
+            {% endif %}
+          </span>
+        {% endif %}
+      </div>
+    </button>
+
+    {% if type == 'custom_grid' %}
+      <button
+        class="video-play-pause-button pos-absolute top-right width-100 height-100 d-flex {{ mobile_content_alignment }} {{ mobile_content_position }} hidden"
+        toggle-btn
+        aria-label="Video play button"
+      >
+        {% render 'svg-icons', icon_type: 'custom-grid-play', extra_class: 'custom-grid-play hidden' %}
+        {% render 'svg-icons', icon_type: 'custom-grid-pause', extra_class: 'custom-grid-pause' %}
+      </button>
+    {% endif %}
+  </div>
+</deferred-media-video>

@@ -1,0 +1,82 @@
+<style>
+  #shopify-block-{{ block.id }}{
+    --svgSize:{{ block.settings.image_width }}px;
+    --separatorColor: {{ block.settings.marquee_sep_color }};
+  }
+  @media only screen and (max-width: 767px) {
+    #shopify-block-{{ block.id }}{
+      --svgSize:{{ block.settings.mobile_image_width }}px;
+    }
+  }
+</style>
+
+{% if block.settings.icons != 'none' %}
+  <div class="marquee-item-wrap">
+    {% render 'shapes', shape_type: block.settings.icons, extra_class: '' %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.scrolling-text.blocks.Separator.name",
+  "class": "marquee-item marquee-item-separator",
+  "settings": [
+    {
+      "type": "select",
+      "id": "icons",
+      "label": "t:sections.all.settings.icon.name",
+      "default": "diamond",
+      "options": [
+        {
+          "label": "t:sections.all.settings.icon_list.options.arrow",
+          "value": "arrow"
+        },
+        {
+          "label": "t:sections.all.settings.icon_list.options.circle",
+          "value": "circle"
+        },
+        {
+          "label": "t:sections.all.settings.icon_list.options.square",
+          "value": "square"
+        },
+        {
+          "label": "t:sections.all.settings.icon_list.options.diamond",
+          "value": "diamond"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "t:sections.all.settings.icon.icon_width",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_image_width",
+      "label": "t:sections.all.settings.icon.mobile_icon_width",
+      "default": 15,
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "marquee_sep_color",
+      "label": "t:sections.all.headers.color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.scrolling-text.blocks.Separator.name",
+      "category": "Basic"
+    }
+  ]
+}
+{% endschema %}

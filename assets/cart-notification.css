@@ -1,0 +1,36 @@
+  .cart-notification {
+    position: fixed;
+    z-index: 9;
+    right: 20px;
+    width: 100%;
+    max-width: 280px;
+    visibility: hidden;
+    transition: 0.5s cubic-bezier(0.6, 0, 0.4, 1);
+    top: calc(var(--headerDynamicHeight, 0px) + 10px);
+    &.active {
+      visibility: visible;
+    }
+  }
+  .cart-notification-drawer {
+    opacity: 0;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    padding: 15px 22px;
+    border-radius: 50px;
+    align-items: center;
+    justify-content: space-between;
+    transform: translateX(100%);
+    background: var(--cartNotificationBg);
+    color: var(--cartNotificationText);
+    transition: 0.5s cubic-bezier(0.6, 0, 0.4, 1);
+    .active & {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .cart-notification-item-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }

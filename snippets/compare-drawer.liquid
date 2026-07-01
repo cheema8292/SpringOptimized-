@@ -1,0 +1,39 @@
+{{ 'compare-drawer.css' | asset_url | stylesheet_tag }}
+<compare-drawer-aside class="drawer drawer-right drawer-regular drawer-fixed {{ color_scheme }}" tabindex="0">
+  <div class="drawer-backdrop" drawer-close=""></div>
+  <div class="drawer-inner">
+    <div class="drawer-contentwrap">
+      <div class="drawer-content">
+        <div class="drawer-head">
+          <div class="drawer-head-inner border-bottom">
+            <div class="drawer-heading heading-font h5 heading-color">Compare products</div>
+            <button class="drawer-close-btn" type="button" aria-label="Close" drawer-close-btn>
+              {% render 'svg-icons', icon_type: 'cross-icon' %}
+            </button>
+          </div>
+        </div>
+        <div class="drawer-body">
+          <div class="compare-drawer-body">
+            <ul class="compare-drawer-items" aside-item-list-compare>
+              {% for i in (1..settings.max_product_compare) %}
+                <li class="compare-drawer-item compare-drawer-item-placeholder">
+                  {% render 'svg-icons', icon_type: 'product-compare-dummy', extra_class: 'place-holder-item' %}
+                </li>
+              {% endfor %}
+            </ul>
+            <div class="compare-drawer-footer">
+              <button class="button button-primary" aria-label="Compare" button-compare-drawer>
+                <span class="button-text">Compare Now</span>
+                {% render 'svg-icons', icon_type: 'arrow-right', extra_class: 'button-icon' %}
+              </button>
+              <button class="button button-secondary" aria-label="Clear all" button-compare-clear>
+                <span class="button-text">Clear All</span>
+                {% render 'svg-icons', icon_type: 'arrow-right', extra_class: 'button-icon' %}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</compare-drawer-aside>

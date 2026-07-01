@@ -1,0 +1,49 @@
+  .newsletter-form-inner {
+    display: grid;
+    gap: 20px;
+  }
+  .newsletter-form-inner.design-1,
+  .newsletter-form-inner.design-3 {
+    grid-template-columns: 1fr 36px;
+    gap: 20px;
+    background: var(--formBackground);
+    padding: 5px;
+    padding-inline-start: 20px;
+    border-radius: var(--formRadius);
+    min-height: 46px;
+    border: 1px solid var(--formBorder);
+  }
+  .newsletter-form-inner.design-3 {
+    grid-template-columns: 1fr auto;
+  }
+  .newsletter-form-inner.design-1 .button-text {
+    display: none;
+  }
+
+  .newsletter-form-inner.design-1 .button-subscribe {
+    padding: 0;
+    min-height: auto;
+  }
+  .newsletter-form-inner.design-1 .button-subscribe,
+  .newsletter-form-inner.design-3 .button-subscribe {
+    border-radius: calc(var(--formRadius) / 2);
+  }
+  .newsletter-form-inner.design-2 .button-subscribe {
+    border-radius: var(--formRadius);
+  }
+  .newsletter-form-inner.design-1 .form-control,
+  .newsletter-form-inner.design-3 .form-control {
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+  .newsletter-form-inner.design-2 {
+    grid-template-columns: 1fr 160px;
+    gap: 10px;
+  }
+  .term-description {
+    display: inline-block;
+    margin-block-start: 8px;
+  }

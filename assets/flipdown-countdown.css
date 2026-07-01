@@ -1,0 +1,132 @@
+  @keyframes flipdown-flip-top {
+    to {
+      transform: rotateX(90deg);
+    }
+  }
+  @keyframes flipdown-flip-bottom {
+    to {
+      transform: rotateX(0deg);
+    }
+  } 
+  .custom-grid-wrapper .countdown-content .flipdown-card { 
+    text-align: center; 
+    min-width: 54px; 
+    flex: 1 1 auto;  
+    max-width: 100px;
+    position: relative; 
+    @media (max-width: 1600px) {
+      min-width: 47px;
+    }
+    @media (max-width: 991px) {
+      min-width: 40px;
+    }
+  
+  }
+  .flipdown-cards {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    @media (max-width: 1280px){ 
+      gap: 8px;
+    }
+  }
+ 
+
+  .flipdown-half,
+  .flipdown-top-flip,
+  .flipdown-bottom-flip {
+    font-size: 16px;
+    height: 18px;
+    width: 100%;
+    padding: 5px;
+    overflow: hidden;
+    text-align: center;
+    @media (max-width: 1024px) and (min-width: 768px){
+      height: 15px; 
+      padding: 1px;
+    }
+  }
+
+  .flipdown-top-half,
+  .flipdown-top-flip {
+    background-color: var(--countdown-box-bg-color); /* fallback */
+    background-color: color-mix(in srgb, var(--countdown-box-bg-color), #000 10%);
+    border-radius: 6px 6px 0 0;
+    padding-top: 5px;
+    @media (max-width: 1024px) and (min-width: 768px){
+      padding-top: 2px;
+    }
+  }
+
+  .flipdown-bottom-half,
+  .flipdown-bottom-flip {
+    background-color: var(--countdown-box-bg-color);
+    border-radius: 0 0 6px 6px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 5px;
+     @media (max-width: 1024px) and (min-width: 768px){
+        padding-bottom: 2px;
+    }
+  }
+
+  .flipdown-top-flip {
+    position: absolute;
+    transform-origin: bottom;
+    transform: rotateX(0deg);
+    animation: flipdown-flip-top 0.5s ease-in forwards;
+  }
+
+  .flipdown-bottom-flip {
+    position: absolute;
+    bottom: 0;
+    transform-origin: top;
+    transform: rotateX(90deg);
+    animation: flipdown-flip-bottom 0.5s ease-out 0.5s;
+  }
+  .flipdown-card .flipdown-unit {
+    color: var(--countdown-box-units-color);
+    padding-top: 8px;
+  }
+  .flipdown-flip-card{ 
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden; 
+    .flipdown-half {
+      color: var(--countdown-box-color);
+      font-size: var(--textMedium);
+      line-height: 1.6;
+      @media (max-width: 1024px) and (min-width: 768px){
+        font-size: var(--textSmall);
+        line-height: 26px;
+      }
+    }
+  }
+  
+
+
+  .flipdown-cards {
+        .flipdown-card{
+          &:not(:first-child):before {
+        content: '';
+        position: absolute;
+        right: calc(100% + 8px);
+        top: 7px;
+        height: 33px;
+        width: 1px;
+        background: var(--countdown-box-bg-color);
+        background: radial-gradient(
+          circle,
+          rgba(42, 123, 155, 0) 0%,
+          var(--countdown-box-bg-color) 0%,
+          rgba(237, 221, 83, 0) 100%
+        );
+        @media (max-width: 1280px){
+          right: calc(100% + 3px);
+          top: 2px; 
+        } 
+      }
+    }
+  }

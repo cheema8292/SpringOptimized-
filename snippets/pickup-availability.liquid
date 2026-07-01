@@ -1,0 +1,39 @@
+{%- assign pick_up_availabilities = product.selected_or_first_available_variant.store_availabilities
+  | where: 'pick_up_enabled', true
+-%}
+{%- if pick_up_availabilities.size > 0 -%}
+ 
+  <div class="product-block product-block-pickup-availability" product-pickup {{ block.shopify_attributes }}>
+    <pickup-availability
+      class="product__pickup-availabilities quick-add-hidden"
+      {% if product.selected_or_first_available_variant.available and pick_up_availabilities.size > 0 %}
+        available
+      {% endif %}
+      data-root-url="{{ routes.root_url }}"
+      data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+      data-has-only-default-variant="{{ product.has_only_default_variant }}"
+      data-product-page-color-scheme="gradient {{ section.settings.color_scheme }}"
+    >
+      <template>
+        <pickup-availability-preview class="pickup-availability-preview">
+          <span class="svg-wrapper">
+            {{- 'icon-unavailable.svg' | inline_asset_content -}}
+          </span>
+          <div class="pickup-availability-info">
+             <p class="caption-large">{{ 'products.product.pickup_availability.unavailable' | t }}</p>
+            <button  
+              class="pickup-availability-button text-xsmall text-underline"
+              id="ShowPickupAvailabilityDrawer-{{ product.selected_or_first_available_variant.id }}"
+              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              aria-label="Show pickup availability"
+              aria-haspopup="dialog">
+              {{ 'products.product.pickup_availability.refresh' | t }}
+            </button> 
+          </div>
+        </pickup-availability-preview> 
+      </template>
+    </pickup-availability>
+    <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
+  </div>
+{%- endif -%}
+

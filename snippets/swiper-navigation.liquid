@@ -1,0 +1,38 @@
+{% comment %}
+  Swiper navigation
+
+  Accepts:
+  - id : {id} unique id (optional)
+  - Extra class : {extra_class} extra class design purpose (optional)
+
+  Usage:
+  {% render 'swiper-navigation', id: section.id, extra_class:'' %}
+{% endcomment %}
+<div class="swiper-navigation {% if extra_class and extra_class != blank%}{{ extra_class }}{% endif %}">
+  <button
+    class="swiper-nav swiper-nav-prev swiper-nav-prev-{{ id }}"
+    tabindex="0"
+    role="button"
+    aria-label="Previous slide"
+    aria-controls="swiper-wrapper"
+  >
+    <svg width="42" height="18" viewBox="0 0 42 18" fill="none">
+    <path d="M0.000782013 9H41.3008V10H2.40078L9.70078 17.3L9.00078 18L0.000782013 9Z" fill="currentColor"/>
+    </svg> 
+  </button>
+  {%- if source == 'product-gallery-media' -%}
+    <div class="swiper-pagination d-block md-none swiper-pagination-{{ id }}"></div>
+  {%- endif -%}
+  <button
+    class="swiper-nav swiper-nav-next swiper-nav-next-{{ id }}"
+    tabindex="0"
+    role="button"
+    aria-label="Next slide"
+    aria-controls="swiper-wrapper"
+  > 
+    <svg width="42" height="18" viewBox="0 0 42 18" fill="none">
+    <path d="M41.9992 9H0.699219V8H39.5992L32.2992 0.7L32.9992 0L41.9992 9Z" fill="currentColor"/>
+    </svg>
+  </button>
+</div>
+

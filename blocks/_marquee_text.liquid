@@ -1,0 +1,114 @@
+<div class="marquee-item-wrap text-{{ block.settings.marquee_text_style }}">
+  <div class="marquee-text {{ block.settings.highlight_font }}">
+    {{ block.settings.text | replace: '<a', '<a class="text-underline"' }}
+  </div>
+</div>
+<style>
+  #shopify-block-{{ block.id }}{
+    --textSize:{{ block.settings.text_size }}px;
+    {% if block.settings.marquee_text_style == 'gradient' %}  
+      --marqueeTextColor: {{ block.settings.marquee_text_gradient }};
+    {% else %}
+      --marqueeTextColor: {{ block.settings.marquee_text_solid }};
+    {% endif %}
+  }
+  @media only screen and (max-width: 767px) {
+    #shopify-block-{{ block.id }}{
+      --textSize:{{ block.settings.mobile_text_size }}px;
+    }
+  }
+</style>
+{% schema %}
+{
+  "name": "t:sections.scrolling-text.blocks.text.name",
+  "class": "marquee-item marquee-item-text",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "t:sections.all.headers.text",
+      "default": "Your Promotion Text Goes Here"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "t:sections.all.settings.description_size.text",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "default": 26,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "marquee_text_style",
+      "label": "t:sections.all.headers.text",
+      "options": [
+        {
+          "label": "t:sections.all.settings.color_background.options.background_solid",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.color_background.options.background_gradiant",
+          "value": "gradient"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color_background",
+      "id": "marquee_text_gradient",
+      "label": "t:sections.all.headers.color",
+      "default": "linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.04) 100%)",
+      "visible_if": "{{ block.settings.marquee_text_style == 'gradient' }}"
+    },
+    {
+        "type": "color",
+        "id": "marquee_text_solid",
+        "label": "t:sections.all.headers.color",
+        "default": "#ffffff",
+        "visible_if": "{{ block.settings.marquee_text_style == 'solid' }}"
+    },
+    {
+      "type": "select",
+      "id": "highlight_font",
+      "label": "t:sections.all.settings.fontStyle.label",
+      "options": [
+        {
+          "value": "heading-font",
+          "label": "t:sections.all.settings.fontStyle.options.headingFont"
+        },
+        {
+          "value": "body-font",
+          "label": "t:sections.all.settings.fontStyle.options.bodyFont"
+        },
+        {
+          "value": "accent-font",
+          "label": "t:sections.all.settings.fontStyle.options.accent"
+        }
+      ],
+      "default": "heading-font"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.mobile_layout.header"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_size",
+      "label": "t:sections.all.settings.description_size.text",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "default": 22,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.scrolling-text.blocks.text.name",
+      "category": "Basic"
+    }
+  ]
+}
+{% endschema %}

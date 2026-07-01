@@ -1,0 +1,118 @@
+{% assign variant = product.selected_or_first_available_variant %}
+{% assign qty = variant.inventory_quantity %}
+
+<div class="product-card-badges badges-{{ settings.badge_style }} badge-position-{{ settings.badge_postion }}">
+
+  {% liquid
+    assign sale_badge = false
+    assign sale_badge_text = ''
+    assign discount_badge_text = ''
+    assign display_style = settings.saving_price
+  %}
+
+  {% if product.available %}
+
+    {% comment %} Sale badge start {% endcomment %}
+    {% if settings.is_sale_badge and product.compare_at_price_max %}
+      {% if product.compare_at_price > product.price %}
+        {% assign sale_badge = true %}
+        {% assign sale_badge_text = 'product_card.sale_badge' | t %}
+      {% endif %}
+    {% endif %}
+
+    {% unless settings.saving_price == 'none' %}
+      {% if product.compare_at_price_min > product.price_min %}
+        {% assign off_text = 'product_card.amount_off_badge' | t %}
+        {% assign discount = product.compare_at_price_min | minus: product.price_min %}
+        {% case settings.saving_price %}
+          {% when 'amount-off' %}
+            {% assign sale_badge = true %}
+            {% assign discount_badge_text = discount | money | append: ' ' | append: off_text %}
+          {% when 'percentage-off' %}
+            {% assign sale_badge = true %}
+            {% assign discount_badge_text = discount | times: 100 | divided_by: product.compare_at_price_min | append: '% ' | append: off_text %}
+          {% when 'text-money' %}
+            {% assign sale_badge = true %}
+            {% assign discount_badge_text = discount | money | append: ' ' | append: off_text %}
+          {% when 'text-percentage' %}
+            {% assign sale_badge = true %}
+            {% assign discount_badge_text = discount | times: 100 | divided_by: product.compare_at_price_min | append: '% ' | append: off_text %}
+        {% endcase %}
+      {% endif %}
+    {% endunless %}
+
+    {% if sale_badge and settings.is_sale_badge %}
+      <span class="badge sale-badge" id="product--badge-item-{{ section.id }}-{{ product.id }}">
+        {% if display_style == 'none' %}
+          {{ sale_badge_text }}
+        {% elsif display_style == 'amount-off' or display_style == 'percentage-off' %}
+          {{ discount_badge_text }}
+        {% else %}
+          {{ sale_badge_text }} {{ discount_badge_text }}
+        {% endif %}
+      </span>
+    {% endif %}
+    {% comment %} Sale badge end {% endcomment %}
+
+    {% comment %} Promo tag badge {% endcomment %}
+    {% if settings.is_sale_badge2 %}
+      {% assign promo_tag_text = '' %}
+      {% for tag in product.tags %}
+        {% if tag contains 'sale_' %}
+          {% assign promo_tag_text = tag | remove: 'sale_' %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+      {% if promo_tag_text != blank %}
+        <span class="badge sale-badge">{{ promo_tag_text }}</span>
+      {% endif %}
+    {% endif %}
+
+    {% comment %} Preorder badge {% endcomment %}
+    {% if settings.is_preorder_badge and qty <= 0 and variant.inventory_policy == 'continue' %}
+      <span class="badge preorder-badge">{{ 'product_card.preroder_badge' | t }}</span>
+    {% endif %}
+
+    {% comment %} Low stock badge {% endcomment %}
+    {% if settings.is_soldout_badge and variant.inventory_policy == 'deny' %}
+      {% if qty > 0 and qty <= 20 %}
+        <span class="badge lowstock-badge" style="background:{{ settings.low_badge_color }}; color: {{ settings.low_badge_text_color }}">
+          Only {{ qty }} left
+        </span>
+      {% endif %}
+    {% endif %}
+
+    {% comment %} Custom badges {% endcomment %}
+    {% if settings.custom_tag != blank and settings.custom_badges_text != blank %}
+      {% assign custom_tags = settings.custom_tag | downcase | split: ',' %}
+      {% assign custom_texts = settings.custom_badges_text | split: ',' %}
+      {% for tag in custom_tags %}
+        {% assign clean_tag = tag | strip %}
+        {% for product_tag in product.tags %}
+          {% assign clean_product_tag = product_tag | downcase | strip %}
+          {% if clean_product_tag == clean_tag %}
+            {% assign index = forloop.parentloop.index0 %}
+            {% assign badge_text = custom_texts[index] | strip %}
+            {% if badge_text != blank %}
+              <span class="badge custom-badges {% if clean_tag contains 'new' %}new-badge{% endif %}">
+                {{ badge_text }}
+              </span>
+            {% endif %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+
+  {% else %}
+
+    {% comment %} Sold out badge {% endcomment %}
+    {% if settings.is_soldout_badge and variant.inventory_policy == 'deny' %}
+      <span class="badge soldout-badge">
+        {{ 'product_card.soldout_badge' | t }}
+      </span>
+    {% endif %}
+
+  {% endif %}
+
+</div>

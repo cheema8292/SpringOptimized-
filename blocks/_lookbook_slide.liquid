@@ -1,0 +1,396 @@
+{% liquid
+    assign loading = 'lazy'
+  if section.index <= 3
+    assign loading = 'eager'
+  endif
+%}
+{% capture spotlight %}
+       {% content_for 'blocks' %}
+  {% endcapture %}
+{% render 'lookbook', section: block, spotlight: spotlight, desktop_position: 'desktop-pos-absolute', loading:loading, active_first_item: block.settings.active_first_item  %}
+<style>
+       #shopify-block-{{ block.id }} {
+       --headingColor: rgba({{ block.settings.heading_color.rgba }});
+        --textColor: rgba({{ block.settings.description_color.rgba }});
+        --contentBackground : {{ block.settings.content_background }};
+        {% if block.settings.enable_overlay %}
+        {% if block.settings.overlay_style == 'gradient' %}
+          --imageOverlay: {{ block.settings.overlay_gradient }};
+        {% else %}
+          --imageOverlay: rgba({{ block.settings.overlay_solid.rgba }});
+        {% endif %}
+      {% endif %}
+
+  }  
+
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.lookbook-banner.blocks.lookbook_slide.name",
+  "class": "lookbook-banner-item swiper-slide ",
+  "blocks": [
+    {
+      "type": "_spotlight"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.image"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "t:sections.all.settings.media_type.option_0.desktop_img"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "t:sections.all.settings.media_type.option_0.mobile_img"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.overlay.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "t:sections.all.settings.overlay.enable_overlay.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:sections.all.settings.overlay.style.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.overlay.style.options__0.label",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.overlay.style.options__1.label",
+          "value": "gradient"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color_background",
+      "id": "overlay_gradient",
+      "label": "t:sections.all.settings.overlay.color.label",
+      "default": "linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.04) 100%)",
+      "visible_if": "{{ block.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_solid",
+      "label": "t:sections.all.settings.overlay.color.label",
+      "alpha": true,
+      "default": "#00000093",
+      "visible_if": "{{ block.settings.overlay_style == 'solid' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.lookbook-banner.blocks.spotlite.name"
+    },
+    {
+      "type": "select",
+      "label": "t:sections.lookbook-banner.blocks.lookbook_slide.settings.hotspot_color.label",
+      "id": "hotspot_color",
+      "options": [
+        {
+          "label": "t:sections.lookbook-banner.blocks.lookbook_slide.settings.hotspot_color.option__0.label",
+          "value": "light-pin"
+        },
+        {
+          "label": "t:sections.lookbook-banner.blocks.lookbook_slide.settings.hotspot_color.option__1.label",
+          "value": "dark-pin"
+        }
+      ],
+      "default": "light-pin"
+    },
+    {
+      "type": "checkbox",
+      "id": "active_first_item",
+      "label": "t:sections.lookbook-banner.blocks.lookbook_slide.settings.active_first_item.label",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.content"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "t:sections.all.headers.heading",
+      "info": "t:sections.all.settings.heading_info.info"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "t:sections.all.settings.heading_tag.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        },
+        {
+          "value": "div",
+          "label": "Div"
+        },
+        {
+          "value": "span",
+          "label": "Span"
+        },
+        {
+          "value": "p",
+          "label": "P"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "t:sections.all.settings.heading_size.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:sections.all.settings.heading_size.options.heading_xl"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.settings.heading_size.options.heading_l"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.settings.heading_size.options.heading_m"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.settings.heading_size.options.heading_s"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.settings.heading_size.options.heading_xs"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "t:sections.all.headers.description",
+      "default": "Add a brief introduction or description here that gives context to the heading above."
+    },
+    {
+      "type": "select",
+      "id": "description_size",
+      "label": "t:sections.all.settings.description_size.label",
+      "options": [
+        {
+          "value": "text-xlarge",
+          "label": "t:sections.all.settings.description_size.options.text-xlarge"
+        },
+        {
+          "value": "text-large",
+          "label": "t:sections.all.settings.description_size.options.text-large"
+        },
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        },
+        {
+          "value": "text-xsmall",
+          "label": "t:sections.all.settings.description_size.options.text-xsmall"
+        }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.all.settings.text_alignment.label",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.all.settings.text_alignment.option_1"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.all.settings.text_alignment.option_2"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.all.settings.text_alignment.option_3"
+        }
+      ],
+      "default": "center"
+      
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "t:sections.all.settings.vertical_alignment.label",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.all.settings.vertical_alignment.option_1"
+        },
+        {
+          "value": "middle",
+          "label": "t:sections.all.settings.vertical_alignment.option_2"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.all.settings.vertical_alignment.option_3" 
+        }
+      ],
+      "default": "middle"
+    
+    },
+    {
+      "type": "select",
+      "id": "mobile_text_alignment",
+      "label": "t:sections.all.settings.mobile_text_alignment.label",
+      "default":"text-left",
+      "options": [
+        {
+          "label":"t:sections.all.settings.text_alignment.option_1",
+          "value": "text-left"
+        },
+        {
+          "label":"t:sections.all.settings.text_alignment.option_2",
+          "value": "text-center"
+        },
+        {
+          "label":"t:sections.all.settings.text_alignment.option_3",
+          "value": "text-right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.highlight_content"
+    },
+    {
+      "type": "select",
+      "id": "highlight_text",
+      "label": "t:sections.all.settings.highlight_text.label",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.all.settings.highlight_text.options.none"
+        },
+        {
+          "value": "underline",
+          "label": "t:sections.all.settings.highlight_text.options.underline"
+        },
+        {
+          "value": "color",
+          "label": "t:sections.all.settings.highlight_text.options.markertextcolor"
+        },
+        {
+          "value": "gradiant",
+          "label": "t:sections.all.settings.highlight_text.options.markergradiant"
+        }
+      ],
+      "default": "color"
+    },
+    {
+      "type": "select",
+      "id": "highlight_font",
+      "label": "t:sections.all.settings.fontStyle.label",
+      "options": [
+        {
+          "value": "heading-font",
+          "label": "t:sections.all.settings.fontStyle.options.headingFont"
+        },
+        {
+          "value": "body-font",
+          "label": "t:sections.all.settings.fontStyle.options.bodyFont"
+        },
+        {
+          "value": "accent-font",
+          "label": "t:sections.all.settings.fontStyle.options.accent"
+        }
+      ],
+      "default": "heading-font"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.all.headers.markertextcolor",
+      "default": "#0424A7", 
+      "visible_if": "{{ block.settings.highlight_text == 'color' }}"
+    },
+    {
+        "type": "color_background",
+        "id": "gradiant_color",
+        "label": "t:sections.all.headers.markertextcolor",
+        "default": "linear-gradient(54deg, rgba(239, 37, 18, 1) 4%, rgba(239, 95, 18, 1) 52.518%, rgba(241, 163, 28, 1) 100%)",
+        "visible_if": "{{ block.settings.highlight_text == 'gradiant' }}"
+    },
+    {
+      "type": "header",
+      "content":"t:sections.all.headers.color"
+    },
+    {
+      "type": "color",
+      "id": "content_background",
+      "label": "t:sections.lookbook-banner.blocks.lookbook_slide.settings.content_bg.label",
+      "default": "#c0c2c5"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "t:sections.all.settings.heading_color.label",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "t:sections.all.settings.desc_color.label",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.lookbook-banner.blocks.lookbook_slide.name"
+    }
+  ]
+}
+{% endschema %}

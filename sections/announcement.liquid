@@ -1,0 +1,558 @@
+{{ 'announcement.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign is_announcement_slider = false
+  assign announcement_inner_bar = false
+  if section.blocks.size > 1
+    assign is_announcement_slider = true
+  endif
+  if section.settings.enable_language_and_country_selector or is_announcement_slider or section.settings.quick_link_list != blank or section.blocks.size > 0 or section.settings.contact_heading != blank or section.settings.contact_number != blank or section.settings.store_loc_heading != blank
+    assign announcement_inner_bar = true
+  endif
+-%}
+{% assign announcement_bar_visibility = false %}
+{% if section.settings.announcement_bar_visibility == 'all_pages' %}
+  {% assign announcement_bar_visibility = true %}
+{% elsif section.settings.announcement_bar_visibility == 'home_page' and template.name == 'index' %}
+  {% assign announcement_bar_visibility = true %}
+{% endif %}
+{% if announcement_bar_visibility %}
+  <div class="announcement-bar-main-wrapper outer-color-scheme section-spacing">
+    <div class="{{ section.settings.container_width }}">
+      <div class="announcement-bar-main color-scheme {{ section.settings.color_scheme }} color-{{ section.settings.color_type }}{%  if section.settings.rounded_corners == 'all' %} {{ section.settings.rounded_corners_type }} {% endif %}">
+        <div class="star-section" star-option></div>
+        {% if announcement_inner_bar %}
+          <announcement-bar
+            class="announcement-bar-wrapper {% if section.settings.container_width == 'container-full' %}{{ section.settings.inner_container_width }}{% endif %} {% if section.blocks.size == 0 and settings.enable_color_mode == false %}empty-bar{% endif %}"
+            data-section="{{ section.id }}"
+          >
+            {% if section.settings.quick_link_list != blank or section.settings.enable_language_and_country_selector %}
+              <div class="announcement-bar-left">
+                {% if settings.enable_country_selector or settings.enable_language_selector %}
+                  {% if section.settings.enable_language_and_country_selector %}
+                    <div class="announcement-bar-country">
+                      {% render 'localization', dataTrigger: 'header-localization' %}
+                    </div>
+                  {% endif %}
+                {% endif %}
+                {% if section.settings.quick_link_list != blank %}
+                  {% assign menu_size = section.settings.quick_link_list.links.size %}
+                  {% if menu_size > 0 %}
+                    <ul class="announcement-bar-menu list-inline">
+                      {% for link in section.settings.quick_link_list.links %}
+                        <li class="announcement-bar-menu-item">
+                          <a href="{{ link.url }}" class="announcement-bar-menu-item-link text-small">{{ link.title }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endif %}
+            <div class="announcement-bar-middle">
+              {% if is_announcement_slider %}
+                <div class="swiper-navigation swiper-navigation-expand d-flex">
+                  <button class="swiper-nav swiper-nav-prev swiper-nav-prev-{{ section.id }}"
+                    aria-label="Previous slide"
+                    aria-controls="swiper-wrapper"
+                  >
+                    {% render 'svg-icons', icon_type: 'icon-chewron-left' %}
+                  </button>
+                  <button class="swiper-nav swiper-nav-next swiper-nav-next-{{ section.id }}"
+                    aria-label="Next slide"
+                    aria-controls="swiper-wrapper"
+                  >
+                    {% render 'svg-icons', icon_type: 'icon-chewron-right' %}
+                  </button>
+                </div>
+              {% endif %}
+              <div
+                class="announcement-bar-item-wrapper {% if is_announcement_slider %}swiper{% endif %}"
+                {% if is_announcement_slider %}
+                  data-swiper='
+                    {
+                      "loop": true,
+                      {% if section.settings.slide_dir == 'vertical' %}
+                       "direction": "vertical",
+                      {% endif %}
+                      "autoHeight": false,
+                      "slidesPerView": 1,
+                      "speed":1000,
+                      "spaceBetween": 0,
+                      "navigation": {
+                        "nextEl": ".swiper-nav-next-{{ section.id }}",
+                        "prevEl": ".swiper-nav-prev-{{ section.id  }}"
+                      },
+                      "autoplay": {
+                        "enabled": {{ section.settings.auto_rotate }},
+                        "delay": {{ section.settings.change_slides_speed | times: 1000 }},
+                        "disableOnInteraction": false,
+                        "pauseOnMouseEnter": false
+                      },
+                      "centeredSlides": true,
+                       "keyboard": {
+                        "enabled": true,
+                        "onlyInViewport": true
+                      }
+                    }
+                  '
+                {% endif %}  
+              >
+                {% if is_announcement_slider %}<div class="announcement-bar-items swiper-wrapper">{% endif %}
+                {% for block in section.blocks %}
+                  {% if block.settings.title != blank %}
+                    <div
+                      class="announcement-bar-item {% if is_announcement_slider %}swiper-slide{% endif %}"
+                      {{ block.shopify_attributes }}
+                    >
+                    {% if block.settings.link != blank %}
+                      <a href="{{  block.settings.link }}"class="announcement-bar-text text-center {{ section.settings.text_size }} focus-inside">
+                      {% else %} 
+                      <div class="announcement-bar-text text-center {{ section.settings.text_size }} focus-inside">
+                    {% endif %}
+                        <p class="announcement-bar-content">{{ block.settings.title | escape }}</p>
+                        {% if block.settings.link != blank %}
+                          </a>
+                          {% else %}
+                          </div>
+                        {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+                {% if is_announcement_slider %}
+                  </div>
+                {%- endif %}
+              </div>
+            </div>
+            {% if section.settings.contact_heading != blank
+              or section.settings.contact_number != blank
+              or section.settings.store_loc_heading != blank
+              or settings.enable_color_mode != false
+            %}
+              <ul class="announcement-bar-right"> 
+                {% if settings.enable_color_mode %}
+                  <li class="color-mode-toggle">
+                    <color-mode class="d-block" data-dark-text="{{ 'sections.header.dark_mode' | t }}" data-light-text="{{ 'sections.header.light_mode' | t }}">
+                      <input type="checkbox" class="color-mode-toggle-checkbox" id="color-mode-toggle-checkbox" data-dark-toggle="" title="light dark" tabindex="0">
+                      <label for="color-mode-toggle-checkbox" class="color-mode-toggle-content">
+                         <span class="light-color-mode color-mode-icon-toggle"> 
+                          <svg class="light-color-icon" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="iconify sun-icon" data-icon="feather-sun" data-inline="false">
+                          <g fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></g>
+                          </svg>
+                        </span> 
+                        <span class="dark-color-mode color-mode-icon-toggle">
+                          <svg class="dark-color-icon" aria-hidden="true" focusable="false" width="1em" height="1em" style="" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="iconify moon-icon" data-icon="feather-moon" data-inline="false">
+                          <path fill="currentColor"  d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
+                          </svg> 
+                        </span>
+                        <span class="color-mode-circle"></span> 
+                         <span class="visually-hidden">{{ 'announcement.toggle_dark_light' | t }}</span>
+                      </label>
+                    </color-mode>
+                  </li>  
+                {% endif %}
+                {% if section.settings.store_loc_heading != blank %}
+                  <li class="announcement-store-selector" announcement-store-locator tabindex="0">
+                    <div class="announcement-store-selector-icon">
+                      {% render 'svg-icons', icon_type: 'icon-location' %}
+                    </div>
+                    <div class="announcement-store-selector-text">
+                      <span class="text-small">{{ section.settings.store_loc_heading }} </span>
+                    </div>
+                  </li>
+                {% endif %}
+                {% if section.settings.contact_heading != blank or section.settings.contact_number != blank %}
+                  <li class="announcement-bar-help">
+                    <p class="text-small">
+                      {% if section.settings.contact_heading != blank -%}
+                        {{- section.settings.contact_heading -}}
+                      {%- endif %}
+                      {% if section.settings.contact_number != blank -%}
+                        <a href="tel:{{ section.settings.contact_number }}">{{ section.settings.contact_number }}</a>
+                      {%- endif %}
+                    </p>
+                  </li>
+                {% endif %}
+              </ul>
+            {% endif %}
+          </announcement-bar>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<style>
+  #shopify-section-{{ section.id }}{
+    --topSpacer: {{ section.settings.top_space_desktop }}px;
+    --bottomSpacer:{{ section.settings.bottom_space_desktop }}px;
+    --outerBackground: {{ section.settings.outer_background }};
+    --sectionRadius:{{ section.settings.border_radius }}px;
+  }
+  @media only screen and (max-width: 767px) {
+    #shopify-section-{{ section.id }} {
+      --topSpacer: {{ section.settings.top_space_mobile }}px;
+      --bottomSpacer:{{ section.settings.bottom_space_mobile }}px;
+      {% if section.settings.border_radius > 30 %}
+        --sectionRadius: calc({{ section.settings.border_radius }}px / 2);
+      {% else %}
+         --sectionRadius:{{ section.settings.border_radius }}px;
+      {% endif %}
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.announcement-bar.name",
+  "class": "announcement-bar-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "select",
+      "id": "announcement_bar_visibility",
+      "label": "t:sections.announcement-bar.settings.announcement_bar_visibility.label",
+      "default": "home_page",
+      "options": [
+        {
+          "label": "t:sections.announcement-bar.settings.announcement_bar_visibility.option_0.label",
+          "value": "none"
+        },
+        {
+          "label": "t:sections.announcement-bar.settings.announcement_bar_visibility.option_1.label",
+          "value": "home_page"
+        },
+        {
+          "label": "t:sections.announcement-bar.settings.announcement_bar_visibility.option_2.label",
+          "value": "all_pages"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "outer_background",
+      "label": "t:sections.all.settings.outer_background.label",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "select",
+      "id": "color_type",
+      "label": "t:sections.all.settings.color_background.label",
+      "default": "solid",
+      "options": [
+        {
+          "label": "t:sections.all.settings.color_background.options.background_solid",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.color_background.options.background_gradiant",
+          "value": "gradient"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "t:sections.all.settings.container_width.label",
+      "default": "container-full",
+      "options": [
+        {
+          "label": "t:sections.all.settings.container_width.small.label",
+          "value": "container-small"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.standard.label",
+          "value": "container"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_wide.label",
+          "value": "container-wide"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_edge.label",
+          "value": "container-narrow"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.full_width.label",
+          "value": "container-full"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "inner_container_width",
+      "label": "t:sections.all.settings.container_width.inner_container",
+      "default": "container-wide",
+      "visible_if": "{{ section.settings.container_width == 'container-full' }}",
+      "options": [
+        {
+          "label": "t:sections.all.settings.container_width.small.label",
+          "value": "container-small"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.standard.label",
+          "value": "container"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_wide.label",
+          "value": "container-wide"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_edge.label",
+          "value": "container-narrow"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "rounded_corners",
+      "label": "t:sections.all.settings.rounded_corners.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.rounded_corners.sharp.label",
+          "value": "none"
+        },
+        {
+          "label": "t:sections.all.settings.rounded_corners.rounded.label",
+          "value": "all"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "rounded_corners_type",
+      "label": "t:sections.all.settings.rounded_corners_type.label",
+      "visible_if": "{{ section.settings.rounded_corners == 'all' }}",
+      "options": [
+        {
+          "label": "t:sections.all.settings.rounded_corners_type.option_0.label",
+          "value": "layout-rounded-top"
+        },
+        {
+          "label": "t:sections.all.settings.rounded_corners_type.option_1.label",
+          "value": "layout-rounded-bottom"
+        },
+        {
+          "label": "t:sections.all.settings.rounded_corners_type.option_2.label",
+          "value": "layout-rounded"
+        }
+      ],
+      "default": "layout-rounded"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "info": "t:sections.all.settings.card_radius.info",
+      "label": "t:sections.all.settings.corner_radius.label",
+      "min": 2,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 10,
+      "visible_if": "{{ section.settings.rounded_corners == 'all' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.section_spacing"
+    },
+    {
+      "type": "select",
+      "id": "select_type",
+      "label": "t:sections.all.settings.section_spacing.choose_from.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.section_spacing.choose_from.options.desktop.label",
+          "value": "desktop"
+        },
+        {
+          "label": "t:sections.all.settings.section_spacing.choose_from.options.mobile.label",
+          "value": "mobile"
+        }
+      ],
+      "default": "desktop"
+    },
+    {
+      "type": "range",
+      "id": "top_space_desktop",
+      "label": "t:sections.all.settings.section_spacing.top_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom_space_desktop",
+      "label": "t:sections.all.settings.section_spacing.bottom_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "top_space_mobile",
+      "label": "t:sections.all.settings.section_spacing.top_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'mobile' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom_space_mobile",
+      "label": "t:sections.all.settings.section_spacing.bottom_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'mobile' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.announcement-bar.blocks.announcement.name"
+    },
+    {
+      "type": "select",
+      "id": "slide_dir",
+      "label": "t:sections.announcement-bar.settings.direction.label",
+      "default": "horizontal",
+      "options": [
+        {
+          "label": "t:sections.announcement-bar.settings.direction.option_0.label",
+          "value": "horizontal"
+        },
+        {
+          "label": "t:sections.announcement-bar.settings.direction.option_1.label",
+          "value": "vertical"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "t:sections.announcement-bar.settings.auto_rotate.label",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "change_slides_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "t:sections.announcement-bar.settings.change_slides_speed.label",
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "t:sections.all.settings.description_size.text",
+      "options": [
+        {
+          "value": "text-large",
+          "label": "t:sections.all.settings.description_size.options.text-large"
+        },
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        },
+        {
+          "value": "text-xsmall",
+          "label": "t:sections.all.settings.description_size.options.text-xsmall"
+        }
+      ],
+      "default": "text-small"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.desktop_layout"
+    },
+    {
+      "type": "checkbox",
+      "label": "t:sections.all.settings.enable_language_country.label",
+      "id": "enable_language_and_country_selector",
+      "default": true
+    },
+    {
+      "type": "link_list",
+      "id": "quick_link_list",
+      "label": "t:sections.announcement-bar.settings.quick_links.label",
+      "info": "t:sections.announcement-bar.settings.quick_links.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.announcement-bar.settings.store_loc.label",
+      "info": "t:sections.announcement-bar.settings.store_loc.info"
+    },
+    {
+      "type": "text",
+      "id": "store_loc_heading",
+      "label": "t:sections.all.headers.text"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.announcement-bar.settings.contact.label"
+    },
+    {
+      "type": "text",
+      "id": "contact_heading",
+      "label": "t:sections.all.headers.text",
+      "default": "Need help? Call Us:"
+    },
+    {
+      "type": "text",
+      "id": "contact_number",
+      "label": "t:sections.announcement-bar.settings.contact.settings.contact_number.label",
+      "default": "+1 800 900"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "t:sections.announcement-bar.blocks.announcement.name",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "default": "Welcome to our store",
+          "label": "t:sections.all.headers.text"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.all.headers.link"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

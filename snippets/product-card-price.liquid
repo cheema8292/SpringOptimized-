@@ -1,0 +1,152 @@
+{% comment %}
+  Renders a list of product's price (regular, sale)
+
+  Accepts:
+  - product: {Object} Product Liquid object (optional)
+  - placeholder: {Boolean} Renders a placeholder price (optional)
+  - use_variant: {Boolean} Renders selected or first variant price instead of overall product pricing (optional)
+  - show_badges: {Boolean} Renders 'Sale' and 'Sold Out' tags if the product matches the condition (optional)
+  - price_class: {String} Adds a price class to the price element (optional)
+  - show_compare_at_price: {Boolean} Renders the compare at price if the product matches the condition (optional)
+
+  Usage:
+  {% render 'price', product: product %}
+{% endcomment %}
+
+{%- liquid
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  elsif placeholder
+    assign target = null
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign price_min = product.price_min
+  assign price_max = product.price_max
+  assign available = target.available | default: false
+  assign money_price = price | money
+  assign money_price_min = price_min | money
+  assign money_price_max = price_max | money
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_price_min = price_min | money_with_currency
+    assign money_price_max = price_max | money_with_currency
+  endif
+
+  # Handle product-card specific display based on theme setting
+  assign show_from_prefix = true
+  assign selected_variant = product.selected_or_first_available_variant
+  if price_context == 'card'
+    if product.price_varies
+      case settings.card_price_varies_based_on
+        when 'show_min_price'
+          assign money_price = money_price_min
+          assign price = price_min
+          for variant in product.variants
+            if variant.price == price_min
+              assign selected_variant = variant
+              break
+            endif
+          endfor
+          assign compare_at_price = selected_variant.compare_at_price
+          assign target = product
+        when 'show_max_price'
+          assign money_price = money_price_max
+          assign price = price_max
+          for variant in product.variants reversed
+            if variant.price == price_max
+              assign selected_variant = variant
+              break
+            endif
+          endfor
+          assign compare_at_price = selected_variant.compare_at_price
+          assign target = product
+          assign show_from_prefix = false
+      endcase
+    endif
+  endif
+
+  if target == product and product.price_varies and show_from_prefix
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+-%}
+
+{%- unless target == null and placeholder == null -%}
+  <div class="product-price {%- if price_class %} {{ price_class }}{% endif -%}{%- if available == false %} price--sold-out{% endif -%}{%- if compare_at_price > price and product.quantity_price_breaks_configured? != true %} price--on-sale{% endif -%}{%- if compare_at_price > price and product.quantity_price_breaks_configured? %} volume-pricing--sale-badge{% endif -%}{%- if product.price_varies == false and product.compare_at_price_varies %} price--no-compare{% endif -%}">
+    {%- if product.quantity_price_breaks_configured? -%}
+      {%- if show_compare_at_price and compare_at_price -%}
+        {%- unless product.price_varies == false and product.compare_at_price_varies %}
+          <span class="visually-hidden visually-hidden--inline">
+            {{- 'products.product.price.regular_price' | t -}}
+          </span>
+          <span class="compare-price text-small price-quantity-price-breaks {{ settings.product_card_text_size }}">
+            {% if settings.currency_code_enabled %}
+              {{ compare_at_price | money_with_currency }}
+            {% else %}
+              {{ compare_at_price | money }}
+            {% endif %}
+          </span>
+        {%- endunless -%}
+      {%- endif -%}
+      <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
+      <span class="{%  if source == "product_card" %}{{ settings.card_price_font_family }}-font {{ settings.card_price_font_size }}{% else %}actual-price{% endif %} {{ price_font }}">
+        {{- 'products.product.volume_pricing.price_range' | t: minimum: money_price_min, maximum: money_price_max -}}
+      </span>
+    {%- else -%}
+      <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
+      <span class="{%  if source == "product_card" %}{{ settings.card_price_font_family }}-font {{ settings.card_price_font_size }}{% else %}actual-price{% endif %} {{ price_font }}">{{ money_price }}</span>
+    {%- endif -%}
+
+    {% if compare_at_price > price %}  
+      {%- unless product.price_varies == false and product.compare_at_price_varies %}
+        <span class="compare-price {%  if source == "product_card" %}{{ settings.card_price_font_family }}-font {%  if settings.card_price_font_size == "text-xsmall"  %}text-xsmall {% else %}text-small {% endif %}{%  else %}text-small{% endif %}">
+          {% if settings.currency_code_enabled %} 
+            {{ compare_at_price | money_with_currency }}
+          {% else %}
+            {{ compare_at_price | money }}
+          {% endif %}
+        </span>
+      {%- endunless -%}
+    {% endif %}
+    
+    <span class="unit-price{% if selected_variant.unit_price_measurement == nil %} hidden{% endif %}">
+      <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+      <span class="price-item price-item--last">
+        <span>({{- selected_variant.unit_price | money -}}</span>
+        <span aria-hidden="true">/</span>
+        <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+        <span>
+          {%- if selected_variant.unit_price_measurement.reference_value != 1 -%}
+            {{- selected_variant.unit_price_measurement.reference_value -}}
+          {%- endif -%}
+          {{ selected_variant.unit_price_measurement.reference_unit }})
+        </span>
+      </span>
+    </span>
+    {% for tag in product.tags %}
+  {% if tag contains 'set' %}
+  <span class="set">(Set of 2)</span>
+  {% endif %}
+  {% endfor %}
+  </div>
+  {%- if block.settings.show_tax_information -%}
+    <div class="product-shipping rte text-small">
+      {%- if cart.duties_included and cart.taxes_included -%}
+        {{ 'products.product.duties_and_taxes_included' | t }}
+      {%- elsif cart.taxes_included -%}
+        {{ 'products.product.taxes_included' | t }}
+      {%- elsif cart.duties_included -%}
+        {{ 'products.product.duties_included' | t }}
+      {%- endif -%}
+      {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+    </div>
+  {% endif %}
+
+{% else %}
+  <div class="product-price{% if price_class %} {{ price_class }}{% endif %}">
+    <span class="{%  if source == "product_card" %}{{ settings.card_price_font_family }}-font {{ settings.card_price_font_size }}{% else %}actual-price{% endif %} {{ price_font }}">{{ 1999 | money_with_currency }}</span>
+  </div>
+{% endunless %}

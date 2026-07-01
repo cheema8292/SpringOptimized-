@@ -1,0 +1,68 @@
+{% liquid
+  if loading 
+     assign loading = loading
+  else
+    assign loading = 'lazy'
+    if section.index <= 2
+      assign loading = 'eager'
+    endif
+  endif
+  if product != blank
+    assign tag_name = 'a'
+  else
+    assign tag_name = 'div'
+  endif
+%}
+
+<div class="horizontal-product-card">
+  <{{ tag_name }}
+    {% if product %}
+      href="{{ product.url }}"
+      aria-label="{{ product.title | escape }}"
+    {% endif %}
+    class="horizontal-product-card-media{% unless source == 'cart-drawer' %} focus-inside{% endunless %}"
+  >
+          {% comment %} assign image_sizes = '(max-width: 767px) 75px, (max-width: 1024px) 75px, (max-width: 1367px) 75px, (max-width: 1599px) 75px, 75px'
+          assign image_widths = '150, 200, 300, 400, 500, 600, 700, 800, 900, 1000' {% endcomment %}
+    <div class="media-card media-adapt" style="--imageRatio:1/1;">
+      {% if product != blank and product.featured_media.preview_image != blank %}
+        {% liquid
+          assign image_alt = product.featured_media.preview_image.alt | default: product.title | default: "Product image" | escape          
+          assign fetch_priority = 'low'
+          if loading == 'eager'
+            assign fetch_priority = 'high'
+          endif          
+          assign image_sizes = '(max-width: 480px) 20vw, (max-width: 768px) 12vw, (max-width: 1024px) 10vw, 120px'
+         assign image_widths = '60,90,120,150,180' 
+        %}
+        {{ product.featured_media.preview_image | image_url: width: 120, format: 'webp' | image_tag: 
+           sizes: image_sizes, 
+           widths: image_widths, 
+           decoding: 'async', 
+           loading: loading,
+           fetchpriority: fetch_priority,
+           class: 'horizontal-product-image',
+           alt: image_alt
+        }}
+      {% else %}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    </div>   
+  </{{ tag_name }}>
+  <div class="horizontal-product-detail">
+    <div class="horizontal-product-info">
+      {% if product %}
+        <a href="{{ product.url }}" class="product-title heading-font">{{ product.title }}</a>
+      {% else %}
+        <div class="product-title heading-font">Product Title</div>
+      {% endif %}  
+      {% comment %}
+              {% render 'card-price', product: product, price_class: '', show_compare_at_price: true %}
+      {% endcomment %}
+      {% render 'product-card-price', product: product, section:section, use_variant: true, price_context: 'card' %}
+    </div>
+    {% if source == 'cart-drawer' %}
+      {% render 'buy-buttons', section: section, block: block, product: product, source: 'cart-drawer'%}
+    {% endif %}
+  </div>
+</div>

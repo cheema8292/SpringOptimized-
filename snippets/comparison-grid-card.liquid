@@ -1,0 +1,141 @@
+{% if source == 'summary' %}
+  <th class="product-compare-table-header">
+    <div class="product-compare-card">
+      <div class="product-card-media">
+        {% if product != blank %}
+          <a href="{{ product.url }}" class="product-media focus-inside">
+        {% else %}
+          <div class="product-media focus-inside">
+        {% endif %}
+        {% if image_ratio == 'auto' %}
+          {% assign image_ratio = '1/1' %}
+          {% if product != blank %}
+            {% assign image_ratio = product.featured_image.aspect_ratio %}
+          {% endif %}
+        {% endif %}
+        <div class="media-card media-adapt" style="--imageRatio:{{ image_ratio }}">
+          {% if product != blank %}
+            {% liquid
+              assign title_alt = product.title | escape
+              assign product_image_alt = product.featured_media.alt | default: title_alt
+            %}
+            {{
+              product.featured_media.preview_image
+              | image_url: width: 3840, format: 'webp'
+              | image_tag:
+                sizes: '(max-width: 479px) 100vw, (max-width: 767px) 100vw, (max-width: 1023px) 100vw, 100vw',
+                widths: '320, 1160, 1200, 1500, 1800, 2100, 2400, 2700, 3000',
+                decoding: 'async',
+                loading: 'lazy',
+                fetchpriority: 'auto',
+                alt: product_image_alt
+            }}
+          {% else %}
+            {% if cycleIndex != blank %}
+              {{ 'product-apparel-' | append: cycleIndex | placeholder_svg_tag: 'placeholder-svg' }}
+            {% else %}
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          {% endif %}
+        </div>
+        {% if product != blank %}
+          </a>
+        {% else %}
+          </div>
+        {% endif %}
+      </div>
+      {% if block_settings.product_title %}
+        <div class="product-card-title">
+          {% if product != blank %}
+            <a href="{{ product.url }}" class="product-card-title-link">
+          {% else %}
+            <div class="product-card-title-link">
+          {% endif %}
+          {% if product.title != blank %}
+            {{- product.title -}}
+          {% else %}
+            {{ 'onboarding.product_title' | t }}
+          {% endif %}
+          {% if product != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if block_settings.product_button %}
+        {% assign url_button = '' %}
+        {% if product != blank %}
+          {% assign url_button = product.url %}
+        {% endif %}
+        {% if block_settings.button_text != blank %}
+          <div class="product-card-button">
+            {% if product != blank %}
+              {% render 'button-appearance',
+                button_text: block_settings.button_text,
+                button_url: url_button,
+                button_style: block_settings.button_style,
+                is_open_in_new_tab: block_settings.is_open_in_new_tab
+              %}
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
+      {% if section_execute and section_execute == 'product-compare' %}
+        <button
+          class="compare-table-remove"
+          aria-label="Remove"
+          compare-pop-up-product-close
+          data-product-id="{{ product.id }}"
+        >
+          {% render 'svg-icons', icon_type: 'cross-icon' %}
+        </button>
+      {% endif %}
+    </div>
+  </th>
+{% elsif source == 'all-variant' %}
+  <td class="product-compare-table-cell">
+    <div class="product-compare-content-holder text-center">
+      {%- for option in product.options_with_values -%}
+        {% capture variant_heading %} 
+            <div class="variant-heading">
+              <strong>{{ option.name | capitalize }} : </strong>
+            </div>
+          {% endcapture %}
+        <div class="variant-box d-flex">
+          {{ variant_heading }}
+          <div class="variant-data">
+            {%- for option_value in option.values -%}
+              {{ option_value | escape -}}
+              {%- unless forloop.last %}, {% endunless %}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </td>
+{% elsif source == 'variant' %}
+  {% if product.options.size > 0 %}
+    {% assign option_name = block_settings.option_name | handleize %}
+    {% assign product_options = product.options | handleize %}
+    {% if product_options contains option_name %}
+      {% assign option_index = null %}
+      {% for name in product.options %}
+        {% if name == option_name %}
+          {% assign option_index = forloop.index0 %}
+        {% endif %}
+      {% endfor %}
+      {% if option_index != -1 or option_index != null %}
+        <td class="product-compare-table-cell">
+          {% render 'comparison-grid-variant', product: product, option_index: option_index, option_name: option_name %}
+        </td>
+      {% else %}
+        <td class="product-compare-table-cell text-center">-</td>
+      {% endif %}
+    {% else %}
+      <td class="product-compare-table-cell text-center">-</td>
+    {% endif %}
+  {% else %}
+    <td class="product-compare-table-cell text-center">-</td>
+  {% endif %}
+{% endif %}

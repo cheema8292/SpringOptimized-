@@ -1,0 +1,13 @@
+{{ 'scroll-to-top.css' | asset_url | stylesheet_tag }}
+<scroll-to-top class="scroll-to-top back-to-top back-top-{{ settings.scroll_to_top_horizontal_position }}">
+  {% render 'svg-icons', icon_type: 'arrow-up-long' %}
+</scroll-to-top>
+
+<style>
+  .scroll-to-top {
+      --scroll-top-background:{{ background_color }};
+      --scroll-top-color:{{ icon_color }};
+      --scroll-top-vertical-position: {{ vertical_position }}px;
+      --scroll-top-border: {{ border_color }};
+  }
+</style>

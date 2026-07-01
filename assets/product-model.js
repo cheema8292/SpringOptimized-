@@ -1,0 +1,84 @@
+if (!customElements.get('product-model')) {
+  customElements.define(
+    'product-model',
+    class ProductModel extends DeferredMediaVideo {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        const posterBtn = this.querySelector('[play-pause-btn]');
+        if (posterBtn) {
+          posterBtn.addEventListener('click', () => this.onHandleClick());
+        }
+      }
+
+      contentLoad() {
+        super.contentLoad();
+
+        Shopify.loadFeatures([
+          {
+            name: 'model-viewer-ui',
+            version: '1.0',
+            onLoad: this.setupModelViewerUI.bind(this),
+          },
+        ]);
+      }
+
+      setupModelViewerUI(errors) {
+        if (errors) return;
+        
+        const modelViewer = this.querySelector('model-viewer');
+        if (!modelViewer) return;
+
+        this.modelViewerUI = new Shopify.ModelViewerUI(modelViewer);
+
+        modelViewer.addEventListener('load', () => {
+          this.pauseAllExcept(this);
+        });
+        const get_overlay = this.querySelector('.shopify-model-viewer-ui__controls-overlay');
+        
+        get_overlay.addEventListener("click", () => {
+           this.pauseAllExcept(this);
+        });
+
+      }
+
+    }
+  );
+}
+
+window.ProductModel = {
+  loadShopifyXR() {
+    Shopify.loadFeatures([
+      {
+        name: 'shopify-xr',
+        version: '1.0',
+        onLoad: this.setupShopifyXR.bind(this),
+      },
+    ]);
+  },
+
+  setupShopifyXR(errors) {
+    if (errors) return;
+
+    if (!window.ShopifyXR) {
+      document.addEventListener('shopify_xr_initialized', () => this.setupShopifyXR());
+      return;
+    }
+
+    document.querySelectorAll('[id^="ProductJSON-"]').forEach((modelJSON) => {
+      window.ShopifyXR.addModels(JSON.parse(modelJSON.textContent));
+      modelJSON.remove();
+    });
+    window.ShopifyXR.setupXRElements();
+  },
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.ProductModel) window.ProductModel.loadShopifyXR();
+});
+
+/*document.addEventListener('product-info:loaded', () => {
+  if (window.ProductModel) window.ProductModel.loadShopifyXR();
+});*/

@@ -1,0 +1,159 @@
+{% liquid
+  assign media_class = 'media-fixed-height'
+  if section.settings.desktop_image_height == 'auto'
+    assign media_desktop_class = 'desktop-media-adapt'
+  else
+    assign media_desktop_class = 'desktop-' | append: media_class
+  endif
+
+  if section.settings.mobile_image_height == 'auto'
+    assign media_mobile_class = 'mobile-media-adapt'
+  else
+    assign media_mobile_class = 'mobile-' | append: media_class
+  endif
+
+  assign desktop_image = section.settings.desktop_image
+  assign mobile_image = section.settings.mobile_image | default: desktop_image
+  assign gradiant_color = section.settings.gradiant_color
+%}
+
+<lookbook-banner-item class="lookbook-banner-item-inner" data-first-active="{{ section.settings.active_first_item }}">
+  <div class="lookbook-media {{ section.settings.hotspot_color }}">
+    <div
+      class="media-card {{ media_desktop_class }} {{ media_mobile_class }} media-card-overlay"
+      {% if settings.image_animation_type != 'none' %}
+        animate-element="true"
+        data-animate="{{ settings.image_animation_type }}"
+        data-zoom-initial="1.1"
+        data-zoom-final="1.0"
+        data-zoom-duration="1.5"
+        data-zoom-ease="power3.out"
+        data-delay="0.3"
+      {% endif %}
+    >
+      {% if desktop_image == blank and mobile_image == blank %}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg d-none md-block' }}
+      {% else %}
+        {% if desktop_image != blank %}
+          {% liquid
+            assign default_alt = 'Lookbook image' | escape
+            assign desktop_image_alt = desktop_image.alt | default: default_alt
+          %}
+          {{
+            desktop_image
+            | image_url: width: 3840, format: 'webp'
+            | image_tag:
+              sizes: '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, (max-width: 1367px) 100vw, (max-width: 1599px) 100vw, 100vw',
+              widths: '375, 550, 750, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600, 3840',
+              decoding: 'async',
+              class: 'd-none md-block',
+              loading: loading,
+              fetchpriority: 'auto',
+              alt: desktop_image_alt
+          }}
+        {% else %}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg d-none md-block' }}
+        {% endif %}
+        {% liquid
+          assign default_alt = 'Lookbook image' | escape
+          assign mobile_image_alt = mobile_image.alt | default: default_alt
+          assign mobile_image_sizes = '(max-width: 767px) 100vw'
+          assign mobile_image_widths = '320, 480, 640, 750, 828, 1200, 1440'
+        %}
+        {{
+          mobile_image
+          | image_url: width: 1440, format: 'webp'
+          | image_tag:
+            sizes: mobile_image_sizes,
+            widths: mobile_image_widths,
+            decoding: 'async',
+            loading: loading,
+            fetchpriority: 'auto',
+            class: 'd-block md-none',
+            alt: mobile_image_alt
+        }}
+      {% endif %}
+    </div>
+  </div>
+  {% if section.settings.heading != blank or section.settings.description != blank %}
+    {% liquid
+      assign mobile_text_alignment = ''
+      if section.settings.mobile_text_alignment != blank
+        assign mobile_text_alignment = section.settings.mobile_text_alignment
+      endif
+    %}
+    <div class="lookbook-content text-{{ block.settings.alignment }} content-{{ block.settings.position }} ">
+      {% assign description_data = '' %}
+      {% if section.settings.description != blank %}
+        {% assign description_data = '<p class="lookbook-desc '
+          | append: section.settings.description_size
+          | append: '">'
+          | append: section.settings.description
+          | newline_to_br
+          | append: '</p>'
+        %}
+      {% endif %}
+      {% render 'section-heading',
+        section_heading_tag: section.settings.heading_tag,
+        section_heading_size: section.settings.heading_size,
+        section_heading_content: section.settings.heading,
+        section_heading_highlight_text: section.settings.highlight_text,
+        section_heading_highlight_font: section.settings.highlight_font,
+        section_extra_classes: mobile_text_alignment,
+        extra_html_content: description_data
+      %}
+    </div>
+  {% endif %}
+  {{ spotlight }}
+</lookbook-banner-item>
+
+<style>
+    #shopify-section-{{ section.id }} {
+    --topSpacer: {{ section.settings.top_space_desktop }}px;
+    --bottomSpacer: {{ section.settings.bottom_space_desktop }}px;
+    {% if section.settings.desktop_media_height == "100vh" %}
+      --mediaHeight: {{ section.settings.desktop_media_height }};
+    {% else %}
+      --mediaHeight: {{ section.settings.desktop_custom_height }}px;
+    {% endif %}
+    {% if section.settings.enable_overlay %}
+      {% if section.settings.overlay_style == 'gradient' %}
+      --imageOverlay: {{ section.settings.overlay_gradient }};
+      {% else %}
+      --imageOverlay: rgba({{ section.settings.overlay_solid.rgba }});
+      {% endif %}
+    {% endif %}
+  }
+  #shopify-block-{{ section.id }} .text-highlight-color{
+    --highlightColor:{{ section.settings.text_color }};
+  }
+  #shopify-block-{{ section.id }} .text-highlight-gradiant{
+    --highlightColor:{{ gradiant_color }};
+  }
+
+  @media only screen and (max-width: 767px) {
+    #shopify-section-{{ section.id }} {
+      --topSpacer: {{ section.settings.top_space_mobile }}px;
+      --bottomSpacer: {{ section.settings.bottom_space_mobile }}px;
+      {% if section.settings.mobile_media_height == "100vh" %}
+        --mediaHeight: {{ section.settings.mobile_media_height }};
+      {% else %}
+        --mediaHeight: {{ section.settings.mobile_custom_height }}px;
+      {% endif %}
+    }
+  }
+
+  {% if section.settings.section_visibility == 'large' %}
+    @media (max-width: 767px) {
+      #shopify-section-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {% elsif section.settings.section_visibility == 'small' %}
+    @media (min-width: 768px) {
+      #shopify-section-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {% endif %}
+</style>

@@ -1,0 +1,669 @@
+<style>
+  .newsletter-popup .popup-close {
+    inset-block-start: 40px;
+    inset-inline-end: 40px;
+  }
+
+  .newsletter-popup-icon {
+    --svgSize: 40px;
+  }
+  .newsletter-popup-text > * + * {
+    padding-top: 20px;
+  }
+</style>
+{%- liquid
+  assign loading = 'lazy'
+  if section.index <= 3
+    assign loading = 'eager'
+  endif
+  assign show_popup = true
+  if section.settings.only_homepage and request.page_type != 'index'
+    assign show_popup = false
+  endif
+  if section.settings.only_visitor and customer
+    assign show_popup = false
+  endif
+-%}
+{% if show_popup and section.blocks.size > 0 %}
+  <newsletter-popup
+    class="newsletter-popup popup {{ section.settings.color_scheme }} position-{{ section.settings.pop_position }}"
+    data-delay="{{ section.settings.delay }}"
+    data-visitor="{{ section.settings.only_visitor }}"
+    data-expiry="{{ section.settings.cookie_days }}"
+    data-test-mode="{% if section.settings.mode == 'testing' %}true{% else %}false{% endif %}"
+    data-customer-id="{{ customer.id }}"
+    data-disable-account-holders="{{ section.settings.disable_for_account_holders }}"
+  >
+    <div class="page-overlay" data-popup-overlay></div>
+    <div class="popup-dialog width-small">
+      <div class="popup-content with-border">
+        <button class="popup-close" data-popup-close="" aria-label="Close">
+          {% render 'svg-icons', icon_type: 'cross-icon' %}
+        </button>
+        <div class="newsletter-popup-body">
+          <div class="newsletter-popup-text text-center">
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'heading' %}
+                  {% render 'section-heading',
+                    section_heading_tag: block.settings.heading_tag,
+                    section_heading_size: block.settings.heading_size,
+                    section_heading_content: block.settings.heading,
+                    section_heading_highlight_text: block.settings.highlight_text,
+                    section_heading_highlight_font: block.settings.highlight_font,
+                    section_extra_classes: 'text-center',
+                    extra_html_content: '',
+                    themeblock: block,
+                    simple_heading: 'only-heading'
+                  %}
+                {% when 'description' %}
+                  {% if block.settings.description != blank %}
+                    <div class="newsletter-popup-description {{ block.settings.description_size }}">
+                      {{ block.settings.description }}
+                    </div>
+                  {% endif %}
+                {% when 'newsletter' %}
+                  {% render 'newsletter-form',
+                    section: '',
+                    block_setting: block,
+                    is_email: false,
+                    design: 'design-1',
+                    source: 'pop-up'
+                  %}
+                {% when 'icon' %}
+                  <div
+                    class="newsletter-popup-icon {{ block.settings.choose_from }}"
+                    id="media-news-{{ block.id }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    {% if block.settings.choose_from == 'custom-icon' %}
+                      {% if block.settings.custom_icon != blank %}
+                        {% liquid
+                          assign default_alt = 'Newsletter popup icon' | escape
+                          assign fetch_priority = 'auto'
+                          if loading == 'eager'
+                            assign fetch_priority = 'high'
+                          endif
+                        %}
+                        {{
+                          block.settings.custom_icon
+                          | image_url: width: 991, format: 'webp'
+                          | image_tag:
+                            sizes: '100vw',
+                            widths: '375, 550, 750, 991',
+                            decoding: 'async',
+                            loading: loading,
+                            fetchpriority: fetch_priority,
+                            alt: default_alt
+                        }}
+                      {% endif %}
+                    {% elsif block.settings.choose_from == 'list' %}
+                      {% render 'svg-list-icons', icon_type: block.settings.icon %}
+                    {% endif %}
+                  </div>
+              {% endcase %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </newsletter-popup>
+{% endif %}
+
+<style>
+  {% if section.blocks.size > 0 %}
+    {% for block in section.blocks %}
+      #media-news-{{ block.id }} {
+        --iconWidth:{{ block.settings.desktop_icon_width }}px;
+      }
+      {% if block.type == 'image' and block.settings.image_width == 'custom' %}
+        #media-news-{{ block.id }} {
+          --image-max-width:{{ block.settings.custom_width }}px;
+        }
+      {% endif %}
+      {% if block.type == 'heading'%}
+          #shopify-section-{{ section.id }} .text-highlight-color{
+            --highlightColor:{{ block.settings.text_color }};
+          }
+          #shopify-section-{{ section.id }} .text-highlight-gradiant{
+            --highlightColor:{{ block.settings.gradiant_color }};
+          }
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  @media only screen and (max-width: 767px) {
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        #media-news-{{ block.id }} {
+          --iconWidth:{{ block.settings.mobile_icon_width }}px;
+        }
+        {% if block.type == 'image' and block.settings.image_width == 'custom' %}
+          #media-news-{{ block.id }} {
+            --image-max-width:{{ block.settings.custom_width_mobile }}px;
+          }
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.newsletter-popup.name",
+  "class": "newsletter-popup-section",
+  "enabled_on": {
+    "groups": ["custom.Overlay"]
+  },
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "t:sections.all.headers.heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "t:sections.all.headers.heading",
+          "default": "Newsletter",
+          "info": "t:sections.all.settings.heading_info.info"
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "t:sections.all.settings.heading_tag.label",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            },
+            {
+              "value": "h4",
+              "label": "H4"
+            },
+            {
+              "value": "h5",
+              "label": "H5"
+            },
+            {
+              "value": "h6",
+              "label": "H6"
+            },
+            {
+              "value": "div",
+              "label": "Div"
+            },
+            {
+              "value": "span",
+              "label": "Span"
+            },
+            {
+              "value": "p",
+              "label": "P"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "t:sections.all.settings.heading_size.label",
+          "options": [
+            {
+              "value": "h1",
+              "label": "t:sections.all.settings.heading_size.options.heading_xl"
+            },
+            {
+              "value": "h2",
+              "label": "t:sections.all.settings.heading_size.options.heading_l"
+            },
+            {
+              "value": "h3",
+              "label": "t:sections.all.settings.heading_size.options.heading_m"
+            },
+            {
+              "value": "h4",
+              "label": "t:sections.all.settings.heading_size.options.heading_s"
+            },
+            {
+              "value": "h5",
+              "label": "t:sections.all.settings.heading_size.options.heading_xs"
+            },
+            {
+              "value": "h6",
+              "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.all.headers.highlight_content"
+        },
+        {
+          "type": "select",
+          "id": "highlight_text",
+          "label": "t:sections.all.settings.highlight_text.label",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:sections.all.settings.highlight_text.options.none"
+            },
+            {
+              "value": "underline",
+              "label": "t:sections.all.settings.highlight_text.options.underline"
+            },
+            {
+              "value": "color",
+              "label": "t:sections.all.settings.highlight_text.options.markertextcolor"
+            },
+            {
+              "value": "gradiant",
+              "label": "t:sections.all.settings.highlight_text.options.markergradiant"
+            }
+          ],
+          "default": "color"
+        },
+        {
+          "type": "select",
+          "id": "highlight_font",
+          "label": "t:sections.all.settings.fontStyle.label",
+          "options": [
+            {
+              "value": "heading-font",
+              "label": "t:sections.all.settings.fontStyle.options.headingFont"
+            },
+            {
+              "value": "body-font",
+              "label": "t:sections.all.settings.fontStyle.options.bodyFont"
+            },
+            {
+              "value": "accent-font",
+              "label": "t:sections.all.settings.fontStyle.options.accent"
+            }
+          ],
+          "default": "heading-font"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "t:sections.all.headers.markertextcolor",
+          "visible_if": "{{ block.settings.highlight_text == 'color' }}",
+          "default": "#0424A7"
+        },
+        {
+          "type": "color_background",
+          "id": "gradiant_color",
+          "label": "t:sections.all.headers.markertextcolor",
+          "default": "linear-gradient(54deg, rgba(239, 37, 18, 1) 4%, rgba(239, 95, 18, 1) 52.518%, rgba(241, 163, 28, 1) 100%)",
+          "visible_if": "{{ block.settings.highlight_text == 'gradiant' }}"
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "t:sections.all.headers.description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "t:sections.all.headers.description",
+          "default": "Our newsletter subscribers are the first to hearabout new launches, restocks and special offers."
+        },
+        {
+          "type": "select",
+          "id": "description_size",
+          "label": "t:sections.all.settings.description_size.label",
+          "options": [
+            {
+              "value": "text-xlarge",
+              "label": "t:sections.all.settings.description_size.options.text-xlarge"
+            },
+            {
+              "value": "text-large",
+              "label": "t:sections.all.settings.description_size.options.text-large"
+            },
+            {
+              "value": "text-medium",
+              "label": "t:sections.all.settings.description_size.options.text-medium"
+            },
+            {
+              "value": "text",
+              "label": "t:sections.all.settings.description_size.options.text"
+            },
+            {
+              "value": "text-small",
+              "label": "t:sections.all.settings.description_size.options.text-small"
+            },
+            {
+              "value": "text-xsmall",
+              "label": "t:sections.all.settings.description_size.options.text-xsmall"
+            }
+          ],
+          "default": "text-medium"
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "t:sections.all.headers.newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "t:sections.newsletter.settings.form.label"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "term_policy_text",
+          "label": "t:sections.newsletter.settings.form.text",
+          "default": "By subscribing you agree to the <a>Terms of Use</a> & <a>Privacy Policy.</a>"
+        },
+        {
+          "type": "select",
+          "id": "term_policy_text_size",
+          "label": "t:sections.all.settings.description_size.text",
+          "options": [
+            {
+              "value": "text-medium",
+              "label": "t:sections.all.settings.description_size.options.text-medium"
+            },
+            {
+              "value": "text",
+              "label": "t:sections.all.settings.description_size.options.text"
+            },
+            {
+              "value": "text-small",
+              "label": "t:sections.all.settings.description_size.options.text-small"
+            },
+            {
+              "value": "text-xsmall",
+              "label": "t:sections.all.settings.description_size.options.text-xsmall"
+            }
+          ],
+          "default": "text-xsmall"
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "name": "t:sections.all.settings.icon.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "choose_from",
+          "label": "t:sections.all.settings.icon.settings.label",
+          "options": [
+            {
+              "label": "t:sections.all.settings.icon.settings.option__0.label",
+              "value": "list"
+            },
+            {
+              "label": "t:sections.all.settings.icon.settings.option__1.label",
+              "value": "custom-icon"
+            }
+          ],
+          "default": "list"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:sections.all.settings.icon_list.label",
+          "visible_if": "{{ block.settings.choose_from == 'list' }}",
+          "default": "newsletter-icon",
+          "options": [
+            {
+              "label": "t:sections.all.settings.icon_list.options.cart",
+              "value": "cart"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.categories",
+              "value": "categories"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.delete",
+              "value": "delete"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.delivery-box",
+              "value": "delivery-box"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.easy-return",
+              "value": "easy-return"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.shipping",
+              "value": "shipping"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.giftcard",
+              "value": "gift-card"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.heart",
+              "value": "heart"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.location",
+              "value": "location"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.discount",
+              "value": "discount-icon"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.phone",
+              "value": "icon-phone"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.promotion",
+              "value": "promotion"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.return-box",
+              "value": "return-box"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.search",
+              "value": "search"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.newsletter",
+              "value": "newsletter-icon"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.secure-payment",
+              "value": "icon-secure-payment"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.send",
+              "value": "send"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.store",
+              "value": "icon-store"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.support",
+              "value": "support"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.user",
+              "value": "user"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.thumbs_up",
+              "value": "thumbs-up"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.trust",
+              "value": "trust"
+            },
+            {
+              "label": "t:sections.all.settings.icon_list.options.warranty",
+              "value": "warranty"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "label": "t:sections.all.settings.icon.name",
+          "id": "custom_icon",
+          "visible_if": "{{ block.settings.choose_from == 'custom-icon' }}"
+        },
+        {
+          "type": "range",
+          "label": "t:sections.all.settings.icon.icon_width",
+          "id": "desktop_icon_width",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 50,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "label": "t:sections.all.settings.icon.mobile_icon_width",
+          "id": "mobile_icon_width",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 50,
+          "unit": "px"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "t:sections.newsletter-popup.settings.display_mode.label",
+      "default": "testing",
+      "info": "t:sections.newsletter-popup.settings.display_mode.info",
+      "options": [
+        {
+          "label": "t:sections.newsletter-popup.settings.display_mode.option_0.label",
+          "value": "enable"
+        },
+        {
+          "label": "t:sections.newsletter-popup.settings.display_mode.option_1.label",
+          "value": "testing"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "select",
+      "id": "pop_position",
+      "label": "t:sections.all.settings.content_position.label",
+      "default": "bottom-left",
+      "options": [
+        {
+          "label": "t:sections.all.settings.content_position.option_1",
+          "value": "top-left",
+          "group": "t:sections.all.settings.content_position.group_1"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_2",
+          "value": "top-center",
+          "group": "t:sections.all.settings.content_position.group_1"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_3",
+          "value": "top-right",
+          "group": "t:sections.all.settings.content_position.group_1"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_4",
+          "value": "center-left",
+          "group": "t:sections.all.settings.content_position.group_2"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_5",
+          "value": "center",
+          "group": "t:sections.all.settings.content_position.group_2"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_6",
+          "value": "center-right",
+          "group": "t:sections.all.settings.content_position.group_2"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_7",
+          "value": "bottom-left",
+          "group": "t:sections.all.settings.content_position.group_3"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_8",
+          "value": "bottom-center",
+          "group": "t:sections.all.settings.content_position.group_3"
+        },
+        {
+          "label": "t:sections.all.settings.content_position.option_9",
+          "value": "bottom-right",
+          "group": "t:sections.all.settings.content_position.group_3"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "label": "t:sections.newsletter-popup.settings.only_homepage.label",
+      "id": "only_homepage",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "label": "t:sections.newsletter-popup.settings.only_visitor.label",
+      "id": "only_visitor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_for_account_holders",
+      "label": "t:sections.newsletter-popup.settings.disable_for_account_holders.label",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "delay",
+      "max": 60,
+      "min": 2,
+      "step": 1,
+      "unit": "s",
+      "label": "t:sections.newsletter-popup.settings.delay.label",
+      "info": "t:sections.newsletter-popup.settings.delay.info",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "cookie_days",
+      "label": "t:sections.newsletter-popup.settings.cookie_days.label",
+      "default": 30,
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "day"
+    }
+  ]
+}
+{% endschema %}

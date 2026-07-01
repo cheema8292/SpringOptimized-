@@ -1,0 +1,53 @@
+{%- for option in product.options_with_values -%}
+  {% assign option_checked = option.name | handleize %}
+  {% if option_name == option_checked %}
+    {% assign is_color = false %}
+    {% if settings.color_name != blank %}
+      {% assign swatch_trigger_list = settings.color_name | downcase | split: ',' %}
+      {% assign downcased_option = option_checked | downcase %}
+      {% for trigger in swatch_trigger_list %}
+        {% assign swatch_trigger = trigger | strip %}
+        {% if downcased_option contains swatch_trigger %}
+          {% assign is_color = true %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    <div class="product-compare-content-holder text-center">
+    <ul class="data-variant-single d-flex flex-wrap">
+      {%- for option_value in option.values -%}
+        {%- assign swatch_fallback = null %}
+        {% liquid
+          assign swatch_image = blank
+          assign option_disabled = true
+          if option_value.available
+            assign option_disabled = false
+          endif
+        %}
+        {% if option_value.swatch != blank and option_value.swatch.image %}
+          {%- assign swatch_image = option_value.swatch.image | image_url: width: 70 %}
+        {%- elsif option_value.swatch != blank and option_value.swatch.color -%}
+          {%- assign swatch_fallback = option_value.swatch.color %}
+        {%- else -%}
+          {%- assign swatch_fallback = option_value %}
+        {%- endif -%}
+        <li class="variant-item-comparison-grid{% if option_disabled %} variant-disabled{% endif %}{% if swatch_image != blank %} has-swatch-image{% endif %}{% if is_color %} has-color-swatch{% endif %}">
+          <span
+            class="swatch-label {{ is_color }}"
+            style="{% if swatch_image != blank  %}--swatchImage:url({{ swatch_image }});{%  elsif swatch_fallback != blank and is_color %}--colorPalette:{{ swatch_fallback }};{% endif %}"
+            {% if is_color %}
+              data-tooltip
+            {% endif %}
+          >
+            {% if is_color %}
+              <div class="tooltip body-font">{{ option_value | escape }}</div>
+            {% else %}
+              {{ option_value | escape }}
+            {% endif %}
+          </span>
+        </li>
+      {%- endfor -%}
+    </ul>
+    </div>
+  {% endif %}
+{%- endfor -%}

@@ -1,0 +1,51 @@
+<div class="header-right">
+  <div class="header-icons header-icons-with-text{% if section.settings.show_dividers_in_icons %} has-seperator{% endif %}">
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'menu_label' %}
+          {% liquid
+            assign link = block.settings.link_to
+            assign tag = 'div'
+            if link != blank
+              assign tag = 'a'
+            endif
+          %}
+
+          <{{ tag }}
+            {% if link != blank %}
+              href="{{ block.settings.link_to }}"
+              {%  if block.settings.is_open_in_new_tab %}target="_blank" {% endif %}
+            {% endif %}
+            class="header-icon-link has-label {{ settings.header_first_level_menus_font }}-font"
+          >
+            {% render 'svg-list-icons', icon_type: block.settings.icon %}
+            <span>{{ block.settings.menu_label_text }}</span>
+          </{{ tag }}>
+      {% endcase %}
+    {% endfor %}
+    {% if section.settings.enable_country_language_selector %}
+      {% render 'localization', dataTrigger: 'header-localization', staticclass: 'header-icon-link' %}
+    {% endif %}
+
+    {% unless section.settings.header_desktop_style == 'hamburger-with-search-bar' %}
+      <a href="{{ routes.search_url }}" class="header-icon-link" data-header-search-trigger aria-label="{{ 'accessibility.search' | t }}">
+        {% if section.settings.icons_style == 'icon' or section.settings.icons_style == 'text-with-icon' %}
+         {% render 'svg-icons', icon_type: 'search' %}
+        {% endif %}
+        {% if section.settings.icons_style == 'text' or section.settings.icons_style == 'text-with-icon' %}
+         <span class="d-none md-block">{{ 'general.search.search' | t }}</span>
+        {% endif %}
+      </a>
+    {% endunless %}
+    <a href="{{ routes.account_url }}" class="header-icon-link"  aria-label="{{ 'accessibility.account' | t }}">
+      {% if section.settings.icons_style == 'icon' or section.settings.icons_style == 'text-with-icon' %}
+       {% render 'svg-icons', icon_type: 'user' %}
+      {% endif %}
+      {% if section.settings.icons_style == 'text' or section.settings.icons_style == 'text-with-icon' %}
+        <span class="d-none md-block">{{ 'customer.account.title' | t }}</span>
+      {% endif %}
+    </a>
+
+    {% render 'header-cart' %}
+  </div>
+</div>

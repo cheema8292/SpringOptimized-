@@ -1,0 +1,18 @@
+  .size-chart-popup .popup-content {
+    padding: 30px;
+  }
+  .size-chart-popup .popup-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .size-chart-popup .popup-close {
+    position: relative;
+  }
+  .size-cart-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    --svgSize: 20px;
+}

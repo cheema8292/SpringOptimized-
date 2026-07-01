@@ -1,0 +1,208 @@
+.lookbook-banner-item {
+  position: relative; 
+}
+.lookbook-banner-item-inner {
+    display: grid;    height: 100%;
+}
+ .lookbook-media, .lookbook-content {
+    grid-column-start: 1;
+    grid-row-start: 1;
+}
+.lookbook-media {
+  border-radius: var(--blockRadius);
+  overflow: hidden;
+}
+
+.lookbook-hotspot-block {
+  position: absolute;
+  top: var(--hotspotOffsetTop);
+  left: var(--hotspotOffsetLeft);
+  display: flex;
+  cursor: pointer;
+} 
+
+.lookbook-hotspot .hotspot-button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+  border: 1px solid var(--pinColor);  
+} 
+ .lookbook-banner-item:has(.light-pin) {
+  --pinColor: #fff;
+}
+  .lookbook-banner-item:has(.dark-pin) {
+  --pinColor: #000;
+}
+
+.lookbook-hotspot .hotspot-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 50%;
+  transform: scale(0.4);
+  background-color: var(--pinColor);
+}
+
+.lookbook-hotspot .hotspot-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 100%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--pinColor) 30%, transparent);
+  transition: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
+  animation: hotspot 2s ease infinite;
+}
+
+.hotspot-content {
+  position: absolute;
+  bottom: calc(100% + 15px);
+  left: 50%;
+  background: var(--cardBackground);
+  border-radius: var(--blockRadiusSmall);
+  padding: 10px;
+  opacity: 0;
+  cursor: auto;
+  pointer-events: none;
+  transition: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
+  width: max-content;
+  max-width: 200px;
+  transform: scale(0.9) translateX(-50%);
+  transition-property: opacity, transform;
+  .hotspot-product-title {
+      color: var(--cardHeading);
+  }
+  .product-price .actual-price {
+      color: var(--cardText);
+  }
+}
+
+ .hotspot-content::after {
+  content: '';
+  display: block;
+  border-top: 0.6rem solid var(--cardBackground);
+  border-left: 0.6rem solid transparent;
+  border-right: 0.6rem solid transparent;
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+ .lookbook-hotspot {
+  display: inline-flex;
+}
+
+.lookbook-hotspot:hover .hotspot-content,
+.lookbook-hotspot.active .hotspot-content,
+.lookbook-hotspot:focus-within .hotspot-content{
+  opacity: 1;
+  transform: scale(1) translateX(-50%);
+  pointer-events: all; 
+}
+
+.lookbook-content {
+  width: 100%;
+  padding: 2rem;  
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.lookbook-hotspot.content-bottom .hotspot-content {
+  top: calc(100% + 15px);
+  bottom: auto;
+}
+
+ .lookbook-hotspot.content-bottom .hotspot-content::after {
+  border-top: none;
+  border-bottom: 0.6rem solid var(--cardBackground);
+  bottom: auto;
+  top: -6px;
+} 
+ .lookbook-hotspot.content-right .hotspot-content {
+  left: 0;
+  transform: none;
+}
+
+ .lookbook-hotspot.content-right .hotspot-content::after {
+  left: 15px;
+  right: auto;
+}
+
+ .lookbook-hotspot.content-left .hotspot-content {
+  left: auto;
+  right: 0px;
+  transform: none;
+} 
+ .lookbook-hotspot.content-left .hotspot-content:after {
+  right: 0;
+  left: auto;
+}
+
+.lookbook-banner-item .first-spotlight-active + .lookbook-content + .lookbook-hotspot-block .hotspot-content{
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1) translate(-50%);
+}
+ .lookbook-desc {
+    padding-top: 5px;
+}
+
+
+@keyframes hotspot {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.6);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (min-width:768px) {
+  .lookbook-banner-wrapper:not(.swiper.swiper-initialized) .lookbook-banner-items {
+    display: flex;
+    gap: var(--columnGap, 10px);
+  }
+  .lookbook-banner-wrapper:not(.swiper.swiper-initialized) .lookbook-banner-item {
+    flex: 1;
+  }
+   .lookbook-desc {
+    padding-top: 10px;
+  }
+  .lookbook-banner-section .lookbook-content {
+    padding: 3rem;
+  }
+  .lookbook-content .section-header-block {
+      text-align: inherit;
+  }
+}
+ 
+@media (max-width: 767px) {
+  .lookbook-banner-wrapper .lookbook-banner-item-inner {
+    display: flex;
+    flex-direction: column-reverse; 
+  }
+  .lookbook-banner-wrapper .lookbook-content{
+    max-width: 100%;
+    padding: 20px; 
+    background: var(--contentBackground);
+    border-radius: var(--blockRadius) var(--blockRadius) 0 0;
+  } 
+  .lookbook-banner-wrapper .lookbook-content .section-header-block {
+      padding: 0;margin: 0;
+  }
+  .lookbook-banner-wrapper .lookbook-banner-item .lookbook-media:has(~ .lookbook-content) {
+    border-radius: 0 0 var(--blockRadius) var(--blockRadius);
+  }  
+}

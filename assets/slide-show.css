@@ -1,0 +1,58 @@
+.floating-arrow-btn {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: var(--swiperNavigationBackground);
+    stroke: var(--swiperNavigationColor);
+    transition: 0.4s ease;
+    transform: translate(-50%, -50%) scale(1);
+    z-index: 999;
+  }
+  .floating-arrow-btn [floating-arrow] {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .floating-arrow-btn .swiper-nav {
+    --svgSize: 24px;
+    cursor: none;
+  }
+  .is-half-start svg {
+    transform: rotate(-180deg);
+    transform-origin: center;
+  }
+  [content-btn]:hover ~ .custom-cursor,
+  [content-btn]:hover + .custom-cursor {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+
+  
+  /* color switch css */
+  .floating-arrow-btn.dark{
+    --swiperNavigationColor: #fff;
+    --swiperNavigationBackground: #000;
+  }
+  .floating-arrow-btn.light{
+    --swiperNavigationColor: #000;
+    --swiperNavigationBackground: #fff;
+  }
+  .swiper-pagination-count.dark {
+    --swiperNavigationBackground: #000;
+    --swiperNavigationColor: #000;
+  }
+  
+  .swiper-pagination-count.light {
+    --swiperNavigationBackground: #fff;
+    --swiperNavigationColor: #fff;
+  }
+
+  .slideshow-wrapper .swiper-pagination.swiper-pagination-bullets {
+    position: absolute;
+    bottom: 20px;
+    padding: 0;
+  }

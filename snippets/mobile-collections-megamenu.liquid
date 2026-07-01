@@ -1,0 +1,72 @@
+<div class="mobile-menu-submenu mobile-collection-megamenu height-100">
+  <div class="mobile-menu-submenu-back" data-back-to-menu>
+    <button aria-label="Back">
+      {% render 'svg-icons', icon_type: 'angle-left' %}
+    </button>
+    <span class="{{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+      {{ link.title }}
+    </span>
+  </div>
+  <ul class="mobile-submenu-list">
+    {% for collection in block.settings.collection_list %}
+      {% liquid
+        assign is_inner_chlid_menu = false
+        assign inner_link_tag = 'a'
+        if collection.all_products_count > 0
+          assign inner_link_tag = 'span'
+          assign is_inner_chlid_menu = true
+        endif
+      %}
+      <li
+        class="mobile-menu-item"
+        {% if is_inner_chlid_menu %}
+          data-menu-item
+        {% endif %}
+      >
+        <{{ inner_link_tag }}
+          {% if inner_link_tag == 'a' %}
+            href="{{ collection.url }}"
+          {% else %}
+            tabindex="0"
+          {% endif %}
+          class="mobile-menu-link text-small"
+        >
+          {{- collection.title }}
+          {% if collection.all_products_count > 0 %}
+            {% render 'svg-icons', icon_type: 'angle-right' %}
+          {% endif -%}
+        </{{ inner_link_tag }}>
+        {% if collection.all_products_count > 0 %}
+          <div class="mobile-menu-submenu inner-submenu height-100">
+            <div class="mobile-menu-submenu-back horizontal-product-card-back" data-back-to-menu>
+              <button aria-label="Back">
+                {% render 'svg-icons', icon_type: 'angle-left' %}
+              </button>
+              <span class="{{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+                {{ collection.title }}
+              </span>
+            </div>
+            <ul class="mobile-submenu-list inner-submenu-list">
+              {% for product in collection.products limit: block.settings.max_products_to_show %}
+                <li class="mobile-menu-item">
+                  {% render 'horizontal-product-card', product: product, source: 'cart-drawer', loading: 'lazy' %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% if block.settings.button_text != blank %}
+    <div class="mega-menu-sidebar-btn">
+      {% render 'button-appearance',
+        button_text: block.settings.button_text,
+        button_url: block.settings.button_link_to,
+        button_style: block.settings.button_style,
+        is_open_in_new_tab: false,
+        extra_attribute: ''
+      %}
+    </div>
+  {% endif %}
+</div>

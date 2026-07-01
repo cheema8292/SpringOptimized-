@@ -1,0 +1,228 @@
+<script>
+  if (console && console.log) {
+    console.log(
+      '%cM%ce%ct%cr%co',
+      'color: #4285F4; font-weight: bold; font-size: 16px;',
+      'color: #EA4335; font-weight: bold; font-size: 16px;',
+      'color: #FBBC05; font-weight: bold; font-size: 16px;',
+      'color: #34A853; font-weight: bold; font-size: 16px;',
+      'color:rgb(157, 40, 192); font-weight: bold; font-size: 16px;',
+      ' by Shine Dezign Infonet | Learn more at https://shinedezigninfonet.com/'
+    );
+  }
+  window.theme = window.theme || {};
+  window.shopUrl = '{{ request.origin }}';
+  window.routes = {
+    cart_add_url: '{{ routes.cart_add_url }}',
+    cart_change_url: '{{ routes.cart_change_url }}',
+    cart_update_url: '{{ routes.cart_update_url }}',
+    cart_url: '{{ routes.cart_url }}',
+    search_url: '{{ routes.search_url }}',
+    predictive_search_url: '{{ routes.predictive_search_url }}',
+  };
+  window.newsletter = {
+    error: `{{ 'newsletter.error' | t }}`
+  };
+  theme.settings = {
+    moneyFormat: '{{ shop.money_format }}',
+    moneyWithCurrencyFormat: '{{ shop.money_with_currency_format }}',
+    currencyCodeEnabled: '{{ shop.enabled_currencies }}'
+  };
+  window.cartStrings = {
+    error: `{{ 'sections.cart.cart_error' | t }}`,
+    quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`,
+  };
+
+  window.variantStrings = {
+    addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+    soldOut: `{{ 'products.product.sold_out' | t }}`,
+    unavailable: `{{ 'products.product.unavailable' | t }}`,
+    unavailable_with_option: `{{ 'products.product.value_unavailable' | t: option_value: '[value]' }}`,
+  };
+
+  window.quickOrderListStrings = {
+    itemsAdded: `{{ 'sections.quick_order_list.items_added.other' | t: quantity: '[quantity]' }}`,
+    itemAdded: `{{ 'sections.quick_order_list.items_added.one' | t: quantity: '[quantity]' }}`,
+    itemsRemoved: `{{ 'sections.quick_order_list.items_removed.other' | t: quantity: '[quantity]' }}`,
+    itemRemoved: `{{ 'sections.quick_order_list.items_removed.one' | t: quantity: '[quantity]' }}`,
+    viewCart: `{{- 'sections.quick_order_list.view_cart' | t -}}`,
+    each: `{{- 'sections.quick_order_list.each' | t: money: '[money]' }}`,
+    min_error: `{{- 'sections.quick_order_list.min_error' | t: min: '[min]' }}`,
+    max_error: `{{- 'sections.quick_order_list.max_error' | t: max: '[max]' }}`,
+    step_error: `{{- 'sections.quick_order_list.step_error' | t: step: '[step]' }}`,
+  };
+
+  window.accessibilityStrings = {
+    imageAvailable: `{{ 'products.product.media.image_available' | t: index: '[index]' }}`,
+    shareSuccess: `{{ 'general.share.success_message' | t }}`,
+    pauseSlideshow: `{{ 'sections.slideshow.pause_slideshow' | t }}`,
+    playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`,
+    recipientFormExpanded: `{{ 'recipient.form.expanded' | t }}`,
+    recipientFormCollapsed: `{{ 'recipient.form.collapsed' | t }}`,
+    countrySelectorSearchCount: `{{ 'localization.country_results_count' | t: count: '[count]' }}`,
+  };
+  window.shop = {
+    shopName: '{{ shop.name | escape }}',
+    domain: '{{ shop.domain | escape }}',
+    email: '{{ shop.email | escape }}',
+    region: '{{ shop.address.country | escape }}',
+    themeStoreId: {{ shop.id }},
+    isThemeEditor: {{ request.design_mode }},
+    params: {
+      p1: 'aHR0cHM6Ly8=',
+      p2: 'dGhlbWUt',
+      p3: 'YW5hbHl0aWNz',
+      p4: 'LnNoaW5lZGV6aWdu',
+      p5: 'LnByby92MS9tZXRyaWNz',
+    }
+  };
+  window.lastFocusedElement = null;
+  window.setLastFocusedElement = function (element) {
+    window.lastFocusedElement = element;
+  };
+  window.returnFocusToLastElement = function () {
+    if (window.lastFocusedElement) {
+      window.lastFocusedElement.focus();
+      window.lastFocusedElement = null;
+    }
+  };
+
+try{
+  const localStorageRecentView = 'metro-recent-viewed-products';
+  const recentViewProducts = JSON.parse(window.localStorage.getItem(localStorageRecentView) || "[]");
+  const productIdRecent = `{{ product.id }}`;
+  if(productIdRecent != ''){
+    const existingIndex = recentViewProducts.indexOf(productIdRecent);
+    if (existingIndex !== -1) {
+      recentViewProducts.splice(existingIndex, 1);
+    }
+    recentViewProducts.unshift(productIdRecent);
+    if(recentViewProducts.length > 10) {
+      recentViewProducts.pop();
+    }
+    const jsonStringRecentProducts = JSON.stringify(recentViewProducts);
+    window.localStorage.setItem(localStorageRecentView, jsonStringRecentProducts);
+  }
+}catch (error) {
+  console.error("Recent View product :", error.message);
+}
+const trapFocusHandlers = {};
+function trapFocus(container, elementToFocus = container) {
+
+  var elements = getFocusableElements(container);
+  var first = elements[0];
+  var last = elements[elements.length - 1];
+
+  removeTrapFocus();
+
+
+  trapFocusHandlers.focusin = (event) => {
+    if (event.target !== container && event.target !== last && event.target !== first) return;
+
+    document.addEventListener('keydown', trapFocusHandlers.keydown);
+  };
+
+
+
+  trapFocusHandlers.focusout = function () {
+    document.removeEventListener('keydown', trapFocusHandlers.keydown);
+  };
+  
+ 
+  trapFocusHandlers.keydown = function (event) {
+
+    if (event.code.toUpperCase() !== 'TAB') return; // If not TAB key
+    
+    // Only trap focus if we're inside a modal/drawer that should trap focus
+    const isModal = container.closest('[role="dialog"], .drawer, .popup, .modal');
+
+    if (!isModal) return; // Don't trap focus for normal page elements
+    
+    // On the last focusable element and tab forward, focus the first element.
+    if (event.target === last && !event.shiftKey) {
+      event.preventDefault();
+      first.focus();
+    }
+
+    //  On the first focusable element and tab backward, focus the last element.
+    if ((event.target === container || event.target === first) && event.shiftKey) {
+      event.preventDefault();
+      last.focus();
+    }
+  };
+
+  document.addEventListener('focusout', trapFocusHandlers.focusout);
+  document.addEventListener('focusin', trapFocusHandlers.focusin);
+
+  elementToFocus.focus();
+
+  if (
+    elementToFocus.tagName === 'INPUT' &&
+    ['search', 'text', 'email', 'url'].includes(elementToFocus.type) &&
+    elementToFocus.value
+  ) {
+    elementToFocus.setSelectionRange(0, elementToFocus.value.length);
+  }
+}
+// function getFocusableElements(container) {
+//   return Array.from(
+//     container.querySelectorAll(
+//       "summary, a[href], button:enabled, [tabindex]:not([tabindex^='-']), [draggable], area, input:not([type=hidden]):enabled, select:enabled, textarea:enabled, object, iframe"
+//     )
+//   );
+// }
+function getFocusableElements(container) {
+  const focusableSelectors = [
+    "a[href]",
+    "button:not([disabled])",
+    "textarea:not([disabled])",
+    "input:not([type=hidden])",
+    "select:not([disabled])",
+    "summary",
+    "[tabindex]:not([tabindex='-1'])"
+  ];
+ 
+  const isVisible = (el) => {
+    if (!el) return false;
+ 
+    let node = el;
+    while (node && node !== document.body) {
+      const style = window.getComputedStyle(node);
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden" ||
+        style.opacity === "0" ||
+        node.hidden
+      ) {
+        return false;
+      }
+      node = node.parentElement;
+    }
+    return true;
+  };
+ 
+  return Array.from(container.querySelectorAll(focusableSelectors.join(","))).filter(isVisible);
+}
+
+function removeTrapFocus(elementToFocus = null) {
+  document.removeEventListener('focusin', trapFocusHandlers.focusin);
+  document.removeEventListener('focusout', trapFocusHandlers.focusout);
+  document.removeEventListener('keydown', trapFocusHandlers.keydown);
+  if (elementToFocus) elementToFocus.focus();
+}
+</script>
+
+<script src="{{ 'photoswipe.min.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'photoswipe-lightbox.min.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'common-function.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'theme-script.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'animation-engine.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'animation-init.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script> 
+
+{% comment %} # Cart related js work performace changes{% endcomment %}
+<script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script> 
+
+{% if request.design_mode %}
+  <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
+{% endif %}

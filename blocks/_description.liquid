@@ -1,0 +1,72 @@
+<style>
+    #shopify-block-{{block.id}}{
+        --textColor: rgba({{ block.settings.description_color.rgba }}) ;
+        }
+</style>
+
+{% if block.settings.description != blank %}
+  
+  <p class="{{ block.settings.description_size }}">
+    {{ block.settings.description | newline_to_br }}
+  </p>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.all.headers.description",
+  "class": "text-block",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:sections.all.headers.description",
+      "default":"Add short description for this block."
+    },
+    {
+      "type": "select",
+      "id": "description_size", 
+      "label": "t:sections.all.settings.description_size.label",
+      "options": [
+        { 
+          "value": "text-xlarge",
+          "label": "t:sections.all.settings.description_size.options.text-xlarge"
+        },
+        {
+          "value": "text-large",
+          "label": "t:sections.all.settings.description_size.options.text-large"
+        },
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        },
+        {
+          "value": "text-xsmall",
+          "label": "t:sections.all.settings.description_size.options.text-xsmall"
+        }
+      ],
+      "default": "text-small"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "t:sections.all.settings.desc_color.label",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.all.headers.description",
+      "category": "Basic"
+
+    }
+  ]
+}
+{% endschema %}

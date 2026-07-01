@@ -1,0 +1,33 @@
+  .drawer-quick-view .drawer-head {
+    padding-block-start: 10px;
+    padding-inline-end: 10px;
+  }
+
+  .quick-view-content {
+    padding-inline: 35px;
+    padding-block-end: 30px;
+  }
+  .quick-view-content .product-blocks {
+    padding-top: 30px;
+  }
+
+  .product-block-quantity .quantity-rules {
+    display: contents;
+  }
+  .drawer-quick-view .quantity {
+    @media (max-width: 767px) {
+      gap: 5px;
+      height: 28px;
+      max-width: 94px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .quick-view-content {
+      padding-inline: 20px;
+      padding-block-end: 20px;
+    }
+    .quick-view-content .product-blocks {
+      padding-top: 10px;
+    }
+  }

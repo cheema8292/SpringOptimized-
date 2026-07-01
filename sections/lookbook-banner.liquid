@@ -1,0 +1,329 @@
+ {% if request.design_mode %}
+ <script src="{{ 'transparent-header.js' | asset_url }}" defer="defer"></script>
+ {% endif %}
+
+{% capture lookbook_slides %}
+    {% content_for 'blocks' %}
+  {% endcapture %}
+<div class="color-scheme {{ section.settings.color_scheme }} color-{{ section.settings.color_type }} section-spacing" {%  if section.settings.header_transparent %}allow-header-transparent {% endif %}>
+  <div class="{{ section.settings.container_width }}{% if section.settings.enable_mobile_swipe %} m-pr-0{% endif %}">
+      {% render 'lookbook-slides', section: section, lookbook_slides: lookbook_slides %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.lookbook-banner.name",
+  "class": "lookbook-banner-section",
+  "tag": "section",
+  "disabled_on": { "groups": ["header", "footer","custom.Overlay"] },
+  "blocks": [
+    {
+      "type": "_lookbook_slide"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "checkbox",
+      "id": "header_transparent",
+      "label": "t:sections.all.headers.header_transparent.label",
+      "default": false,
+      "info": "t:sections.all.headers.header_transparent.info"
+    },
+    {
+      "type": "select",
+      "id": "section_visibility",
+      "label": "t:sections.all.settings.section_visibility.label",
+      "default": "always",
+      "options": [
+        {
+          "label": "t:sections.all.settings.section_visibility.always.label",
+          "value": "always"
+        },
+        {
+          "label": "t:sections.all.settings.section_visibility.small_devices.label",
+          "value": "small"
+        },
+        {
+          "label": "t:sections.all.settings.section_visibility.large_devices.label",
+          "value": "large"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "select",
+      "id": "color_type",
+      "label": "t:sections.all.settings.color_background.label",
+      "default": "solid",
+      "options": [
+        {
+          "label": "t:sections.all.settings.color_background.options.background_solid",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.color_background.options.background_gradiant",
+          "value": "gradient"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "t:sections.all.settings.container_width.label",
+      "default": "container-narrow",
+      "options": [
+        {
+          "label": "t:sections.all.settings.container_width.small.label",
+          "value": "container-small"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.standard.label",
+          "value": "container"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_wide.label",
+          "value": "container-wide"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_edge.label",
+          "value": "container-narrow"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.full_width.label",
+          "value": "container-full"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.section_spacing"
+    },
+    {
+      "type": "select",
+      "id": "select_type",
+      "label": "t:sections.all.settings.section_spacing.choose_from.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.section_spacing.choose_from.options.desktop.label",
+          "value": "desktop"
+        },
+        {
+          "label": "t:sections.all.settings.section_spacing.choose_from.options.mobile.label",
+          "value": "mobile"
+        }
+      ],
+      "default": "desktop"
+    },
+    {
+      "type": "range",
+      "id": "top_space_desktop",
+      "label": "t:sections.all.settings.section_spacing.top_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom_space_desktop",
+      "label": "t:sections.all.settings.section_spacing.bottom_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "top_space_mobile",
+      "label": "t:sections.all.settings.section_spacing.top_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'mobile' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom_space_mobile",
+      "label": "t:sections.all.settings.section_spacing.bottom_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'mobile' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.desktop_layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_custom_height",
+      "label": "t:sections.all.settings.media_height.label",
+      "min": 400,
+      "max": 1000,
+      "default": 500,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:sections.all.settings.card_radius.label",
+      "info": "t:sections.all.settings.card_radius.info",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "label": "t:sections.all.settings.column_gap.label",
+      "id": "column_gap",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.mobile_layout.header"
+    },
+    {
+      "type": "range",
+      "id": "mobile_custom_height",
+      "label": "t:sections.all.settings.media_height.label",
+      "min": 200,
+      "max": 800,
+      "default": 400,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:sections.all.settings.mobile_layout.mobile_column_count.label",
+      "default": "1",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:sections.all.settings.mobile_layout.mobile_column_count.options__0.label"
+        },
+        {
+          "value": "2",
+          "label": "t:sections.all.settings.mobile_layout.mobile_column_count.options__1.label"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "label": "t:sections.all.settings.column_gap.label",
+      "id": "mobile_column_gap",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "default": 5,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile_swipe",
+      "label": "t:sections.all.settings.mobile_layout.enable_swipe.label",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.lookbook-banner.preset.name1",
+      "blocks": [
+        {
+          "type": "_lookbook_slide",
+          "blocks": [
+            {
+              "type": "_spotlight"
+            }
+          ]
+        }
+      ],
+      "category": "General"
+    },
+    {
+      "name": "t:sections.lookbook-banner.preset.name2",
+      "category": "General",
+      "blocks": [
+        {
+          "type": "_lookbook_slide",
+          "settings": {
+            "heading_size": "h5",
+            "heading_tag": "h5",
+            "description_size": "text-small"
+          },
+          "blocks": [
+            {
+              "type": "_spotlight"
+            }
+          ]
+        },
+        {
+          "type": "_lookbook_slide",
+          "settings": {
+            "heading_size": "h5",
+            "heading_tag": "h5",
+            "description_size": "text-small"
+          },
+          "blocks": [
+            {
+              "type": "_spotlight"
+            }
+          ]
+        },
+        {
+          "type": "_lookbook_slide",
+          "settings": {
+            "heading_size": "h5",
+            "heading_tag": "h5",
+            "description_size": "text-small"
+          },
+          "blocks": [
+            {
+              "type": "_spotlight"
+            }
+          ]
+        },
+        {
+          "type": "_lookbook_slide",
+          "settings": {
+            "heading_size": "h5",
+            "heading_tag": "h5",
+            "description_size": "text-small"
+          },
+          "blocks": [
+            {
+              "type": "_spotlight"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

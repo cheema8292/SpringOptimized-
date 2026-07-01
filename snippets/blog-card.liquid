@@ -1,0 +1,212 @@
+{% comment %}
+  {% stylesheet %}
+  {% endstylesheet %}
+{% endcomment %}
+
+{% assign media_adapt_class = 'media-adapt' %}
+{% if media_adapt and media_adapt != blank %}
+  {% assign media_adapt_class = media_adapt %}
+{% endif %}
+<div class="blog-item img-hover" {{ block.shopify_attributes }}>
+  <div class="blog-item-inner{% if section.settings.card_style == 'card' and section.settings.border_radius %} border{% endif %}">
+    {% if article_data != blank %}
+      <a
+        href="{{ article_data.url }}"
+        class="blog-media {%if predictive_search %} border{% else %}{% if section.settings.card_style == 'normal' and section.settings.border_radius %} border{% endif %}{% endif %}"
+      >
+    {% else %}
+      <div
+        href="{{ article_data.url }}"
+        class="blog-media {%if predictive_search %} border{% else %}{% if section.settings.card_style == 'normal' and section.settings.border_radius %} border{% endif %}{% endif %}"
+      >
+    {% endif %}
+    {% if article_data.image != blank %}
+      {% if image_ratio == 'auto' %}
+        {% assign image_ratio = article_data.image.aspect_ratio %}
+      {% endif %}
+      <div class="media-card {{ media_adapt_class }}" style="--imageRatio:{{ image_ratio }};">
+        {% liquid
+          assign blog_card_default_alt = 'Blog card image'
+          assign blog_card_article_default_alt = article_data.title | escape
+          assign blog_card_image_alt = article_data.image.alt | default: blog_card_article_default_alt | default: blog_card_default_alt
+        %}
+        {{
+          article_data.image
+          | image_url: width: 3300, format: 'webp'
+          | image_tag:
+            sizes: '(max-width: 767px) 100vw',
+            widths: '360, 540, 900, 1080, 1200, 1500, 1600, 2000, 2200, 2500, 2700, 3000, 3300',
+            decoding: 'async',
+            loading: 'lazy',
+            fetchpriority: 'auto',
+            alt: blog_card_image_alt,
+            class: 'blog-post-image'
+        }}
+      </div>
+    {% else %}
+      {% if image_ratio == 'auto' %}
+        {% assign image_ratio = '4/3' %}
+      {% endif %}
+      <div class="media-card media-adapt" style="--imageRatio:{{ image_ratio }};">
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {% endif %}
+    {% if source_page == 'main-blog' or source_page == 'main-blog-predictive' %}
+      {% if section.settings.show_post_author or section.settings.show_article_published_date %}
+        <div class="blog-meta">
+          {% if section.settings.show_post_author %}
+            <div class="blog-posts-author m-item text-small light-bg">
+              {% render 'svg-icons', icon_type: 'user' %}
+              {% if article_data.author != blank %}
+                {{- article_data.author -}}
+              {% else %}
+                {{ 'sections.blog-post.author' | t }}
+              {% endif %}
+            </div>
+          {% endif %}
+          {% if section.settings.show_article_published_date %}
+            <div class="blog-posts-date m-item text-small light-bg">
+              {% render 'svg-list-icons', icon_type: 'clock' %}
+              {% if article_data.published_at != blank %}
+                {{- article_data.published_at | date: '%d, %B  %Y' -}}
+              {% else %}
+                {{ 'sections.blog-post.date' | t }}
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% else %}
+      {% if item_index > 1 and section.settings.blog_style == 'modern' %}
+        {% if section.settings.show_post_author or section.settings.show_article_published_date %}
+          <div class="blog-meta">
+            {% if section.settings.show_post_author %}
+              <div class="blog-posts-author m-item text-small light-bg">
+                {% render 'svg-icons', icon_type: 'user' %}
+                {% if article_data.author != blank %}
+                  {{- article_data.author -}}
+                {% else %}
+                  {{ 'sections.blog-post.author' | t }}
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if section.settings.show_article_published_date %}
+              <div class="blog-posts-date m-item text-small light-bg">
+                {% render 'svg-list-icons', icon_type: 'clock' %}
+                {% if article_data.published_at != blank %}
+                  {{- article_data.published_at | date: '%d, %B  %Y' -}}
+                {% else %}
+                  {{ 'sections.blog-post.date' | t }}
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+    {% if article_data != blank %}
+      </a>
+    {% else %}
+      </div>
+    {% endif %}
+    {% comment %}
+    <div class="blog-content">
+      {% if item_index == 1 and source_page == 'blog-post' %}
+        {% if section.settings.blog_style == 'modern' %}
+          {% if section.settings.show_post_author or section.settings.show_article_published_date %}
+            <div class="blog-meta">
+              {% if section.settings.show_post_author %}
+                <div class="blog-posts-author m-item text-small light-meta-bg">
+                  {% render 'svg-icons', icon_type: 'user', extra_class: '' %}
+                  {% if article_data.author != blank %}
+                    {{- article_data.author -}}
+                  {% else %}
+                    {{ 'sections.blog-post.author' | t }}
+                  {% endif %}
+                </div>
+              {% endif %}
+              {% if section.settings.show_article_published_date %}
+                <div class="blog-posts-date m-item text-small light-meta-bg">
+                  {% render 'svg-list-icons', icon_type: 'clock', extra_class: '' %}
+                  {% if article_data.published_at != blank %}
+                    {{- article_data.published_at | date: '%d, %B  %Y' -}}
+                  {% else %}
+                    {{ 'sections.blog-post.date' | t }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+      <div class="blog-posts-heading-header">
+        {% if article_data != blank %}
+          <a
+            href="{{ article_data.url }}"
+            class="blog-title focus-inside heading-font{% if title_size != blank %} {{ title_size }}{% else %} {{ section.settings.title_size }}{% endif %}"
+          >
+        {% else %}
+          <div
+            class="blog-title focus-inside heading-font{% if title_size != blank %} {{ title_size }}{% else %} {{ section.settings.title_size }}{% endif %}"
+          >
+        {% endif %}
+        {% if article_data != blank %}
+          {{- article_data.title -}}
+        {% else %}
+          {{ 'sections.blog-post.post' | t }}
+        {% endif %}
+        {% if article_data != blank %}
+          </a>
+        {% else %}
+          </div>
+        {% endif %}
+      </div>
+      {% if section.settings.show_article_excerpts or predictive_search %}
+        {% assign truncatewords = 30 %}
+        <div class="blog-desc{% if description_size != blank %} {{ description_size }}{% else %} {{ section.settings.description_size }}{% endif %}">
+          {% if article_data != blank %}
+            {{ article_data.excerpt_or_content | strip_html | truncatewords: truncatewords }}
+          {% else %}
+            {{ 'sections.blog-post.postdesc' | t }}
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if section.settings.show_read_more_button %}
+        {% assign read_more = 'sections.blog-post.readmore' | t %}
+        {% render 'button-appearance',
+          button_text: read_more,
+          button_url: article_data.url,
+          button_style: section.settings.button_style,
+          is_open_in_new_tab: false
+        %}
+      {% endif %}
+      {% if section.settings.blog_style == 'classic' and source_page == 'blog-post' %}
+        {% if section.settings.show_post_author or section.settings.show_article_published_date %}
+          <div class="blog-meta">
+            {% if section.settings.show_post_author %}
+              <div class="blog-posts-author m-item text-small light-meta-bg">
+                {% render 'svg-icons', icon_type: 'user', extra_class: '' %}
+                {% if article_data.author != blank %}
+                  {{- article_data.author -}}
+                {% else %}
+                  {{ 'sections.blog-post.author' | t }}
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if section.settings.show_article_published_date %}
+              <div class="blog-posts-date m-item text-small light-meta-bg">
+                {% render 'svg-list-icons', icon_type: 'clock', extra_class: '' %}
+                {% if article_data.published_at != blank %}
+                  {{- article_data.published_at | date: '%d, %B  %Y' -}}
+                {% else %}
+                  {{ 'sections.blog-post.date' | t }}
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+    {% endcomment %}
+  </div>
+</div>

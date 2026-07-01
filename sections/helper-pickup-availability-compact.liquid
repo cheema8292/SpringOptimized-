@@ -1,0 +1,30 @@
+{%- assign pick_up_availabilities = product_variant.store_availabilities | where: 'pick_up_enabled', true -%}
+
+{%- if pick_up_availabilities.size > 0 -%}
+    {%- for availability in pick_up_availabilities -%}
+
+        {% if availability.available %}
+            <div class="pickup-availability-alert" data-store="{{ availability.location.name | handleize }}">
+                <span class="alert alert--circle alert--success">{{ 'products.product.pickup_availability.available_pickup_at' | t }}</span>
+                <span class="pickup-availability-alert-store" style="display:none">{{ availability.location.name | escape }}</span>
+            </div>
+        {% else %}
+            <div class="pickup-availability-alert" data-store="{{ availability.location.name | handleize }}">
+                <span class="alert alert--circle alert--error">{{ 'products.product.pickup_availability.pickup_not_available_at' | t }}</span>
+                <span class="pickup-availability-alert-store" style="display:none">{{ availability.location.name | escape }}</span>
+            </div>
+       {% endif %}
+    {%- endfor -%}
+{%- endif -%}
+
+<div class="pickup-availability-alert" data-default-unavailable="">
+  <span>
+    {{ 'products.product.pickup_availability.out_of_stock' | t }}
+  </span>
+</div>
+
+<div class="pickup-availability-alert" data-default-store="">
+  <span>
+    {{ 'products.product.pickup_availability.choose_a_store' | t }}
+  </span>
+</div>

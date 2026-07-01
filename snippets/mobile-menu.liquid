@@ -1,0 +1,185 @@
+{{ 'mobile-menu.css' | asset_url | stylesheet_tag }}
+{% liquid
+  assign is_menu_label = false
+  if section.blocks.size > 0
+    for block in section.blocks
+      if block.type == 'menu_label'
+        assign is_menu_label = true
+      endif
+    endfor
+  endif
+%}
+
+<mobile-menu
+  class="{{ settings.mobile_menu_color_scheme }} mobile-menu-drawer drawer drawer-left drawer-regular drawer-fixed"
+  mobile-drawer-content
+>
+  <div class="drawer-backdrop" drawer-close=""></div>
+  <div class="drawer-inner">
+    <div class="drawer-contentwrap">
+      <div class="drawer-content">
+        <div class="drawer-head">
+          <div class="drawer-head-inner">
+            {% comment %} {% render 'header-logo', section: section, is_transparent_logo_exist: true %} {% endcomment %}
+            {%- liquid
+              assign logo = section.settings.hamburger_logo
+            -%}
+            {% if logo != blank %}
+              <a href="{{ routes.root_url }}" class="hamburger-header-logo" aria-label="Logo">
+                {{
+                  section.settings.hamburger_logo
+                  | image_url: width: logo.width
+                  | image_tag:
+                    class: 'hamburger-header-logo-img',
+                    widths: widths,
+                    height: logo_height,
+                    width: range_width,
+                    alt: '',
+                    sizes: sizes,
+                    preload: true
+                }}
+              </a>
+            {% else %}
+              <a
+                href="{{ routes.root_url }}"
+                class="store-name text-medium heading-font"
+              >
+                {{ shop.name }}
+              </a>
+            {% endif %}
+            <drawer-close-button>
+              <button type="button" aria-label="Close" class="drawer-close-btn" drawer-close-btn="">
+                {% render 'svg-icons', icon_type: 'cross-icon' %}
+              </button>
+            </drawer-close-button>
+          </div>
+        </div>
+        <div class="drawer-body">
+          <div class="mobile-menu-drawer-content">
+            <div class="mobile-menu-drawer-content-inner">
+              <div class="mobile-menu-box">
+                <ul class="mobile-menu-list">
+                  {% for link in section.settings.menu.links -%}
+                    {% liquid
+                      assign menu_type = 'inner_menu'
+                      assign is_inner_menu = false
+                      assign link_title = link.title | downcase | handle
+                      for block in section.blocks
+                        case block.type
+                          when 'images_mega_menu'
+                            assign image_menu_title = block.settings.menu_title | downcase | handle
+                            if link_title == image_menu_title
+                              if link.links.size > 0
+                                assign menu_type = 'images_mega_menu'
+                                assign block_data = block
+                                assign is_inner_menu = true
+                              endif
+                            endif
+                          when 'tabs_mega_menu'
+                            assign tab_menu_title = block.settings.menu_title | downcase | handle
+                            if link_title == tab_menu_title
+                              assign menu_type = 'tabs_mega_menu'
+                              assign block_data = block
+                              if block_data.settings.menu.links.size > 0
+                                assign is_inner_menu = true
+                              endif
+                            endif
+                          when 'collections_mega_menu'
+                            assign collections_menu_title = block.settings.menu_title | downcase | handle
+                            if link_title == collections_menu_title
+                              assign menu_type = 'collections_mega_menu'
+                              assign block_data = block
+                              assign is_inner_menu = true
+                            endif
+                        endcase
+                      endfor
+                      if menu_type == 'inner_menu'
+                        if link.links.size > 0
+                          assign is_inner_menu = true
+                        endif
+                      endif
+                    %}
+                    <li
+                      class="mobile-menu-item"
+                      {% if is_inner_menu %}
+                        data-menu-item data-menu-type="{{ menu_type }}"
+                      {% endif %}
+                    >
+                    {% if is_inner_menu %}
+                      <span tabindex="0" class="mobile-menu-link {{ settings.header_first_level_menus_size }} {{ settings.header_first_level_menus_font }}-font">
+                        {% else %}
+                        <a href="{{ link.url }}"class="mobile-menu-link {{ settings.header_first_level_menus_size }} {{ settings.header_first_level_menus_font }}-font">
+                    {% endif %}
+                        {{- link.title }}
+                        {% if is_inner_menu %}
+                          {% render 'svg-icons', icon_type: 'angle-right' %}
+                        {% endif -%}
+                        {% if is_inner_menu %}
+                          </span>
+                          {% else %}
+                          </a>
+                    {% endif %}
+                      {% if menu_type == 'inner_menu' %}
+                        {% if link.links.size > 0 %}
+                          {% render 'mobile-inner-menu', link: link %}
+                        {% endif %}
+                      {% elsif menu_type == 'images_mega_menu' %}
+                        {% render 'mobile-image-megamenu', block: block_data, link: link %}
+                      {% elsif menu_type == 'tabs_mega_menu' %}
+                        {% render 'mobile-tabs-megamenu', block: block_data, link: link %}
+                      {% elsif menu_type == 'collections_mega_menu' %}
+                        {% render 'mobile-collections-megamenu', block: block_data, link: link %}
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% if is_menu_label %}
+                <div class="mobile-menu-promotion">
+                  {% for block in section.blocks %}
+                    {% case block.type %}
+                      {% when 'menu_label' %}
+                        {% liquid
+                          assign link = block.settings.link_to
+                          assign tag = 'div'
+                          if link != blank
+                            assign tag = 'a'
+                          endif
+                        %}
+                        <{{ tag }}
+                          {% if link != blank %}
+                            href="{{ block.settings.link_to }}"
+                            {% if block.settings.is_open_in_new_tab %}target="_blank" {% endif %}
+                          {% endif %}
+                          class="header-icon-link has-label"
+                        >
+                          {% render 'svg-list-icons', icon_type: block.settings.icon %}
+                          <span>{{ block.settings.menu_label_text }}</span>
+                        </{{ tag }}>
+                    {% endcase %}
+                  {% endfor %}
+                  {% if section.settings.store_loc_heading != blank %}
+                    <div class="announcement-store-selector" announcement-store-locator>
+                      <div class="announcement-store-selector-icon">
+                        {% render 'svg-icons', icon_type: 'icon-location' %}
+                      </div>
+                      <div class="announcement-store-selector-text">
+                        <span class="text-small">{{ section.settings.store_loc_heading }} </span>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mobile-menu-drawer-footer">
+            {% if section.settings.enable_country_language_selector_on_mobile %}
+              {% render 'localization', dataTrigger: 'header-localization', staticclass: 'header-icon-link' %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mobile-menu>
+<script src="{{ 'mobile-menu.js' | asset_url }}" defer="defer"></script>

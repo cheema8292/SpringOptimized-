@@ -1,0 +1,118 @@
+{% comment %} {{ 'collection-list.css' | asset_url | stylesheet_tag }}performance changes {% endcomment %}
+
+  <template data-type="search-drawer-terms">
+    <div class="drawer search-drawer drawer-right drawer-medium drawer-fixed {{ settings.search_color_scheme }}" is="search-drawer">
+      <div class="drawer-backdrop" drawer-backdrop></div>
+      <div class="drawer-inner">
+        <div class="drawer-contentwrap">
+          <div class="drawer-content">
+            <div class="drawer-head border-bottom">
+              <div class="drawer-head-inner">
+                <div class="drawer-heading heading-font h5 heading-color">Search</div>
+                <button type="button" aria-label="Close" class="drawer-close-btn" drawer-close>
+                  <span class="svg-wrapper">
+                    <svg viewBox="0 0 11 11" fill="none">
+                      <path d="M10.0681 9.36079C10.1134 9.40608 10.1493 9.45985 10.1738 9.51902C10.1983 9.5782 10.2109 9.64162 10.2109 9.70567C10.2109 9.76973 10.1983 9.83315 10.1738 9.89233C10.1493 9.9515 10.1134 10.0053 10.0681 10.0506C10.0228 10.0959 9.96902 10.1318 9.90984 10.1563C9.85067 10.1808 9.78724 10.1934 9.72319 10.1934C9.65914 10.1934 9.59572 10.1808 9.53654 10.1563C9.47736 10.1318 9.4236 10.0959 9.3783 10.0506L5.33594 6.00758L1.29357 10.0506C1.2021 10.142 1.07804 10.1934 0.948681 10.1934C0.819324 10.1934 0.695264 10.142 0.603794 10.0506C0.512325 9.95909 0.460938 9.83503 0.460938 9.70567C0.460937 9.57632 0.512325 9.45226 0.603794 9.36079L4.64677 5.31842L0.603794 1.27605C0.512325 1.18458 0.460938 1.06052 0.460938 0.931164C0.460938 0.801806 0.512325 0.677747 0.603794 0.586277C0.695264 0.494808 0.819324 0.44342 0.948681 0.44342C1.07804 0.44342 1.2021 0.494808 1.29357 0.586277L5.33594 4.62925L9.3783 0.586277C9.46977 0.494808 9.59383 0.44342 9.72319 0.44342C9.85255 0.44342 9.97661 0.494808 10.0681 0.586277C10.1595 0.677747 10.2109 0.801806 10.2109 0.931164C10.2109 1.06052 10.1595 1.18458 10.0681 1.27605L6.0251 5.31842L10.0681 9.36079Z" fill="currentColor"/>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+            <predictive-search-drawer class="drawer-body">
+              <div class="drawer-content-contain">
+                {% render 'search-box' %}
+                  <div class="predictive-search-suggestion hidden" predictive-search-suggestion></div>
+                {% if settings.enable_recent_searches %}
+                  <div class="predictive-search-suggestion hidden" recent-searched-box>
+                    <div class="predictive-search-suggestion-box">
+                      <div class="clear-recent-search">
+                        <span class="predictive-search-label heading-font text">Recent search</span>
+                        <button class="clear-recent-search-text" clear-recent-search>
+                          Clear
+                        </button>
+                      </div>
+                      <ul class="predictive-search-suggestion-inner" recent-list></ul>
+                    </div>
+                  </div>
+                {% endif %}
+
+                <div class="predictive-search-suggestion-wrapper">
+                  {% if settings.search_product_recommendations_enabled %}
+                    {% if settings.search_product_recommendations_product_list.count > 0 %}
+                      <div class="predictive-search-popular-product" product-recommendation-box>
+                        {% if settings.search_product_recommendations_heading != blank %}
+                          <span class="predictive-search-label heading-font {{ settings.search_product_recommendations_heading_size }}">
+                            {{- settings.search_product_recommendations_heading -}}
+                          </span>
+                        {% endif %}
+                        <div class="predictive-search-products-list" predictive-search-product-list>
+                          {% for product in settings.search_product_recommendations_product_list %}
+                            {% render 'horizontal-product-card', product: product, loading: 'lazy' %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                  <div class="predictive-search-result-tabs hidden" predictive-search-result-tab></div>
+                  {%- liquid
+                    assign show_categories = false
+                    assign show_recommendations = false
+                    if settings.search_popular_collections_enabled and settings.search_collection_list.count > 0
+                      assign show_categories = true
+                    endif
+                    if settings.search_recommendations_enabled and settings.search_recommendations_links.links.size > 0
+                      assign show_recommendations = true
+                    endif
+                  -%}
+                  {% if show_categories or show_recommendations %}
+                    <div class="predictive-search-categories">
+                      {% if settings.search_popular_collections_enabled %}
+                        {% if settings.search_collection_list.count > 0 %}
+                          <div class="predictive-popupar-categories">
+                            {% if settings.search_popular_collections_heading != blank %}
+                              <span class="predictive-search-label heading-font {{ settings.search_popular_collections_heading_size }}">
+                                {{- settings.search_popular_collections_heading -}}
+                              </span>
+                            {% endif %}
+                            {% if settings.search_collection_list.count > 0 %}
+                              <ul class="predictive-search-categories-lists">
+                                {% for collection in settings.search_collection_list %}
+                                  <li>
+                                    <a href="{{ collection.url }}" class="text-small">{{ collection.title }}</a>
+                                  </li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                      {% endif %}
+                      {% if settings.search_recommendations_enabled %}
+                        {% if settings.search_recommendations_links.links.size > 0 %}
+                          <div class="search-menus">
+                            {% if settings.search_recommendations_heading != blank %}
+                              <span class="predictive-search-label heading-font {{ settings.search_recommendations_heading_size }}">
+                                {{- settings.search_recommendations_heading -}}
+                              </span>
+                            {% endif %}
+                            {% if settings.search_recommendations_links.links.size > 0 %}
+                              <ul class="predictive-search-categories-lists">
+                                {% for link in settings.search_recommendations_links.links %}
+                                  <li>
+                                    <a href="{{ link.url }}" class="text-small">{{ link.title }}</a>
+                                  </li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </predictive-search-drawer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>

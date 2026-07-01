@@ -1,0 +1,164 @@
+<style>
+  #shopify-block-{{ block.id }}{
+       --hotspotOffsetTop: {{ block.settings.desktop_vertical_position }}%;
+       --hotspotOffsetLeft: {{ block.settings.desktop_horizontal_position }}%;
+  }
+   @media only screen and (max-width: 767px) {
+      #shopify-block-{{ block.id }}{
+     position:"absolute";
+              --hotspotOffsetTop: {{ block.settings.mobile_vertical_position }}%;
+              --hotspotOffsetLeft: {{ block.settings.mobile_horizontal_position }}%;
+          }
+
+   }
+</style>
+{% liquid
+  # Inputs (percent values 0–100)
+  assign x = block.settings.desktop_horizontal_position | default: 50
+  assign y = block.settings.desktop_vertical_position | default: 50
+
+  assign desktop_horizontal_class = ''
+  assign desktop_vertical_class = ''
+  if x == 10 and y == 10
+    assign desktop_horizontal_class = 'content-right'
+    assign desktop_vertical_class = 'content-bottom'
+  else
+    if x >= 30 and x <= 60
+      assign desktop_horizontal_class = ''
+    elsif x <= 15
+      assign desktop_horizontal_class = 'content-right'
+    elsif x >= 75
+      assign desktop_horizontal_class = 'content-left'
+    elsif x <= 50
+      assign desktop_horizontal_class = 'content-right'
+    else
+      assign desktop_horizontal_class = 'content-left'
+    endif
+    if y >= 30 and y <= 60
+      assign desktop_vertical_class = ''
+    elsif y <= 15
+      assign desktop_vertical_class = 'content-bottom'
+    elsif y >= 75
+      assign desktop_vertical_class = 'content-top'
+    elsif y <= 50
+      assign desktop_vertical_class = 'content-bottom'
+    else
+      assign desktop_vertical_class = 'content-top'
+    endif
+  endif
+%}
+
+<div
+  class="lookbook-hotspot {{ desktop_horizontal_class }} {{ desktop_vertical_class }}"
+  id="shop-the-look-hotspot-{{ block.id }}"
+  data-lookbook-hotspot-wrapper
+>
+  <variant-button
+    {% if block.settings.product != blank %}
+      tabindex="0" aria-disabled="true"
+    {% endif %}
+    class="hotspot-button"
+    role="button"
+    aria-label="Spotlight button"
+    {% if block.settings.product != blank %}
+      data-product-url="{{ block.settings.product.url }}"
+    {% endif %}
+    tabindex="0"
+  >
+  </variant-button>
+  <div class="hotspot-content">
+    {% if block.settings.product != blank %}
+      <p class="hotspot-product-title text font-bold">{{ block.settings.product.title }}</p>
+      <div class="product-price">
+        <span class="actual-price">{{ block.settings.product.price | money }}</span>
+      </div>
+    {% else %}
+      <p class="hotspot-product-title text font-bold">{{ 'onboarding.product_title' | t }}</p>
+      <div class="product-price">
+        <span class="actual-price">{{ 1999 | money_with_currency }}</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "t:sections.lookbook-banner.blocks.spotlite.name",
+  "class": "lookbook-hotspot-block",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:sections.all.headers.product"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.lookbook-banner.blocks.spotlite.settings.label"
+    },
+    {
+      "type": "select",
+      "label": "t:sections.lookbook-banner.blocks.spotlite.settings.position.label",
+      "id": "set_position_for",
+      "options": [
+        {
+          "label": "t:sections.lookbook-banner.blocks.spotlite.settings.position.option__0.label",
+          "value": "desktop"
+        },
+        {
+          "label": "t:sections.lookbook-banner.blocks.spotlite.settings.position.option__1.label",
+          "value": "mobile"
+        }
+      ],
+      "default": "desktop"
+    },
+    {
+      "type": "range",
+      "id": "desktop_horizontal_position",
+      "label": "t:sections.lookbook-banner.blocks.spotlite.settings.horizontal_position",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.set_position_for == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "desktop_vertical_position",
+      "label": "t:sections.lookbook-banner.blocks.spotlite.settings.vertical_position",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.set_position_for == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "mobile_horizontal_position",
+      "label": "t:sections.lookbook-banner.blocks.spotlite.settings.horizontal_position",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.set_position_for == 'mobile' }}"
+    },
+    {
+      "type": "range",
+      "id": "mobile_vertical_position",
+      "label": "t:sections.lookbook-banner.blocks.spotlite.settings.vertical_position",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.set_position_for == 'mobile' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.lookbook-banner.blocks.spotlite.name"
+    }
+  ]
+}
+{% endschema %}

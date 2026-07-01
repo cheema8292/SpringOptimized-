@@ -1,0 +1,79 @@
+{%- unless product.has_only_default_variant -%}
+  {% if product != blank %}
+    {% capture has_color_options %}
+    {%- assign has_catagory_swatches = false -%}
+    {%- for option in product.options_with_values -%}
+      {%- assign swatch_count = option.values | map: 'swatch' | compact | size -%}
+      {% comment %}
+        Check if the option has a color trigger (e.g., "color" in the option name).
+      {% endcomment %}
+      {% assign has_color_trigger = false %}
+      {% if settings.color_name != blank %}
+        {% assign swatch_trigger_list = settings.color_name | downcase | split: ',' %}
+        {% assign downcased_option = option.name | downcase %}
+        {% for trigger in swatch_trigger_list %}
+          {% assign swatch_trigger = trigger | strip %}
+          {% if downcased_option contains swatch_trigger %}
+            {% assign has_color_trigger = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% comment %}
+        Render swatches only if either `swatch_count > 0` or `has_color_trigger` is true.
+        If neither is true, skip this option entirely.
+      {% endcomment %}
+      {% if swatch_count > 0 %}
+        {%- assign has_catagory_swatches = true -%}
+        {%- assign options_size = option.values.size -%}
+            {%- for option_value in option.values limit: settings.swatches_count -%}
+                 {% if option_value.variant.featured_media != blank %}
+                    <div class="product-card-variant-images-inner"  data-variant-image="{{ option_value.variant.id }}">
+                     {{ option_value.variant.featured_media
+                        | image_url: width: 3840, format: 'webp'
+                        | image_tag:
+                        widths: '360, 540, 720, 960, 1200, 1440, 1680, 1920',  
+                        sizes: '(max-width: 749px) 50vw, (min-width: 750px) and (max-width: 1199px) 33vw, (min-width: 1200px) and (max-width: 1599px) 25vw, (min-width: 1600px) 20vw, 100vw',
+                        loading: loading,
+                        decoding: 'async',
+                        class: 'product-card-image',
+                        alt: product_card.title | escape
+                    }}
+                    </div>
+                 {% endif %}
+            {%- endfor -%}
+        {% break %}
+      {% elsif has_color_trigger and has_catagory_swatches == false %}
+        {%- assign options_size = option.values.size -%}
+            {%- for option_value in option.values limit: settings.swatches_count -%}
+              {% if has_color_trigger %}
+                 {% if option_value.variant.featured_media != blank %}
+                    <div class="product-card-variant-images-inner"  data-variant-image="{{ option_value.variant.id }}">
+                     {{ option_value.variant.featured_media
+                        | image_url: width: 3840, format: 'webp'
+                        | image_tag:
+                        widths: '360, 540, 720, 960, 1200, 1440, 1680, 1920',  
+                        sizes: '(max-width: 749px) 50vw, (min-width: 750px) and (max-width: 1199px) 33vw, (min-width: 1200px) and (max-width: 1599px) 25vw, (min-width: 1600px) 20vw, 100vw',
+                        loading: loading,
+                        decoding: 'async',
+                        class: 'product-card-image',
+                        alt: product_card.title | escape
+                    }}
+                    </div>
+                 {% endif %}
+              {% endif %}
+            {%- endfor -%}
+        {% break %}
+      {% endif %}
+    {%- endfor -%}
+  {% endcapture %}
+    {% if options_size == 1 and settings.hide_single_swatch %}
+      {% assign hide_swatches = true %}
+    {% endif %}
+    {% if options_size > 0 and hide_swatches != true %}
+      <div class="product-card-variant-images-wrapper">
+        {{ has_color_options }}
+      </div>
+    {% endif %}
+  {% endif %}
+{%- endunless -%}

@@ -1,0 +1,54 @@
+{%- liquid
+  assign logo = section.settings.logo
+  assign alternate_logo = section.settings.alternate_logo | default : logo
+-%}
+<div class="header-logo-main">
+  
+    {% if logo != blank %}
+      {%- assign logo_alt = logo.alt | default: shop.name | escape -%}
+      {%- assign logo_height = section.settings.logo_width | divided_by: logo.aspect_ratio -%}
+      {% capture widths %}{{ section.settings.logo_width }}, {{ section.settings.logo_width | times: 1.5 | round }}, {{ section.settings.logo_width | times: 2 }}{% endcapture %}
+      {% capture sizes %}(max-width: {{ section.settings.logo_width | times: 2 }}px) 50vw, {{ section.settings.logo_width }}px{% endcapture %}
+      {% assign range_width = section.settings.logo_width %}
+      <a
+        href="{{ routes.root_url }}"
+        class="header-logo"
+        aria-label="Logo"
+      >
+        {{
+          logo
+          | image_url: width: logo.width
+          | image_tag:
+            class: 'header-logo-img',
+            widths: widths,
+            height: logo_height,
+            width: range_width,
+            alt: logo_alt,
+            sizes: sizes,
+            preload: true
+        }}
+
+        {% if alternate_logo and is_transparent_logo_exist %}
+          {{
+            alternate_logo
+            | image_url: width: logo.width
+            | image_tag:
+              class: 'header-logo-alternate',
+              widths: widths,
+              height: logo_height,
+              width: range_width,
+              alt: logo_alt,
+              sizes: sizes,
+              preload: true
+          }}
+        {% endif %}
+      </a>
+    {% else %}
+      <a
+        href="{{ routes.root_url }}"
+        class="store-name text-medium heading-font"
+      >
+      {{ shop.name }}
+      </a>
+    {% endif %}
+</div>

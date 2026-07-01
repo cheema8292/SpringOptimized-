@@ -1,0 +1,428 @@
+{% if section.settings.heading != blank or section.settings.description != blank or section.blocks.size > 0 %}
+  <store-locator-drawer
+    id="store-locator-drawer"
+    class="drawer drawer-right drawer-medium drawer-fixed {{ section.settings.color_scheme }}"
+    tabindex="0"
+    {% if section.blocks.size == 1 %}
+      data-single-store
+    {% endif %}
+  >
+    <div class="drawer-backdrop" drawer-close></div>
+    <div class="drawer-inner">
+      <div class="drawer-contentwrap color-scheme">
+        <div class="drawer-content">
+          <div class="drawer-head border-bottom">
+            <div class="drawer-head-inner">
+              <div class="drawer-heading heading-font h5 heading-color">{{ 'sections.store_Locator.heading' | t }}</div>
+              <button type="button" aria-label="Close" class="drawer-close-btn" close-btn-store-locator>
+                {% render 'svg-icons', icon_type: 'cross-icon' %}
+              </button>
+            </div>
+          </div>
+          <div class="drawer-body store-selector-body">
+            <div class="store-selector-content">
+              {% assign description_data = '' %}
+              {% if section.settings.description != blank %}
+                {% assign description_data = '<p class="'
+                  | append: section.settings.description_size
+                  | append: '">'
+                  | append: section.settings.description
+                  | newline_to_br
+                  | append: '</p>'
+                %}
+              {% endif %}
+              {% render 'section-heading',
+                section_heading_tag: section.settings.heading_tag,
+                section_heading_size: section.settings.heading_size,
+                section_heading_content: section.settings.heading,
+                section_heading_highlight_text: section.settings.highlight_text,
+                section_heading_highlight_font: section.settings.highlight_font,
+                section_extra_classes: 'store-selector-content-header',
+                extra_html_content: description_data
+              %}
+              <div class="store-selector-list">
+                {% for block in section.blocks %}
+                  {% if block.settings.store_name != blank %}
+                    <div
+                      class="store-selector-item"
+                      data-store-selector-item
+                      data-handle="{{ block.settings.store_name | handleize }}"
+                      data-title="{{ block.settings.store_name }}"
+                    >
+                      <div class="store-selector-image">
+                        <div class="media-card media-adapt" style="--imageRatio:1/1;">
+                          {% if block.settings.store_media == 'image' %}
+                            {% if block.settings.store_image != blank %}
+                              {% liquid
+                                assign default_alt = 'default_alt.store_locator_image' | t
+                                assign image_alt = block.settings.store_image.alt | default: default_alt
+                                assign image_sizes = '(max-width: 400px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, (max-width: 1600px) 25vw, 20vw'
+                                assign image_widths = '375, 550, 750, 1100, 1500, 1780'
+                              %}
+                              {{
+                                block.settings.store_image
+                                | image_url: width: 750, format: 'webp'
+                                | image_tag:
+                                  sizes: image_sizes,
+                                  widths: image_widths,
+                                  decoding: 'async',
+                                  loading: 'lazy',
+                                  fetchpriority: 'auto',
+                                  alt: image_alt
+                              }}
+                            {% else %}
+                              {{ 'image' | placeholder_svg_tag }}
+                            {% endif %}
+                          {% elsif block.settings.store_media == 'map' %}
+                            {% if block.settings.store_map != blank %}
+                              <iframe
+                                class="map-container"
+                                src="https://www.google.com/maps?q={{- block.settings.store_map |  replace: ' ', '+' -}}&output=embed"
+                                allowfullscreen
+                              >
+                              </iframe>
+                            {% else %}
+                              {{ 'image' | placeholder_svg_tag }}
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="store-selector-image-content">
+                        <h6 class="heading-font text store-selector-item-title">{{ block.settings.store_name }}</h6>
+                        {% if block.settings.pickup_time != blank and block.settings.pickup_price != blank %}
+                          <div class="store-selector-item-price">
+                            <p>
+                              {% if block.settings.pickup_price != blank -%}
+                                <strong>{{ block.settings.pickup_price }}.</strong>
+                              {%- endif %}
+                              {{ block.settings.pickup_time }}
+                            </p>
+                          </div>
+                        {% endif %}
+                        <div class="store-selector-item-address">
+                          {% if block.settings.store_address != blank %}
+                            <div class="store-selector-item-address-list">
+                              <div class="store-selector-address-icon">
+                                {% render 'svg-icons', icon_type: 'icon-location' %}
+                              </div>
+                              <div class="store-selector-address-content">
+                                <p class="text-small heading-font store-selector-address-title">
+                                  {{ 'sections.store_Locator.address' | t }}
+                                </p>
+                                <p class="text-small store-selector-address-text">
+                                  {{ block.settings.store_address | newline_to_br }}
+                                </p>
+                              </div>
+                            </div>
+                          {% endif %}
+                          {% if block.settings.store_phone != blank %}
+                            <div class="store-selector-item-address-list">
+                              <div class="store-selector-address-icon">
+                                {% render 'svg-icons', icon_type: 'icon-phone' %}
+                              </div>
+                              <div class="store-selector-address-content">
+                                <p class="text-small heading-font store-selector-address-title">
+                                  {{ 'sections.store_Locator.phone' | t }}
+                                </p>
+                                <p class="text-small store-selector-address-text">
+                                  {{ block.settings.store_phone }}
+                                </p>
+                              </div>
+                            </div>
+                          {% endif %}
+                          {% if block.settings.store_working_Hours != blank %}
+                            <div class="store-selector-item-address-list">
+                              <div class="store-selector-address-icon">
+                                {% render 'svg-icons', icon_type: 'clock' %}
+                              </div>
+                              <div class="store-selector-address-content">
+                                <p class="text-small heading-font store-selector-address-title">
+                                  {{ 'sections.store_Locator.worling_hours' | t }}
+                                </p>
+                                <p class="text-small store-selector-address-text">
+                                  {{ block.settings.store_working_Hours | newline_to_br }}
+                                </p>
+                              </div>
+                            </div>
+                          {% endif %}
+                        </div>
+                        <div class="store-selector-input">
+                          {% if section.blocks.size >= 1 %}
+                            <input
+                              type="checkbox"
+                              name="store-selector"
+                              value="{{ block.settings.store_name }}"
+                              aria-label="Select store {{ block.settings.store_name }}"
+                              class="checkbox-input"
+                            >
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% if section.blocks.size >= 1 %}
+              <div class="store-selector-actions">
+                <button
+                  type="button"
+                  class="button full-button {{ section.settings.button_style }}"
+                  aria-label="{{ section.settings.button_title }}"
+                  disabled
+                  data-js-select-store
+                >
+                  {% render 'button-text-icon', button_text: section.settings.button_title %}
+                </button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </store-locator-drawer>
+  <script>
+    class StoreLocatorDrawer extends HTMLElement {
+      constructor() {
+        super();
+        this.section = this.closest('.shopify-section');
+        this.overlay = this.querySelector('[drawer-close]');
+        this.closeBtn = this.querySelector('[close-btn-store-locator]');
+        this.addEventListener('keyup', (evt) => evt.key === 'Escape' && this.close());
+        if (Shopify.designMode) {
+          this.section.addEventListener('shopify:section:select', () => this.open());
+          this.section.addEventListener('shopify:section:deselect', () => this.close());
+          this.section.addEventListener('shopify:section:unload', () => this.close());
+          this.section.addEventListener('shopify:section:load', () => this.open());
+        }
+
+        if (this.closeBtn) {
+          this.closeBtn.addEventListener('click', () => {
+            this.close();
+          });
+        }
+
+        this.overlay.addEventListener('click', () => {
+          this.close();
+        });
+        this.stores = new Map();
+        this.storesList = [];
+      }
+
+      connectedCallback() {
+        this._initStores();
+        this._bindEvents();
+
+        // Restore selection from localStorage
+        const savedHandle = localStorage.getItem('selected-store');
+        if (savedHandle && this.stores.has(savedHandle)) {
+          this._selectStore(this.stores.get(savedHandle));
+        }
+      }
+
+      _initStores() {
+        this.querySelectorAll('[data-store-selector-item]').forEach((item) => {
+          this.storesList[item.dataset.handle] = item.dataset.title;
+          this.stores.set(item.dataset.handle, item);
+
+          // Auto-select for single store case
+          if (this.hasAttribute('data-single-store')) {
+            this._saveStore(item.dataset.handle);
+          }
+        });
+      }
+
+      _bindEvents() {
+        // Handle checkbox clicks (event delegation)
+        this.addEventListener('click', (e) => {
+          const input = e.target.closest('.checkbox-input');
+          if (!input) return;
+
+          const item = input.closest('[data-store-selector-item]');
+          if (item) this._selectStore(item);
+        });
+
+        this.addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') {
+            const input = e.target.closest('.checkbox-input');
+            if (!input) return;
+
+            const item = input.closest('[data-store-selector-item]');
+            if (item) this._selectStore(item);
+          }
+        });
+
+        // Handle confirm button
+        const confirmBtn = this.querySelector('[data-js-select-store]');
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const active = this.querySelector('.store-selector-item-store-active');
+            if (active) {
+              this._saveStore(active.dataset.handle);
+            } else {
+              this._clearStore();
+            }
+            this.dispatchEvent(
+              new CustomEvent('storechanged', {
+                detail: { handle: active?.dataset.handle || null },
+              })
+            );
+            this.close();
+          });
+        }
+      }
+
+      _selectStore(item) {
+        // Clear previous
+        const current = this.querySelector('.store-selector-item-store-active');
+        if (current && current !== item) {
+          current.classList.remove('store-selector-item-store-active');
+          const input = current.querySelector('input[type="checkbox"]');
+          if (input) input.checked = false;
+        }
+
+        // Toggle current
+        item.classList.toggle('store-selector-item-store-active');
+        const input = item.querySelector('input[type="checkbox"]');
+        if (input) input.checked = item.classList.contains('store-selector-item-store-active');
+
+        this._updateConfirmButtonState();
+      }
+
+      _updateConfirmButtonState() {
+        const confirmBtn = this.querySelector('[data-js-select-store]');
+        if (!confirmBtn) return;
+
+        const hasSelection = !!this.querySelector('.store-selector-item-store-active');
+        confirmBtn.disabled = !hasSelection;
+      }
+
+      _saveStore(handle) {
+        localStorage.setItem('selected-store', handle);
+      }
+
+      _clearStore() {
+        localStorage.removeItem('selected-store');
+      }
+
+      open() {
+        this.setAttribute('drawer-open', '');
+        setTimeout(() => {
+          this.classList.add('drawer-open');
+        }, 500);
+        document.body.classList.add('overflow-hidden');
+      }
+
+      close() {
+        this.classList.remove('drawer-open');
+        setTimeout(() => {
+          this.removeAttribute('drawer-open');
+        }, 300);
+        const checkMobileDrawer = document.querySelector('mobile-menu');
+        if (!checkMobileDrawer.classList.contains('drawer-open')) {
+          document.body.classList.remove('overflow-hidden');
+        }
+        setTimeout(() => {
+          const desktopAnnouncement = document.querySelector('announcement-bar');
+          if (desktopAnnouncement) {
+            this.desktopStoreLocatorButton = desktopAnnouncement.querySelector('[announcement-store-locator]');
+            this.desktopStoreLocatorButton.focus();
+          }
+        }, 500);
+      }
+    }
+
+    customElements.define('store-locator-drawer', StoreLocatorDrawer);
+
+    class PickupAvailabilityCompact extends HTMLElement {
+      constructor() {
+        super();
+        const desktopAnnouncement = document.querySelector('announcement-bar');
+        if (desktopAnnouncement) {
+          this.desktopStoreLocatorButton = desktopAnnouncement.querySelector('[announcement-store-locator]');
+        }
+        const mobileMenuDrawer = document.querySelector('mobile-menu');
+        if (mobileMenuDrawer) {
+          this.mobileStoreLocatorButton = mobileMenuDrawer.querySelector('[announcement-store-locator]');
+        }
+        this.storeSelector = document.querySelector('store-locator-drawer');
+        if (this.storeSelector) {
+          this.updateTriggerClasses();
+          window.addEventListener('resize', () => this.updateTriggerClasses());
+          const STORE_CHANGED_EVENT = () => {
+            this.fetchAvailability(this.dataset.variantId, true);
+          };
+          this.storeSelector.addEventListener('storechanged', STORE_CHANGED_EVENT);
+          const observer = new MutationObserver(() => {
+            this.storeSelector.removeEventListener('storechanged', STORE_CHANGED_EVENT);
+            observer.disconnect();
+          });
+          observer.observe(this.parentElement, {
+            attributes: false,
+            childList: true,
+            subtree: false,
+          });
+          this.fetchAvailability(this.dataset.variantId);
+        }
+      }
+
+      updateTriggerClasses() {
+        this.classList.remove('active');
+
+        const isMobile = window.innerWidth <= 1024;
+
+        if (isMobile && this.mobileStoreLocatorButton) {
+          this.classList.add('active');
+        } else if (!isMobile && this.desktopStoreLocatorButton) {
+          this.classList.add('active');
+        }
+      }
+
+      fetchAvailability(variantId, forceFetch = false) {
+        const variantSectionUrl = `${
+          this.dataset.baseUrl.endsWith('/') ? this.dataset.baseUrl : `${this.dataset.baseUrl}/`
+        }variants/${variantId}/?section_id=helper-pickup-availability-compact`;
+        fetch(variantSectionUrl)
+          .then((response) => response.text())
+          .then((text) => {
+            const sectionInnerHTML = new DOMParser()
+              .parseFromString(text, 'text/html')
+              .querySelector('.shopify-section');
+            this.renderPreview(sectionInnerHTML);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+
+      renderPreview(sectionInnerHTML) {
+        const selectedStore = localStorage.getItem('selected-store');
+        if (this.storeSelector && selectedStore && this.storeSelector.storesList[selectedStore]) {
+          let storeFound = false;
+          if (selectedStore) {
+            sectionInnerHTML.querySelectorAll('.pickup-availability-alert').forEach((elm) => {
+              if (selectedStore == elm.dataset.store) {
+                this.innerHTML = elm.innerHTML.replace('{ store }', this.storeSelector.storesList[selectedStore]);
+                storeFound = true;
+              }
+            });
+          }
+          if (!storeFound) {
+            this.innerHTML = sectionInnerHTML
+              .querySelector('.pickup-availability-alert[data-default-unavailable]')
+              .innerHTML.replace('{ store }', this.storeSelector.storesList[selectedStore]);
+            storeFound = true;
+          }
+          if (!selectedStore || !storeFound) {
+            this.innerHTML = '';
+          }
+        } else {
+          // search based on default store
+          this.innerHTML = sectionInnerHTML.querySelector('.pickup-availability-alert[data-default-store]').innerHTML;
+        }
+      }
+    }
+    customElements.define('pickup-availability-compact', PickupAvailabilityCompact);
+  </script>
+{% endif %}

@@ -1,0 +1,76 @@
+.video-banner-wrapper {
+    overflow: hidden;
+}
+
+.video-hero-content {
+    z-index: 1;
+}
+
+.video-poster-button {
+    padding: clamp(3vw, 70px, 3.5vw);
+    overflow: hidden;
+}
+
+.video-poster-button p {
+    line-height: var(--bodyFontLineHeight);
+}
+
+.video-play-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 8px;
+    border-radius: 40px;
+    color: var(--overlayTextColor);
+    --svgSize: 54px;
+}
+
+.video-play-btn svg { 
+    width: 40px;
+    height: auto;
+}
+
+.video-play-btn * {
+    position: relative;
+    z-index: 1;
+}
+
+.video-play-btn-text {
+    padding-inline-start: 10px;
+    padding-inline-end: 20px;
+}
+
+.video-banner-media[autoplay] .video-poster,
+.video-banner-media[autoplay] svg.placeholder-svg,
+.video-banner-media[autoplay] .video-poster-button {
+    opacity: 0;
+    visibility: hidden;
+}
+.video-play-btn {
+    color: var(--iconColor);
+}
+   
+.video-banner-media:has(.video-poster-button:focus-visible) {
+    outline: 2px solid var(--keyboardFocus);
+}
+
+ .video-play-pause-button{
+    display: inline-grid;
+    justify-content: center;
+    padding: 6px;
+    background: var(--buttonBackground);
+    color: var(--buttonColor);
+    width: 35px;
+    height: 20px;
+    border-radius: 30px;
+    --svgSize: 8px; 
+} 
+.video-play-pause-button>* {
+    grid-column: 1/-1;
+    grid-row: 1/-1;
+}
+ 
+.video-banner-media:has(.video-play-pause-button) iframe {
+    pointer-events: none;
+}

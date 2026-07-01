@@ -1,0 +1,298 @@
+{{ 'reveal-categories.css' | asset_url | stylesheet_tag }}
+{% liquid
+  assign loading = 'lazy'
+  assign fetch_priority = 'auto'
+  if section.index <= 2
+    assign loading = 'eager'
+    assign fetch_priority = 'high'
+  endif
+%}
+<div class="reveal-category-main color-scheme {{ section.settings.color_scheme }}">
+  <reveal-categories class="reveal-category-element d-block">
+    <div
+      class="reveal-category-wrapper"
+      animatedSection="true"
+      methodSection="revealCategory"
+      data-section="{{ section.id }}"
+      data-block-size="{{ section.blocks.size }}"
+      data-animation-style="{{ section.settings.animation_style }}"
+    >
+      <div class="reveal-category-captions-list" reveal-category-caption>
+        {% for block in section.blocks %}
+          {% liquid
+            assign collection_list = block.settings.collection
+            assign collection_title = block.settings.custom_title | default: collection_list.title
+            assign collection_url = collection_list.url
+          %}
+          <a
+            {% if collection_url != blank %}
+              href="{{ collection_url }}"
+            {% else %}
+              data-disabled="true"
+            {% endif %}
+            class="reveal-category-caption {{ section.settings.title_font_size }} heading-font heading-color text-center{% if forloop.first %} active{% endif %}"
+            reveal-caption-list
+            data-reveal-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            <span>
+            {{ collection_title | default: 'Add collection' }}
+            </span>
+          </a>
+        {% endfor %}
+      </div>
+      <ul class="reveal-category-images-list {% if section.settings.enable_overlay %}media-card-overlay{% endif %}" reveal-catgory-image-list>
+        {% for block in section.blocks %}
+          {% liquid
+            assign collection = block.settings.collection
+            assign collection_image = block.settings.image_collection | default: collection.featured_image
+          %}
+          <li
+            class="reveal-category-image{% if forloop.first %} active{% endif %}"
+            reveal-category-images
+            {{ block.shopify_attributes }}
+          >
+            <div class="reveal-category-image-container">
+              <div class="media-card media-fixed-height">
+                {% if collection != blank and collection_image != blank %}
+                  {% liquid
+                    assign default_alt = collection.title | escape
+                    assign collection_image_alt = collection_image.alt | default: default_alt
+                  %}
+                  {{ collection_image | image_url: width: 3840, format: 'webp' | image_tag:
+                    sizes: '(max-width: 479px) 100vw, (max-width: 767px) 100vw, (max-width: 1023px) 100vw, 100vw',
+                    widths: '180, 240, 320, 375, 480, 600, 768, 900, 1024, 1280, 1600, 1920, 2560, 3840',
+                    decoding: 'async',
+                    loading: loading,
+                    fetchpriority: fetch_priority,
+                    alt: collection_image_alt
+                  }}
+                {% else %}
+                  {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {% endif %}
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+        <li class="reveal-category-cover-overlay" reveal-highlight-overlay></li>
+      </ul>
+    </div>
+  </reveal-categories>
+</div>
+<style>
+    #shopify-section-{{ section.id }}{
+      {% if section.settings.enable_overlay %}
+        {% if section.settings.overlay_style == 'gradient' %}
+          --imageOverlay: {{ section.settings.overlay_gradient }};
+        {% else %}
+          --imageOverlay: rgba({{ section.settings.overlay_solid.rgba }});
+        {% endif %}
+      {% endif %}
+    }
+    {% if section.settings.section_visibility == 'large' %}
+      @media(max-width: 767px) {
+        #shopify-section-{{ section.id }} {
+          display: none !important;
+        }
+      }
+    {% elsif section.settings.section_visibility == 'small' %}
+    @media(min-width: 768px) {
+      #shopify-section-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {% endif %}
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.reveal-category-scroll.name",
+  "class": "reveal-category-section",
+  "tag": "section",
+  "disabled_on": { "groups": ["header", "footer", "custom.Overlay"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "select",
+      "id": "section_visibility",
+      "label": "t:sections.all.settings.section_visibility.label",
+      "default": "always",
+      "options": [
+        {
+          "label": "t:sections.all.settings.section_visibility.always.label",
+          "value": "always"
+        },
+        {
+          "label": "t:sections.all.settings.section_visibility.small_devices.label",
+          "value": "small"
+        },
+        {
+          "label": "t:sections.all.settings.section_visibility.large_devices.label",
+          "value": "large"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.collection"
+    },
+    {
+      "type": "select",
+      "id": "title_font_size",
+      "label": "t:sections.all.settings.title_size.label",
+      "default": "h0",
+      "options": [
+        {
+          "value": "h0",
+          "label": "t:sections.all.settings.heading_size.options.xx-large"
+        },
+        {
+          "value": "h1",
+          "label": "t:sections.all.settings.heading_size.options.heading_xl"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.settings.heading_size.options.heading_l"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.settings.heading_size.options.heading_m"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.settings.heading_size.options.heading_s"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.settings.heading_size.options.heading_xs"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "animation_style",
+      "label": "Animation on:",
+      "default": "both",
+      "options": [
+        {
+          "value": "text",
+          "label": "Text"
+        },
+        {
+          "value": "background",
+          "label": "Background"
+        },
+        {
+          "value": "both",
+          "label": "Both"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.overlay.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "t:sections.all.settings.overlay.enable_overlay.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:sections.all.settings.overlay.style.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.overlay.style.options__0.label",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.overlay.style.options__1.label",
+          "value": "gradient"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color_background",
+      "id": "overlay_gradient",
+      "label": "t:sections.all.settings.overlay.color.label",
+      "default": "linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.04) 100%)",
+      "visible_if": "{{ section.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_solid",
+      "label": "t:sections.all.settings.overlay.color.label",
+      "alpha": true,
+      "default": "#00000093",
+      "visible_if": "{{ section.settings.overlay_style == 'solid' }}"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "limit": 10,
+      "name": "t:sections.all.headers.collection",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "It is recommended to use short and concise names for collections.",
+        },      
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:sections.all.headers.collection"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.all.headers.custom_content",
+          "info": "t:sections.all.headers.custom_content_note"
+        },
+        {
+          "type": "image_picker",
+          "label": "t:sections.all.headers.image",
+          "id": "image_collection"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "t:sections.all.headers.title"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.reveal-category-scroll.presets.name",
+      "category": "Collections",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

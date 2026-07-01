@@ -1,0 +1,511 @@
+{% comment %}
+  Section: Comparison Table (Custom)
+  - Looks like "HOLLOW ALPACA VS. OTHER MATERIAL"
+  - Background (color / image), overlay, pattern feel
+  - Center product/logo column + 2 comparison columns
+  - Rows via blocks (feature + check/cross per column)
+  - Fully customizable in Theme Customizer
+{% endcomment %}
+
+<section
+  id="cmp-{{ section.id }}"
+  class="cmp"
+  style="
+    --cmp-bg: {{ section.settings.bg_color }};
+    --cmp-text: {{ section.settings.text_color }};
+    --cmp-muted: {{ section.settings.muted_text_color }};
+    --cmp-line: {{ section.settings.line_color }};
+    --cmp-panel: {{ section.settings.center_panel_bg }};
+    --cmp-panel-radius: {{ section.settings.center_panel_radius }}px;
+    --cmp-panel-w: {{ section.settings.center_panel_width }}px;
+    --cmp-check: {{ section.settings.check_color }};
+    --cmp-cross: {{ section.settings.cross_color }};
+    --cmp-cross-bg: {{ section.settings.cross_bg_color }};
+    --cmp-overlay: {{ section.settings.overlay_color }};
+    --cmp-overlay-op: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --cmp-max: {{ section.settings.max_width }}px;
+    --cmp-py: {{ section.settings.padding_y }}px;
+    --cmp-px: {{ section.settings.padding_x }}px;
+    --cmp-h-size: {{ section.settings.heading_size }}px;
+    --cmp-col-size: {{ section.settings.column_label_size }}px;
+    --cmp-row-size: {{ section.settings.row_text_size }}px;
+    --cmp-icon: {{ section.settings.icon_size }}px;
+  "
+>
+  <div class="cmp__bg" aria-hidden="true">
+    {% if section.settings.bg_image != blank %}
+      <img
+        src="{{ section.settings.bg_image | image_url: width: 2000 }}"
+        srcset="
+          {{ section.settings.bg_image | image_url: width: 1000 }} 1000w,
+          {{ section.settings.bg_image | image_url: width: 1400 }} 1400w,
+          {{ section.settings.bg_image | image_url: width: 2000 }} 2000w
+        "
+        sizes="100vw"
+        alt=""
+        class="cmp__bg-img"
+        loading="lazy"
+      >
+    {% endif %}
+    {% if section.settings.enable_overlay %}
+      <div class="cmp__overlay"></div>
+    {% endif %}
+  </div>
+
+  <div class="cmp__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="cmp__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p class="cmp__sub">{{ section.settings.subheading }}</p>
+    {% endif %}
+
+    <div class="cmp__wrap" role="region" aria-label="Comparison table">
+      <!-- Header row -->
+      <div class="cmp__grid cmp__grid--head">
+  <div class="cmp__cell cmp__cell--feature" aria-hidden="true"></div>
+
+  <!-- Center header cell (image overrides text) -->
+  <div class="cmp__cell cmp__cell--center">
+    <div class="cmp__panel cmp__panel--head">
+      {% if section.settings.center_head_image != blank %}
+        <img
+          src="{{ section.settings.center_head_image | image_url: width: 240 }}"
+          alt="{{ section.settings.center_head_image_alt | escape }}"
+          class="cmp__logo"
+          loading="lazy"
+        >
+      {% elsif section.settings.center_head_text != blank %}
+        <div class="cmp__head-text" style="color: {{ section.settings.center_head_text_color }};">
+          {{ section.settings.center_head_text }}
+        </div>
+      {% elsif section.settings.center_logo != blank %}
+        <img
+          src="{{ section.settings.center_logo | image_url: width: 240 }}"
+          alt="{{ section.settings.center_logo_alt | escape }}"
+          class="cmp__logo"
+          loading="lazy"
+        >
+      {% else %}
+        <div class="cmp__logo cmp__logo--placeholder" aria-hidden="true"></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right column header cell (image overrides text) -->
+  <div class="cmp__cell cmp__cell--col rt_img">
+  {% if section.settings.col2_head_image != blank %}
+    <img
+      src="{{ section.settings.col2_head_image | image_url: width: 240 }}"
+      alt="{{ section.settings.col2_head_image_alt | escape }}"
+      class="cmp__col-head-img"
+      loading="lazy"
+    >
+  {% elsif section.settings.col2_head_text != blank %}
+    <div class="cmp__col-label" style="color: {{ section.settings.col2_head_text_color }};">
+      {{ section.settings.col2_head_text }}
+    </div>
+  {% else %}
+    <div class="cmp__col-label" style="color: {{ section.settings.col2_head_text_color }};">
+      {{ section.settings.col_2_label }}
+    </div>
+  {% endif %}
+</div>
+
+</div>
+
+
+      <!-- Body rows -->
+      <div class="cmp__body">
+        {% for block in section.blocks %}
+          <div class="cmp__grid cmp__grid--row" {{ block.shopify_attributes }}>
+            <div class="cmp__cell cmp__cell--feature">
+              <div class="cmp__feature">{{ block.settings.feature }}</div>
+            </div>
+
+            <div class="cmp__cell cmp__cell--center">
+              <div class="cmp__panel">
+                <span class="cmp__icon-wrap" aria-label="{{ section.settings.center_col_label }}: {{ block.settings.feature }}">
+                  {% render 'cmp-icon', state: block.settings.center_state, id: section.id %}
+                </span>
+              </div>
+            </div>
+
+            <div class="cmp__cell cmp__cell--col">
+              <span class="cmp__icon-wrap" aria-label="{{ section.settings.col_2_label }}: {{ block.settings.feature }}">
+                {% render 'cmp-icon', state: block.settings.col2_state, id: section.id %}
+              </span>
+            </div>
+
+           
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* ====== Base ====== */
+    #cmp-{{ section.id }}{
+      position: relative;
+      color: var(--cmp-text);
+      padding: var(--cmp-py) var(--cmp-px);
+      background: var(--cmp-bg);
+      overflow: hidden;
+    }
+
+    #cmp-{{ section.id }} .cmp__bg{
+      position:absolute; inset:0;
+      z-index:0;
+    }
+    #cmp-{{ section.id }} .cmp__bg-img{
+      width:100%; height:100%;
+      object-fit: cover;
+      opacity: {{ section.settings.bg_image_opacity | divided_by: 100.0 }};
+      transform: scale(1.02);
+    }
+    #cmp-{{ section.id }} .cmp__overlay{
+      position:absolute; inset:0;
+      background: var(--cmp-overlay);
+      opacity: var(--cmp-overlay-op);
+      pointer-events:none;
+    }
+
+    #cmp-{{ section.id }} .cmp__inner{
+      position:relative;
+      z-index:1;
+      max-width: var(--cmp-max);
+      margin: 0 auto;
+    }
+
+    #cmp-{{ section.id }} .cmp__heading{
+      margin: 0 0 24px;
+      text-align:center;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      font-size: var(--cmp-h-size);
+      line-height: 1.1;
+      color: var(--cmp-text);
+    }
+
+    #cmp-{{ section.id }} .cmp__sub{
+      margin: 0 auto 22px;
+      text-align:center;
+      color: var(--cmp-muted);
+      max-width: 70ch;
+      line-height: 1.5;
+      font-size: {{ section.settings.subheading_size }}px;
+    }
+
+    #cmp-{{ section.id }} .cmp__wrap{
+      position:relative;
+    }
+#cmp-{{ section.id }} .cmp__head-text{
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  text-align: center;
+  font-size: var(--cmp-col-size);
+  line-height: 1.1;
+}
+
+#cmp-{{ section.id }} .cmp__col-head-img{
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.rt_img img{
+max-width:{{section.settings.image_width}}%!important;}
+    /* ====== Grid ====== */
+    #cmp-{{ section.id }} .cmp__grid{
+      display:grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      align-items:center;
+      column-gap: 18px;
+    }
+
+    #cmp-{{ section.id }} .cmp__grid--head{
+      margin-bottom: 0px;
+      border-bottom: 1px solid {{section.settings.line_color}};
+    }
+
+    #cmp-{{ section.id }} .cmp__body{
+      border-top: 0;
+    }
+
+    #cmp-{{ section.id }} .cmp__grid--row{
+      min-height: 58px;
+      border-bottom: 1px solid {{section.settings.line_color}};
+      margin-top: -6px;
+    }
+
+    #cmp-{{ section.id }} .cmp__cell{
+      padding: 0px;
+    }
+
+    #cmp-{{ section.id }} .cmp__feature{
+      font-weight: 700;
+      font-size: var(--cmp-row-size);
+      line-height: 1.15;
+      text-transform: none;
+    }
+
+    #cmp-{{ section.id }} .cmp__col-label{
+      text-align:center;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: var(--cmp-col-size);
+      letter-spacing: .02em;
+    }
+
+    /* Center panel look */
+    #cmp-{{ section.id }} .cmp__panel{
+      width: 100%;
+      height: 100%;
+      background: var(--cmp-panel);
+      border-radius: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+      padding: 12px 10px;
+      box-sizing:border-box;
+    }
+.cmp__body .cmp__grid--row:last-child .cmp__panel {
+  border-radius: 0 0 10px 10px !important;
+}
+
+    #cmp-{{ section.id }} .cmp__panel--head{
+      padding: 10px;
+    min-height: 70px;
+    margin: auto;
+    border-radius: 10px 10px 0px 0px;
+    }
+
+    #cmp-{{ section.id }} .cmp__logo{
+      max-width: {{section.settings.image_width_logo}}%;
+      height: auto;
+      display:block;
+    }
+    #cmp-{{ section.id }} .cmp__logo--placeholder{
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.08);
+    }
+
+    /* Icons */
+    #cmp-{{ section.id }} .cmp__icon-wrap{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: calc(var(--cmp-icon) + 6px);
+      height: calc(var(--cmp-icon) + 6px);
+      margin: 0 auto;
+    }
+
+    #cmp-{{ section.id }} .cmp__icon{
+      width: var(--cmp-icon);
+      height: var(--cmp-icon);
+      display:block;
+    }
+
+    /* Align center for non-feature columns */
+    #cmp-{{ section.id }} .cmp__cell--col{
+      display:flex;
+      justify-content:center;
+    }
+
+    /* ====== Responsive ====== */
+    @media (max-width: 900px){
+      #cmp-{{ section.id }} .cmp__grid{
+        grid-template-columns: 1fr 1fr 1fr;
+        column-gap: 12px;
+      }
+    }
+
+    @media (max-width: 749px){
+      #cmp-{{ section.id }}{
+        padding: {{ section.settings.padding_y_mobile }}px {{ section.settings.padding_x_mobile }}px;
+      }
+      {% comment %} .rt_img img {
+    max-width: 100% !important;
+} {% endcomment %}
+
+      /* Stack: show column labels as a small header row */
+      #cmp-{{ section.id }} .cmp__grid{
+        grid-template-columns: 1fr 1fr 1fr;
+        column-gap: 10px;
+      }
+
+      #cmp-{{ section.id }} .cmp__grid--row{
+        min-height: 52px;
+      }
+
+      #cmp-{{ section.id }} .cmp__feature{
+        font-size: {{ section.settings.row_text_size_mobile }}px;
+      }
+
+      #cmp-{{ section.id }} .cmp__heading{
+        font-size: {{ section.settings.heading_size_mobile }}px;
+      }
+
+      #cmp-{{ section.id }} .cmp__col-label{
+        font-size: {{ section.settings.column_label_size_mobile }}px;
+      }
+    }
+
+    @media (max-width: 420px){
+      #cmp-{{ section.id }} .cmp__grid{
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+  </style>
+
+  {% comment %}
+    Inline icon renderer (no extra snippet file needed)
+    Usage: {% render 'cmp-icon', state: 'check' %}
+  {% endcomment %}
+  {% capture cmp_icon_snippet %}
+    {% assign state = state | default: 'check' %}
+    {% if state == 'check' %}
+      <svg class="cmp__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20 6L9 17l-5-5" stroke="var(--cmp-check)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    {% elsif state == 'cross' %}
+      <svg class="cmp__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="11" fill="var(--cmp-cross-bg)"/>
+        <path d="M8 8l8 8M16 8l-8 8" stroke="var(--cmp-cross)" stroke-width="2.8" stroke-linecap="round"/>
+      </svg>
+    {% else %}
+      <span style="display:block; width: var(--cmp-icon); height: var(--cmp-icon);" aria-hidden="true"></span>
+    {% endif %}
+  {% endcapture %}
+
+  {%- comment -%}
+    Shopify doesn't allow defining a snippet inline,
+    but we can emulate render by using a small trick: create a "render" proxy with variables.
+    If your theme errors on {% render 'cmp-icon' %}, then replace those three render lines with:
+      {{ cmp_icon_snippet | replace: 'state', block.settings.center_state }}
+    However, most themes require an actual snippet file.
+  {%- endcomment -%}
+
+</section>
+
+{% schema %}
+{
+  "name": "Comparison Table (Custom)",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "HOLLOW ALPACA VS. OTHER MATERIAL" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (Desktop px)", "min": 18, "max": 60, "step": 1, "default": 34 },
+    { "type": "range", "id": "heading_size_mobile", "label": "Heading size (Mobile px)", "min": 16, "max": 44, "step": 1, "default": 26 },
+
+    { "type": "header", "content": "Header cell controls" },
+
+{ "type": "text", "id": "center_head_text", "label": "Center header text (used if image not set)" },
+{ "type": "color", "id": "center_head_text_color", "label": "Center header text color", "default": "#111111" },
+{ "type": "image_picker", "id": "center_head_image", "label": "Center header image (overrides text)" },
+{ "type": "range", "id": "image_width_logo", "label": "image width", "min": 20, "max": 100, "step": 5, "default": 60 },
+{ "type": "text", "id": "center_head_image_alt", "label": "Center header image alt text" },
+
+{ "type": "image_picker", "id": "col2_head_image", "label": "Right column header image (overrides text)" },
+{ "type": "range", "id": "image_width", "label": "image width", "min": 20, "max": 100, "step": 5, "default": 60 },
+{ "type": "text", "id": "col2_head_image_alt", "label": "Right column header image alt text" },
+{ "type": "text", "id": "col2_head_text", "label": "Right column header text (used if image not set)" },
+{ "type": "color", "id": "col2_head_text_color", "label": "Right column header text color", "default": "#FFFFFF" },
+
+
+    { "type": "text", "id": "subheading", "label": "Subheading (optional)" },
+    { "type": "range", "id": "subheading_size", "label": "Subheading size (px)", "min": 12, "max": 22, "step": 1, "default": 16 },
+
+    
+
+
+    { "type": "range", "id": "column_label_size", "label": "Column label size (Desktop px)", "min": 10, "max": 22, "step": 1, "default": 14 },
+    { "type": "range", "id": "column_label_size_mobile", "label": "Column label size (Mobile px)", "min": 9, "max": 18, "step": 1, "default": 12 },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "max_width", "label": "Max width (px)", "min": 700, "max": 1600, "step": 20, "default": 1100 },
+    { "type": "range", "id": "center_panel_width", "label": "Center panel width (px)", "min": 160, "max": 420, "step": 10, "default": 260 },
+    { "type": "range", "id": "center_panel_radius", "label": "Center panel radius (px)", "min": 0, "max": 40, "step": 2, "default": 16 },
+
+    { "type": "range", "id": "padding_y", "label": "Padding Y (Desktop px)", "min": 0, "max": 120, "step": 4, "default": 40 },
+    { "type": "range", "id": "padding_x", "label": "Padding X (Desktop px)", "min": 0, "max": 80, "step": 4, "default": 20 },
+    { "type": "range", "id": "padding_y_mobile", "label": "Padding Y (Mobile px)", "min": 0, "max": 80, "step": 4, "default": 28 },
+    { "type": "range", "id": "padding_x_mobile", "label": "Padding X (Mobile px)", "min": 0, "max": 40, "step": 2, "default": 14 },
+
+    { "type": "range", "id": "row_text_size", "label": "Row text size (Desktop px)", "min": 12, "max": 22, "step": 1, "default": 16 },
+    { "type": "range", "id": "row_text_size_mobile", "label": "Row text size (Mobile px)", "min": 11, "max": 20, "step": 1, "default": 14 },
+
+    { "type": "range", "id": "icon_size", "label": "Icon size (px)", "min": 14, "max": 34, "step": 1, "default": 22 },
+
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#0B0F14" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#FFFFFF" },
+    { "type": "color", "id": "muted_text_color", "label": "Muted text color", "default": "rgba(255,255,255,0.82)" },
+    { "type": "color", "id": "line_color", "label": "Row divider color", "default": "rgba(255,255,255,0.18)" },
+
+    { "type": "color", "id": "center_panel_bg", "label": "Center panel background", "default": "#FFFFFF" },
+
+    { "type": "color", "id": "check_color", "label": "Check color", "default": "#22C55E" },
+    { "type": "color", "id": "cross_color", "label": "Cross color", "default": "#FFFFFF" },
+    { "type": "color", "id": "cross_bg_color", "label": "Cross background", "default": "#EF4444" },
+
+    { "type": "header", "content": "Background image (optional)" },
+    { "type": "image_picker", "id": "bg_image", "label": "Background image / texture" },
+    { "type": "range", "id": "bg_image_opacity", "label": "Background image opacity (%)", "min": 0, "max": 100, "step": 5, "default": 25 },
+
+    { "type": "checkbox", "id": "enable_overlay", "label": "Enable overlay", "default": true },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#000000" },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity (%)", "min": 0, "max": 90, "step": 5, "default": 35 }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Feature row",
+      "settings": [
+        { "type": "text", "id": "feature", "label": "Feature text", "default": "Adapts To Any Temp" },
+
+        {
+          "type": "select",
+          "id": "center_state",
+          "label": "Center column (Hollow Alpaca)",
+          "default": "check",
+          "options": [
+            { "value": "check", "label": "Check" },
+            { "value": "cross", "label": "Cross" },
+            { "value": "blank", "label": "Blank" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "col2_state",
+          "label": "Column 2 (e.g. Wool)",
+          "default": "cross",
+          "options": [
+            { "value": "check", "label": "Check" },
+            { "value": "cross", "label": "Cross" },
+            { "value": "blank", "label": "Blank" }
+          ]
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Comparison Table (Custom)",
+      "blocks": [
+        { "type": "row", "settings": { "feature": "Adapts To Any Temp", "center_state": "check", "col2_state": "cross" } },
+        { "type": "row", "settings": { "feature": "Moisture-Wicking", "center_state": "check", "col2_state": "cross" } },
+        { "type": "row", "settings": { "feature": "Super Soft & Comfortable", "center_state": "check", "col2_state": "cross" } },
+        { "type": "row", "settings": { "feature": "Durability", "center_state": "check", "col2_state": "check" } },
+        { "type": "row", "settings": { "feature": "99-Day Money Back Guarantee", "center_state": "check", "col2_state": "cross" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

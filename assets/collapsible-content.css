@@ -1,0 +1,122 @@
+  .collapsible-content-items.has-card .collapsible-content-item {
+    background-color: var(--cardBackground);
+    border-radius: var(--blockRadius);
+    transition: background-color 0.3s ease;
+  }
+  .collapsible-content-items.has-border .collapsible-content-item:not(:last-child) {
+    border-bottom: 1px solid var(--borderColor);
+  }
+  .collapsible-content {
+    overflow: hidden;
+    height: 0;
+    transition: height 0.5s ease-out;
+  }
+  .collapsible-content-item + .collapsible-content-item {
+    margin-top: 1px;
+  }
+
+  .collapsible-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px;
+    @media (max-width: 767px) {
+      padding: 15px;
+    }
+  }
+
+  .collapsible-content-item .collapsible-heading-text {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 30px;
+    color: var(--cardHeading);
+    @media (max-width: 767px) {
+      gap: 15px;
+    }
+  }
+
+  .collapsible-icon {
+    --svgSize: 13px;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.4s ease;
+    background: var(--cardHeading);
+    color: var(--cardBackground);
+    border-radius: 4px;
+    @media (max-width: 767px) {
+      --svgSize: 11px;
+    }
+  }
+
+  .collapsible-icon .svg-wrapper {
+    transition: 0.4s ease;
+  }
+
+  .collapsible-content-body * {
+    color: var(--cardText);
+  }
+
+  .collapsible-content-item.open .collapsible-icon .svg-wrapper {
+    transform: rotate(22deg);
+  }
+
+  .collapsible-content-body {
+    padding-inline: 75px;
+    padding-block-end: 24px;
+
+    @media (max-width: 767px) {
+      padding-inline: 47px;
+      padding-block-end: 20px;
+    }
+  }
+  .collapsible-content-items .collapsible-content-item:not(:has(.collapsible-count)) .collapsible-content-body {
+    padding-inline: 24px;
+    @media (max-width: 767px) {
+      padding-inline: 15px;
+    }
+  }
+
+  .collapsible-content-items.has-card .collapsible-content-item[open] {
+    background-color: var(--cardHeading);
+    color: var(--cardBackground);
+  }
+
+  .collapsible-content-items.has-card .collapsible-content-item[open] .collapsible-content-body * {
+    color: var(--cardBackground);
+  }
+
+  .collapsible-content-items.has-card .collapsible-content-item[open] .collapsible-heading-text
+  /* ,
+  .collapsible-content-item[open] .svg-wrapper */ {
+    color: var(--cardBackground);
+  }
+  .collapsible-content-items.has-card .collapsible-content-item[open] .collapsible-icon {
+    background: var(--cardBackground);
+    color: var(--cardHeading);
+  }
+  .collapsible-content-item[open] .svg-wrapper .vertical {
+    transform: rotate(-270deg);
+  }
+
+  .collapsible-content-item .svg-wrapper .vertical {
+    transform-origin: center;
+    transition: transform 0.5s cubic-bezier(0.3, 1, 0.3, 1);
+  }
+
+  @media (max-width: 767px) {
+    .collapsible-heading-text {
+      gap: 20px;
+    }
+
+    .collapsible-icon {
+      width: 24px;
+      min-width: 24px;
+      height: 24px;
+    }
+  }

@@ -1,0 +1,35 @@
+
+<cart-drawer-product-recommendations-content class="drawer-content product-recommended-content" tabindex="0">
+  <div class="drawer-head">
+    <div class="drawer-head-inner">
+      <div class="drawer-heading heading-font h5">{{ settings.recommended_heading }}</div>
+      <drawer-back-button class="d-flex">
+        <button type="button" class="drawer-close-btn" aria-label="Back">
+          {% render 'svg-icons', icon_type: 'cross-icon' %}
+        </button>
+      </drawer-back-button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <cart-drawer-product-recommendations
+      class="draw-contentwrap minicart-suggestionbox"
+      data-url="{{ routes.product_recommendations_url }}?limit={{ settings.products_limit }}&product_id={{ product_id }}&section_id=cart-drawer"
+      data-section-id="cart-drawer"
+      data-product-id="{{ product_id }}"
+      product-recommendations-id="{{ product_id }}"
+    >
+      <div class="minicart-suggestions">
+        {%- for recommendation in recommendations.products -%}
+          <div class="cart-drawer-recomended-item" recommendation-drawer-item>
+            {% render 'horizontal-product-card',
+              product: recommendation,
+              loading_image: 'lazy',
+              source: 'cart-drawer',
+              aspect_ratio_image: '1/1'
+            %}
+          </div>
+        {%- endfor -%}
+      </div>
+    </cart-drawer-product-recommendations>
+  </div>
+</cart-drawer-product-recommendations-content>

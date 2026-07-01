@@ -1,0 +1,154 @@
+{% capture slides %}
+    {% content_for 'blocks' %}
+  {% endcapture %}
+{% render 'slideshow-slide', block: block, slides: slides, imageHeight: 'media-fixed-height' %}
+{% schema %}
+{
+  "name": "t:sections.slideshow.blocks.slide.name",
+  "class": "slideshow-item swiper-slide",
+  "blocks": [
+    {
+      "type": "_hero_text"
+    },
+    {
+      "type": "_content"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "label": "t:sections.all.settings.media_type.label",
+      "id": "media_type",
+      "default": "image",
+      "options": [
+        {
+          "value": "image",
+          "label": "t:sections.all.settings.media_type.option_0.label"
+        },
+        {
+          "value": "video",
+          "label": "t:sections.all.settings.media_type.option_1.label"
+        }
+      ]
+    },
+    {
+      "type": "image_picker",
+      "label": "t:sections.all.settings.media_type.option_0.desktop_img",
+      "id": "desktop_image",
+      "visible_if": "{{ block.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "image_picker",
+      "label": "t:sections.all.settings.media_type.option_0.mobile_img",
+      "id": "mobile_image",
+      "visible_if": "{{ block.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "video",
+      "id": "desktop_video",
+      "label": "t:sections.all.settings.media_type.option_1.desktop_video",
+      "visible_if": "{{ block.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "video",
+      "id": "mobile_video",
+      "label": "t:sections.all.settings.media_type.option_1.mobile_video",
+      "visible_if": "{{ block.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.overlay.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "t:sections.all.settings.overlay.enable_overlay.label",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:sections.all.settings.overlay.style.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.overlay.style.options__0.label",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.overlay.style.options__1.label",
+          "value": "gradient"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color_background",
+      "id": "overlay_gradient",
+      "label": "t:sections.all.settings.overlay.color.label",
+      "default": "linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.04) 100%)",
+      "visible_if": "{{ block.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_solid",
+      "label": "t:sections.all.settings.overlay.color.label",
+      "alpha": true,
+      "default": "#00000093",
+      "visible_if": "{{ block.settings.overlay_style == 'solid' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.content"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.all.settings.text_alignment.label",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.all.settings.text_alignment.option_1"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.all.settings.text_alignment.option_2"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.all.settings.text_alignment.option_3"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "t:sections.all.settings.vertical_alignment.label",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.all.settings.vertical_alignment.option_1"
+        },
+        {
+          "value": "middle",
+          "label": "t:sections.all.settings.vertical_alignment.option_2"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.all.settings.vertical_alignment.option_3"
+        },
+        {
+          "label": "t:sections.all.settings.vertical_alignment.option_4",
+          "value": "justify"
+        }
+      ],
+      "default": "middle"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.slideshow.blocks.slide.name"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,124 @@
+{% comment %} {{ 'header.css' | asset_url | stylesheet_tag }} performace changes {% endcomment %}
+
+<mega-menu class="header-navigation-main" data-open-menu="{{ section.settings.open_menu_items_on }}">
+  <nav class="header-navigation-wrapper">
+    <ul class="header-navigation-list" data-parent-ul-list>
+      {% for link in section.settings.menu.links -%}
+        {% liquid
+          assign is_dropdown = false
+          assign link_title = link.title | downcase | handle
+          assign menu_selected = section.settings.menu_type
+          assign menu_type = menu_selected
+          assign dropdown_class = ''
+          if menu_type == 'dropdown' and link.links.size > 0
+            assign is_dropdown = true
+            assign dropdown_class = 'dropdown'
+          elsif menu_type == 'masonry' and link.links.size > 0
+            assign is_dropdown = true
+            assign dropdown_class = 'masonry'
+          endif
+          if menu_type == 'mega-menu' and link.links.size > 0
+            assign is_dropdown = true
+            assign dropdown_class = 'mega-menu'
+          endif
+          for block in section.blocks
+            case block.type
+              when 'images_mega_menu'
+                assign image_menu_title = block.settings.menu_title | downcase | handle
+                if link_title == image_menu_title
+                  assign menu_type = 'images_mega_menu'
+                  assign block_data = block.settings
+                  assign shopify_attribute = block.shopify_attributes
+                  if link.links.size > 0 
+                    assign is_dropdown = true
+                  else
+                    assign is_dropdown = false
+                  endif
+                  assign dropdown_class = 'mega-menu'
+                endif
+              when 'tabs_mega_menu'
+                assign tab_menu_title = block.settings.menu_title | downcase | handle
+                if link_title == tab_menu_title
+                  assign block_data = block.settings
+                  assign shopify_attribute = block.shopify_attributes
+                  assign menu_type = 'tabs_mega_menu'
+                  if block_data.menu.size > 0
+                    assign is_dropdown = true
+                  else
+                    assign is_dropdown = false
+                  endif
+                  assign dropdown_class = 'mega-menu'
+                endif
+              when 'collections_mega_menu'
+                assign collections_menu_title = block.settings.menu_title | downcase | handle
+                if link_title == collections_menu_title
+                  assign menu_type = 'collections_mega_menu'
+                  assign block_data = block
+                  assign shopify_attribute = block.shopify_attributes
+                  if block_data.settings.collection_list.count > 0
+                    assign is_dropdown = true
+                  else
+                    assign is_dropdown = false
+                  endif
+                  assign dropdown_class = 'mega-menu'
+                endif
+            endcase
+          endfor
+        %}
+        
+        {% assign has_children_dropdown = false %}
+        {% if link.links.size > 0 and is_dropdown %}
+          {% assign has_children_dropdown = true %}
+        {% endif %}
+
+
+        {% assign is_mega_menu = false %}
+        {% if menu_type == 'collections_mega_menu' %}
+          {% assign is_mega_menu = true %}
+        {% endif %}
+        {% if menu_type == 'tabs_mega_menu' %}
+          {% if block_data.menu.links.size > 0 %}
+            {% assign is_mega_menu = true %}
+          {% endif %}
+        {% endif %}
+
+
+        <li class="header-menu-item {% if has_children_dropdown or is_mega_menu %}has-children header-{{ dropdown_class }}{% endif %}">
+          <a
+            href="{{ link.url }}"
+            class="header-menu-link focus-inside {{ settings.header_first_level_menus_size }} {{ settings.header_first_level_menus_font }}-font"
+            data-parent-node
+            {% if is_dropdown and section.settings.open_menu_items_on == 'click' or is_dropdown and section.settings.open_menu_items_on == 'hover' %}
+              nav-links
+            {% endif %}
+            {{ shopify_attribute }}
+          >
+            {{- link.title -}}
+          </a>
+          {% if menu_type == 'dropdown' %}
+            {% if link.links.size > 0 %}
+              {% render 'header-dropdown-menu', link: link, section: section %}
+            {% endif %}
+          {% elsif menu_type == 'images_mega_menu' or menu_type == 'mega-menu' %}
+            {% if link.links.size > 0 %}
+              {% render 'header-mega-menu', link: link, block: block_data, menu_type: menu_type %}
+            {% endif %}
+          {% elsif menu_type == 'tabs_mega_menu' %}
+            {% comment %} {% if block_data.menu.links.size > 0 %} {% endcomment %}
+              {% render 'tab-mega-menu', block: block_data %}
+            {% comment %} {% endif %} {% endcomment %}
+          {% elsif menu_type == 'collections_mega_menu' %}
+            {% if block_data.settings.collection_list.count > 0 %}
+              {% render 'mega-menu-collections', block: block_data %}
+            {% endif %}
+          {% elsif menu_type == 'masonry' %}
+            {% if link.links.size > 0 %}
+              {% render 'header-masonry-menu', link: link %}
+            {% endif %}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</mega-menu>
+<script src="{{ 'nav-menu.js' | asset_url }}" defer="defer"></script>

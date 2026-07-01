@@ -1,0 +1,21 @@
+{{ 'flipdown-countdown.css' | asset_url | stylesheet_tag }}
+<flipdown-countdown-wrapper
+  class="flipdown-main"
+  data-due-date="{{ end_date }}"
+  data-type="{{ countdown_type }}"
+  data-duration="{{ evergreen_duration }}"
+  data-class="text-xsmall"
+>
+  <div class="flipdown-cards">
+    {% assign units = 'days,hours,minutes,seconds' | split: ',' %}
+    {% for unit in units %}
+      <div class="flipdown-card {{ unit }}">
+        <div class="flipdown-flip-card">
+          <div class="flipdown-half flipdown-top-half" data-value="00">00</div>
+          <div class="flipdown-half flipdown-bottom-half" data-value="00">00</div>
+        </div>
+        <p class="flipdown-unit text-xsmall">{{ unit | capitalize }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</flipdown-countdown-wrapper>

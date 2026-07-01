@@ -1,0 +1,146 @@
+.gift-card-wrapper {
+  background: var(--background);
+  padding: 70px 0;
+  min-height: 100vh;
+}
+
+.main-gift-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--background);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--blockRadius);
+  overflow: hidden;
+}
+
+.gift-card-header {
+  text-align: center;
+  padding: 25px 20px;
+}
+
+.gift-card-img {
+  margin-bottom: 15px;
+}
+
+.gift-card-giftimg {
+  position: relative;
+  width: 100%;
+  max-width: 60%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.gift-card-giftimg img {
+  width: 100%;
+}
+
+.gift-card-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 40px 40px;
+}
+
+.gift-card-coupon {
+  display: inline-grid;
+  grid-template-columns: 1fr auto;
+  border: 1px dashed var(--textColor);
+  background: var(--body_alternate_background);
+  overflow: hidden;
+  padding: 4px 8px;
+  justify-content: center;
+  width: max-content;
+  border-radius: 10px;
+}
+
+.gift-card-coupon .gift-card-input {
+  font-size: 16px;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+  padding: 5px;
+  min-height: auto;
+  color: var(--textColor);
+}
+
+.gift-card-copy-link {
+  background: transparent;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gift-card-copy-link svg {
+  width: 15px;
+  height: auto;
+}
+
+.gift-card-price {
+  display: grid;
+  grid-template-columns: auto;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  padding-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.gift-card-pricebox-remaining {
+  text-align: right;
+}
+
+.gift-card-qr {
+  width: 140px;
+  height: 140px;
+  padding: 8px;
+  border: 1px solid var(--borderColor);
+  margin: 0 auto 20px;
+}
+
+.gift-card-instructions {
+  padding: 20px 0px;
+}
+
+.gift-card-buttons-outer {
+  background: var(--alternateBackground);
+  padding: 30px;
+  text-align: center;
+}
+
+.gift-card-buttons {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+}
+
+@media (max-width:1199px) {
+  .gift-card-input {
+    font-size: 18px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width:575px) {
+  .gift-card-input {
+    padding: 5px 5px;
+  }
+
+  .gift-card-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .gift-card-giftimg {
+    max-width: 80%;
+  }
+}
+
+@media (max-width:380px) {
+  .gift-card-input {
+    font-size: 14px !important;
+  }
+}

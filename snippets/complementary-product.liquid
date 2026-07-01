@@ -1,0 +1,176 @@
+{{ 'complementary-product.css' | asset_url | stylesheet_tag }}
+{% liquid
+  assign swiper = true
+  if block.settings.make_collapsible_row
+    assign swiper = false
+  endif
+  assign tag = 'div'
+  if block.settings.make_collapsible_row
+    assign tag = 'details'
+  endif
+%}
+
+<complementary-product
+  class="complementary-products-main {% if block.settings.make_collapsible_row %} is-accordion{% endif %}{% if block.settings.enable_quick_add %} complementary-products-contains-quick-add{% endif %}"
+  data-url="{{ routes.product_recommendations_url }}?limit={{ block.settings.product_list_limit }}&intent=complementary"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-product-count="{{ recommendations.products_count }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <{{ tag }}
+      class="complementary-products-wrapper"
+      {% if block.settings.make_collapsible_row and block.settings.collapsible_open %}
+        open
+      {% endif %}
+    >
+      <summary class="complementary-product-heading text font-bold">
+        {% if block.settings.block_heading != blank -%}
+          {{- block.settings.block_heading -}}
+        {%- else -%}
+          Popular Upgrades
+        {%- endif %}
+        {% if block.settings.make_collapsible_row %}
+          <span class="collapsible-icon">
+            {% render 'svg-icons', icon_type: 'plus-icon' %}
+          </span>
+        {% endif %}
+        {% assign swiper_id = product.id | append: '-complementary-' | append: section.id %}
+        {% if swiper %}
+          {% render 'swiper-navigation', id: swiper_id, extra_class: 'd-flex' %}
+        {% endif %}
+      </summary>
+      {% if swiper %}
+        <div
+          class="complementary-outer-wrapper swiper"
+          data-swiper='
+            {
+              "loop": false,
+              "autoHeight": false,
+              "slidesPerView": 1,
+              "spaceBetween": 20,
+              "navigation": {
+                "nextEl": ".swiper-nav-next-{{ swiper_id }}",
+                "prevEl": ".swiper-nav-prev-{{ swiper_id }}"
+              },
+              "centeredSlides": false,
+              "breakpoints": {
+                "576": {
+                  "slidesPerView": 1.5
+                },
+                "768": {
+                  "slidesPerView": 1
+                },
+                "1025": {
+                  "slidesPerView": {% if section.settings.media_width == 'small' %}2{% elsif section.settings.media_width == 'medium' %}1.5{% else %}1{% endif %}
+                }
+              }
+            }
+          '
+        >
+      {% endif %}
+      <div class="complementary-product-items {% if swiper %}swiper-wrapper{% endif %}">
+        {%- for product in recommendations.products -%}
+          <label class="complementary-product-item {% if swiper %}swiper-slide{% endif %}">
+            <div class="complementary-product-item-inner">
+              <div class="complementary-product-image media-wrapper">
+                <div class="media-card media-adapt" style="--imageRatio:1/1">
+                  {%- for media in product.media -%}
+                    {% liquid
+                      assign title_alt = product.title | escape
+                      assign product_image_alt = product.featured_image.alt | default: title_alt
+                    %}
+                    {%- case media.media_type -%}
+                      {%- when 'image' -%}
+                        {{
+                          product.featured_image
+                          | image_url: width: 3840, format: 'webp'
+                          | image_tag:
+                            sizes: '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, 100vw',
+                            widths: '320, 1160, 1200, 1440',
+                            decoding: 'async',
+                            loading: 'lazy',
+                            fetchpriority: 'auto',
+                            alt: product_image_alt
+                        }}
+                        {% break %}
+                      {%- when 'video' -%}
+                        <video-media
+                          class="deferred-media"
+                          id="deferred-{{ media.media_type }}-{{ product.id }}-{{ section.id }}"
+                          data-section="section_video"
+                          data-autoplay="true"
+                          autoplay
+                          data-type="{{ media.media_type }}"
+                        >
+                          <div class="deferred-media" id="Deferred-Poster-{{ media.id }}">
+                            {% if media.preview_image != blank %}
+                              {{
+                                media.preview_image
+                                | image_url: width: 1440, format: 'webp'
+                                | image_tag:
+                                  sizes: '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, 100vw',
+                                  widths: '320, 1160, 1200, 1440',
+                                  decoding: 'async',
+                                  loading: 'lazy',
+                                  fetchpriority: 'auto',
+                                  alt: product_image_alt
+                              }}
+                            {% endif %}
+                            <template>
+                              {{
+                                media
+                                | media_tag:
+                                  loading: 'lazy',
+                                  class: 'product-card-video no-js-hidden',
+                                  autoplay: true,
+                                  loop: true,
+                                  mute: true,
+                                  controls: false,
+                                  preload: 'none'
+                              }}
+                            </template>
+                          </div>
+                        </video-media>
+                        {% break %}
+                    {%- endcase -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+              <div class="complementary-product-details">
+                <a href="{{ product.url }}" class="complementary-product-title heading-font text-small">
+                  {%- unless placeholder -%}
+                    {{ product.title | escape | default: 'Example product title' }}
+                  {%- else -%}
+                    {{ 'onboarding.product_title' | t }}
+                  {%- endunless -%}
+                </a>
+                <div class="complementary-product-price">
+                  {% render 'product-card-price',
+                    product: product,
+                    section: '',
+                    use_variant: true,
+                    price_context: 'card'
+                  %}
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                name="complementory_product"
+                value="{{ product.selected_or_first_available_variant.id }}"
+                {% if product.selected_or_first_available_variant.available == false
+                  or quantity_rule_soldout
+                  or product.selected_or_first_available_variant == null
+                %}
+                  disabled
+                {% endif %}
+              >
+            </div>
+          </label>
+        {%- endfor -%}
+      </div>
+      {% if swiper %}</div>{% endif %}
+    </{{ tag }}>
+  {%- endif -%}
+</complementary-product>

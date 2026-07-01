@@ -1,0 +1,41 @@
+{%  content_for 'blocks' %}
+
+{% schema %}
+{
+  "name": "t:sections.all.headers.content",
+  "class": "content-block",
+  "blocks": [
+   {
+    "type": "_heading"
+   },
+   {
+    "type": "_subheading"
+   },
+   {
+    "type": "_description"
+   },
+   {
+    "type": "_button"
+   }
+  ],
+  "settings": [
+    
+  ],
+  "presets": [
+    {
+      "name": "t:sections.all.headers.content",
+      "blocks": [
+        {
+          "type": "_heading"
+        },
+        {
+          "type": "_description"
+        },
+        {
+          "type": "_button"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,104 @@
+.featured-collection-layout-stacked {
+  display: grid;
+  gap: var(--columnGap, 0);
+  grid-template-columns: repeat(var(--columnCount, 4), 1fr);
+}
+
+.featured-collection-right-content {
+  min-width: 0;
+}
+
+.featured-collection-view-all {
+  overflow: visible;
+  flex: 0 0 auto;
+}
+
+.featured-collection-right-content .section-header-block>*+* {
+  margin-top: 5px;
+}
+
+/* .section-header-block */
+
+@media (min-width: 768px) {
+  .featured-collection-main {
+    grid-template-columns: 0.4fr 1fr;
+    display: grid;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .featured-collection-main.position-right .promotion-media-card {
+    grid-area: promo-card;
+  }
+
+  .featured-collection-main.position-right .featured-collection-right-content {
+    grid-area: featured-collection;
+  }
+
+  .featured-collection-main.position-right {
+    grid-template-areas: 'featured-collection promo-card';
+    grid-template-columns: 1fr 0.4fr;
+  }
+
+  .featured-collection-section:has(.featured-collection-layout-stacked) .section-header-with-nav-mobile+.promotion-media-card {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  .featured-collection-main {
+    gap: 20px;
+    /* grid-template-columns: 0.6fr 1fr; */
+  }
+
+  /* .featured-collection-main.position-right {
+        grid-template-columns: 1fr 0.6fr;
+      } */
+}
+
+@media (min-width: 1441px) {
+  .featured-collection-main {
+    gap: 30px;
+  }
+}
+
+@media (max-width: 767px) {
+  .promotion-media.adapt-mobile-height {
+    aspect-ratio: 1/1;
+  }
+
+  .featured-collection-main .promotion-media-card {
+    margin-block-end: 20px;
+  }
+
+  .featured-collection-right-content .section-header-with-nav {
+    display: none;
+  }
+
+  .featured-collection-main .featured-collection-view-all,
+  .featured-collection-main>.section-header-with-nav .section-header-block>*+* {
+    margin-top: 5px;
+  }
+
+  .featured-collection-section .section-header-with-nav-mobile.text-adjacent {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding-right: 15px;
+  }
+
+  .featured-collection-section .section-header-with-nav-mobile.text-left {
+    justify-content: flex-start;
+  }
+
+  .featured-collection-section .section-header-with-nav-mobile.text-center {
+    justify-content: center;
+  }
+
+  .featured-collection-section:has(.featured-collection-layout-stacked) .section-header-with-nav-mobile+.promotion-media-card {
+    margin-bottom: 20px;
+  }
+}
+
+.featured-collection-section .swiper-pagination-progressbar {
+    position: relative;
+}

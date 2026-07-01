@@ -1,0 +1,41 @@
+{% if block.settings.heading != blank %}
+  {% assign is_open = block.settings.accordian_open %}
+  {%- if block.settings.content != blank or block.settings.collapsible_dynamic_content != blank or block.settings.product_meta != blank -%}
+    <div class="product-block product-collapsible" {{ block.shopify_attributes }}>
+      <details
+        class="collapsible-product-content-item"
+        is="accordion-details"
+        {% if is_open %}
+          open
+        {% endif %}
+      >
+        <summary class="collapsible-heading">
+          <div class="collapsible-heading-text text font-bold">
+            {{- block.settings.heading -}}
+          </div>
+          <span class="collapsible-icon">
+            {% render 'svg-icons', icon_type: 'plus-icon' %}
+          </span>
+        </summary>
+        <div class="collapsible-content" collapsible-content-wrapper>
+          <div class="collapsible-content-body rte">
+            
+            {{ block.settings.product_meta }}
+                    
+            {{
+              block.settings.content
+              | replace: '<table', '<div class="table-responsive"><table'
+              | replace: '</table>', '</table></div>'
+            }}
+            {{
+              block.settings.collapsible_dynamic_content.content
+              | replace: '<table', '<div class="table-responsive"><table'
+              | replace: '</table>', '</table></div>'
+            }}
+          
+          </div>
+        </div>
+      </details>
+    </div>
+  {% endif %}
+{% endif %}

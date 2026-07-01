@@ -1,0 +1,21 @@
+  .breadcrumbs {
+    display: flex;
+    font-size: var(--text);
+  }
+
+  .breadcrumbs a {
+    white-space: nowrap;
+  }
+
+  .breadcrumbs-sep {
+    display: flex;
+    align-items: center;
+    margin: 0 12px;
+  }
+
+  .breadcrumbs-last {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--textColor) 70%, transparent);
+  }

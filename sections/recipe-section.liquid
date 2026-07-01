@@ -1,0 +1,312 @@
+{% schema %}
+{
+  "name": "Recipe Layout (Advanced)",
+  "settings": [
+    { "type": "text", "id": "prep_time", "label": "Prep time", "default": "15 min" },
+    { "type": "text", "id": "cook_time", "label": "Cook time", "default": "15 min" },
+    { "type": "text", "id": "servings", "label": "Servings", "default": "4 people" }
+  ],
+  "presets": [
+    { "name": "Recipe Layout (Advanced)" }
+  ]
+}
+{% endschema %}
+
+<section class="recipe-adv">
+  
+
+  <div class="recipe-layout">
+    <!-- LEFT CONTENT -->
+    <div class="recipe-content">
+      <!-- TOP META -->
+  {% comment %} <div class="recipe-meta">
+    <div class="meta-card">
+      <small>Prep time</small>
+      <strong>{{ section.settings.prep_time }}</strong>
+    </div>
+    <div class="meta-card">
+      <small>Cook time</small>
+      <strong>{{ section.settings.cook_time }}</strong>
+    </div>
+    <div class="meta-card">
+      <small>Servings</small>
+      <strong>{{ section.settings.servings }}</strong>
+    </div>
+  </div> {% endcomment %}
+
+{% assign recipe_1_title = article.metafields.custom.recipe_1_title.value %}
+{% assign recipe_1_ingredients = article.metafields.custom.recipe_1_ingredient_list.value %}
+{% assign recipe_2_title = article.metafields.custom.recipe_2_title.value %}
+{% assign recipe_2_ingredients = article.metafields.custom.recipe_2_ingredient_list.value %}
+{% assign instructions_title = article.metafields.custom.instructions_title.value %}
+{% assign instructions_list = article.metafields.custom.instructions_list.value %}
+{% if instructions_title != blank %}
+  <h2 class="mt__margin">{{ instructions_title }}</h2>
+
+  {% if instructions_list != blank %}
+    <ol class="instruction-steps">
+      {% for step in instructions_list %}
+        <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  {% endif %}
+{% endif %}
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="recipe-sidebar">
+      {% assign nutrition_heading = article.metafields.custom.nutrition_heading.value %}
+{% assign nutrition_raw = article.metafields.custom.nutrition_list.value %}
+
+{% if nutrition_raw != blank %}
+  <div class="card nutrition-card">
+
+    {% if nutrition_heading != blank %}
+      <h3>{{ nutrition_heading }}</h3>
+    {% endif %}
+
+    <ul>
+      {% assign lines = nutrition_raw | newline_to_br | split: '<br />' %}
+
+      {% for line in lines %}
+        {% if line contains ':' %}
+          {% assign pair = line | split: ':' %}
+          <li>
+            <span>{{ pair[0] | strip }}</span>
+            <strong>{{ pair[1] | strip }}</strong>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+  </div>
+{% endif %}
+
+
+      <div class="card fresh-card">
+        {% if article.metafields.custom.fresh_recipes_title != blank %}
+        <h3 class="rp__title">{{ article.metafields.custom.fresh_recipes_title }}</h3>
+        {% endif %}
+
+        {% assign fresh_recipes = article.metafields.custom.fresh_recipes_list.value %}
+
+{% if fresh_recipes != blank %}
+  {% for recipe in fresh_recipes %}
+    <div class="fresh-row">
+      <a href="{{ recipe.url }}">
+        
+        {% if recipe.image %}
+          <img
+            src="{{ recipe.image | image_url: width: 64 }}"
+            alt="{{ recipe.image.alt | escape }}"
+            width="64"
+            height="64"
+            loading="lazy"
+          >
+        {% else %}
+          <img
+            src="https://via.placeholder.com/64"
+            alt="{{ recipe.title | escape }}"
+            width="64"
+            height="64"
+          >
+        {% endif %}
+
+        <div>
+          <div class="stars">★★★★★</div>
+          <p class="article_title">{{ recipe.title }}</p>
+        </div>
+
+      </a>
+    </div>
+  {% endfor %}
+{% endif %}
+
+        
+
+        
+      </div>
+      <div class="kl__block">
+        <div class="klaviyo-form-RycXQw"></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .rp__title{
+  margin-bottom: 12px;}
+  .fresh-row a{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+.recipe-adv {
+  max-width: 1200px;
+  margin: auto;
+  padding: 60px 42px;
+  padding-top: 0;
+}
+
+/* META */
+.recipe-meta {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.meta-card {
+  background: #f8f8f8;
+  padding: 14px 20px;
+  border-radius: 10px;
+}
+.meta-card small {
+  display: block;
+  font-size: 12px;
+  color: #777;
+}
+.meta-card strong {
+  font-size: 15px;
+}
+
+/* GRID */
+.recipe-layout {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 28px;
+}
+
+/* INGREDIENTS */
+.ingredient-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+.ingredient-list li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.ingredient-list .dot {
+  width: 16px;
+    height: 16px;
+    border: 1px solid #000;
+    border-radius: 50%;
+    animation: unset!important;
+    background: unset;
+}
+.kl__block {
+    margin-top: -20px;
+}
+.ingredient-list li.active .dot {
+  background: #ff6a00;
+}
+
+/* INSTRUCTIONS */
+.instruction-steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+}
+.instruction-steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 42px;
+  margin-bottom: 24px;
+}
+.instruction-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  background: #ff6a00;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* SIDEBAR */
+.recipe-sidebar {
+  position: sticky;
+  top: 30px;
+}
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 30px;
+  {% comment %} box-shadow: 0 10px 30px rgba(0,0,0,.06); {% endcomment %}
+}
+.nutrition-card{
+  background: #f9f9f9;
+}
+
+/* NUTRITION */
+.nutrition-card ul {
+  list-style: none;
+  padding: 0;
+}
+.nutrition-card li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+/* FRESH */
+.fresh-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.fresh-row img {
+  border-radius: 8px;
+}
+.stars {
+  color: #ff6a00;
+  font-size: 16px;
+}
+.recipe-content h4{
+  margin-bottom: 8px;
+    margin-top: 8px;
+    font-size: 20px;
+}
+.mt__margin{
+margin-bottom: 12px;
+}
+.article_title{
+font-size: 14px;
+    color: #000;
+    font-weight: 700;
+}
+/* MOBILE */
+@media (max-width: 768px) {
+  .article_title{
+font-size: 13px;
+}
+  .recipe-layout {
+    grid-template-columns: 1fr;
+  }
+  .recipe-meta {
+    flex-direction: column;
+  }
+  .recipe-sidebar {
+    position: static;
+  }
+}
+.card.fresh-card {
+    padding: 12px 0;
+}
+@media (min-width: 769px){
+.recipe-content{
+  padding-right: 5rem;
+  border-right: 1px solid #cccccc69;
+}
+}
+</style>

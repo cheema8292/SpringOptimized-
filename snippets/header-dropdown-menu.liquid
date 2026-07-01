@@ -1,0 +1,38 @@
+<div class="dropdown-wrapper nav-{{ section.settings.menu_type }}">
+  <div class="dropdown-contain">
+    <ul class="dropdown-menu-nav">
+      {% for innerLink in link.links %}
+        <li class="dropdown-menu-item" {% if innerLink.links.size > 0  %} nav-child-links {% endif %}>
+          {% if  section.settings.open_menu_items_on == "click" and innerLink.links.size > 0 %}
+             <div class="header-menu-link link-animation {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+            {{- innerLink.title }}
+            {% if innerLink.links.size > 0 %}
+              {% render 'svg-icons', icon_type: 'angle-right' %}
+            {% endif %}
+          </div>
+          {% else %}
+          <a href="{{ innerLink.url }}" class="header-menu-link link-animation {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+            {{- innerLink.title }}
+            {% if innerLink.links.size > 0 %}
+              {% render 'svg-icons', icon_type: 'angle-right' %}
+            {% endif %}
+          </a>
+          {% endif %}
+          {% if innerLink.links.size > 0 %}
+            <div class="dropdown-wrapper" sub-menu>
+              <div class="dropdown-contain">
+                <ul class="dropdown-menu-nav">
+                  {% for grandChlid in innerLink.links %}
+                    <li class="dropdown-menu-item">
+                      <a href="{{ grandChlid.url }}" class="header-menu-link link-animation {{ settings.header_third_level_menus_size }} {{ settings.header_third_level_menus_font }}-font">{{ grandChlid.title }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div> 
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+</div>
+</div>

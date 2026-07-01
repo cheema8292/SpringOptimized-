@@ -1,0 +1,183 @@
+{%-liquid 
+    assign media_width_factor = 1
+    if section.settings.media_width == 'small'
+        assign media_width_factor = 0.4
+    elsif section.settings.media_width == 'medium'
+        assign media_width_factor = 0.6
+    else
+        assign media_width_factor = 1
+    endif 
+-%}
+{%- capture image_sizes -%}
+    {%- if source == 'quick-view' -%}
+    (max-width: 749px) 100vw, (min-width: 750px) 40vw
+    {%- else -%}
+    (max-width: 749px) 100vw, (min-width: 750px) and (max-width: 1199px) 80vw, (min-width: 1200px) and (max-width: 1599px) calc((min(100vw, 1200px)) * {{ media_width_factor }}), (min-width: 1600px) calc((min(100vw, 1790px)) * {{ media_width_factor }}), 100vw
+    {%- endif -%}
+{%- endcapture -%}
+{%- case media.media_type -%}
+    {%- when 'image' -%}
+        {% liquid
+          assign media_img_alt = 'products.product.media.media_image' | t | escape
+          assign prouduct_title_alt = product.title | escape
+          assign image_alt = media.preview_image.alt | default: prouduct_title_alt | default: media_img_alt
+        %}
+        {{ media.preview_image
+            | image_url: width: 3840, format: 'webp'
+            | image_tag:
+            sizes: image_sizes,
+            widths: '360, 540, 720, 960, 1200, 1440, 1680, 1920, 2560, 3200, 3840',
+            decoding: 'async',
+            class: 'main-product-media',
+            alt: image_alt,
+            data-pswp-w: media.preview_image.width,
+            data-pswp-h: media.preview_image.height,
+            data-aspect-ratio: media.aspect_ratio
+        }}
+        {%- if section.settings.enable_image_zoom -%}
+            <button
+                is="media-lightbox-button"
+                type="button"
+                class="media-zoom-btn"
+                aria-label="Image zoom"
+                tabindex="-1"
+            >
+                {% render 'svg-icons', icon_type: 'zoom' %}
+            </button>
+        {%- endif -%}
+
+    {%- when 'video', 'external_video', 'model' -%}
+        {%- liquid
+            assign auto_play = false
+            assign video_loop = false
+            if section.settings.enable_video_autoplay 
+                assign auto_play = true 
+            endif
+
+            if section.settings.enable_video_looping
+            assign video_loop = true
+            endif
+        
+          
+          if media.media_type == 'model'
+            assign tag = 'product-model'
+            assign has_model = true
+          else
+            assign tag = 'deferred-media-video'
+            assign has_model = false
+          endif
+        -%}
+        <{{ tag }}
+          class="deferred-media"
+          data-media-id="{{ media.id }}"
+          data-slide-aware="true"
+          data-media-host="{{ media.host }}"
+          data-section="section_video"
+          data-autoplay="{{ auto_play }}"
+          data-type="{{ media.media_type }}"
+          data-control="true"
+        >
+            <div class="deferred-media-wrapper height-100" id="Deferred-Poster-{{ section.id }}-{{ product.id }}-{{ media.id }}">
+                <template>
+                {% comment %} {%- liquid
+                    case media.media_type
+                    when 'external_video'
+                        assign video_class = 'product-media-video no-js-hidden'
+                        if media.host == 'youtube'
+                        echo media | external_video_url: autoplay: true, loop: video_loop, playlist: media.external_id | external_video_tag: class: video_class, loading: 'lazy'
+                        elsif media.host == 'vimeo'
+                        echo media | external_video_url: autoplay: auto_play, loop: video_loop, api: true | external_video_tag: class: video_class, loading: 'lazy'
+                        endif
+                    when 'video'
+                        echo media | media_tag: image_size: '2048x', autoplay: auto_play, loop: video_loop, controls: true, preload: 'none', class: video_class
+                    when 'model'
+                        echo media | media_tag: image_size: '2048x', toggleable: true
+                    endcase
+                -%} {% endcomment %}
+                {%- assign video_class = 'product-media-video no-js-hidden' -%}
+                {%- case media.media_type -%}
+                {%- when 'external_video' -%}
+                    {%- if media.host == 'youtube' -%}
+                        {%- assign youtube_origin = shop.url  -%}
+                        {%- assign youtube_url = "https://www.youtube.com/embed/" | append: media.external_id | append: "?autoplay=1&controls=1&enablejsapi=1&loop=" | append: video_loop | append: "&playlist=" | append: media.external_id | append: "&modestbranding=1&playsinline=1&rel=0&origin=" | append: youtube_origin -%}
+                        
+                        <iframe src="{{ youtube_url }}" class="{{ video_class }}" loading="lazy" allow="autoplay; encrypted-media;" allowfullscreen></iframe>
+                    {%- elsif media.host == 'vimeo' -%}
+                        {{ media | external_video_url: autoplay: auto_play, loop: video_loop, api: true | external_video_tag: class: video_class, loading: 'lazy' }}
+                    {%- endif -%}
+                {%- when 'video' -%}
+                    {{ media | media_tag: image_size: '2048x', autoplay: auto_play, loop: video_loop, controls: true, preload: 'none', class: video_class }}
+                {%- when 'model' -%}
+                    {{ media | media_tag: image_size: '2048x', toggleable: true }}
+                {%- endcase -%}
+
+                </template>
+                {%- if auto_play == false and media.media_type == 'video' or media.media_type == 'external_video' -%}
+                    <button class="video-poster-button pos-absolute top-0 left-0 width-100 height-100 d-flex justify-content-center align-items-center" aria-label="Play video: {{ product.title | escape }}" play-pause-btn>
+                        {% if media.preview_image != blank %}
+                            {{ 
+                                media.preview_image
+                                | image_url: width: 3840, format: 'webp'
+                                | image_tag:
+                                sizes: image_sizes,
+                                widths: '360, 540, 720, 960, 1200, 1440, 1680, 1920, 2560, 3200, 3840',
+                                decoding: 'async',
+                                class: 'product-media-image external-video-preview-image video-poster'
+                            }}
+                        {% endif %}
+                        <div class="video-hero-content rich-text-block pos-relative">
+                            <span class="video-play-btn is-backdrop" play-btn>
+                                {% render 'svg-icons', icon_type: 'video-play' %}
+                            </span>
+                        </div>
+                    </button>
+                {%- endif -%}
+                {%- if has_model -%}
+                <button
+                    class="video-poster-button pos-absolute top-0 left-0 width-100 height-100 d-flex justify-content-center align-items-center"
+                    id="Deferred-Poster-Modal-{{ media.id }}"
+                    aria-label="Play video: {{ product.title | escape }}"
+                    data-action="play"
+                    type="button"
+                    play-pause-btn
+                >
+                    {{ media.preview_image
+                        | image_url: width: 3840, format: 'webp'
+                        | image_tag:
+                        sizes: image_sizes,
+                        widths: '360, 540, 720, 960, 1200, 1440, 1680, 1920, 2560, 3200, 3840',
+                        decoding: 'async',
+                        class: 'main-product-media video-poster'
+                    }}
+                    <span class="visually-hidden">{{ 'products.product.media.play_model' | t }}</span>
+                    <div class="deferred-media-poster-button">
+                    <span class="svg-wrapper">
+                        <svg fill="none" class="icon icon-3d-model" viewBox="0 0 18 21">
+                            <path fill="currentColor" d="m7.68 20.629-6.4-3.906A2.71 2.71 0 0 1 0 14.405v-7.81a2.72 2.72 0 0 1 1.278-2.318l6.4-3.9a2.52 2.52 0 0 1 2.644-.003l6.4 3.9A2.72 2.72 0 0 1 18 6.6v7.809a2.71 2.71 0 0 1-1.279 2.318l-6.4 3.906A2.54 2.54 0 0 1 9 21a2.54 2.54 0 0 1-1.32-.371M8.724 2.078l-6.4 3.9a.71.71 0 0 0-.321.612v7.81a.71.71 0 0 0 .32.61L8 18.48v-7.561a1.77 1.77 0 0 1 .934-1.555l6.512-3.523L9.28 2.08a.52.52 0 0 0-.556-.002"></path>
+                        </svg>
+                    </span>
+                </div>
+                </button>
+                
+                {%- endif -%}
+            </div>
+        </{{ tag }}>
+        {%- if has_model -%}
+          <button
+            class="full-button product__xr-button pos-absolute" 
+            type="button"
+            aria-label="{{ 'products.product.xr_button_label' | t }}"
+            data-shopify-xr
+            data-shopify-model3d-id="{{  media.id }}"
+            data-shopify-title="{{ product.title | escape }}"
+            data-shopify-xr-hidden
+          >
+            <span class="svg-wrapper">
+                <svg fill="none" class="icon icon-3d-model" viewBox="0 0 18 21">
+                    <path fill="currentColor" d="m7.68 20.629-6.4-3.906A2.71 2.71 0 0 1 0 14.405v-7.81a2.72 2.72 0 0 1 1.278-2.318l6.4-3.9a2.52 2.52 0 0 1 2.644-.003l6.4 3.9A2.72 2.72 0 0 1 18 6.6v7.809a2.71 2.71 0 0 1-1.279 2.318l-6.4 3.906A2.54 2.54 0 0 1 9 21a2.54 2.54 0 0 1-1.32-.371M8.724 2.078l-6.4 3.9a.71.71 0 0 0-.321.612v7.81a.71.71 0 0 0 .32.61L8 18.48v-7.561a1.77 1.77 0 0 1 .934-1.555l6.512-3.523L9.28 2.08a.52.52 0 0 0-.556-.002"></path>
+                  </svg>
+            </span>
+            {{ 'products.product.xr_button' | t }}
+          </button>
+        {%- endif -%}
+{%- endcase -%}

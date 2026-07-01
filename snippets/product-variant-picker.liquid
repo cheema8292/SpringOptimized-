@@ -1,0 +1,486 @@
+{% if product != blank %}
+  {%- unless product.has_only_default_variant -%}
+    {% assign section_id = section.id %}
+      <variant-selects
+        class="product-block product-block-variant-picker no-js-hidden"
+        id="VariantPicker-{{ section.id }}-{{ product.id }}"
+        form="{{ product_form_id }}"
+        data-section-id="{{ section_id }}"
+        data-product-id="{{ product.id }}"
+        data-product-url="{{ product.url }}"
+        data-update-url="{{ update_url }}"
+        {{ block.shopify_attributes }}
+      >
+        {% if product != blank %}
+          {%- for option in product.options_with_values -%}
+            {% liquid
+              assign swatch_count = option.values | map: 'swatch' | compact | size
+              assign picker_type = block.settings.picker_type
+              assign swatch_trigger_list = settings.color_option_trigger | downcase | split: ',' 
+              assign downcased_option = option.name | downcase 
+              
+              assign is_color = false
+              for trigger in swatch_trigger_list 
+                 assign swatch_trigger = trigger | strip 
+                 if downcased_option contains swatch_trigger 
+                   assign is_color = true 
+                   break 
+                 endif 
+              endfor 
+
+              assign show_color_as_button = block.settings.show_color_as_button
+               
+              if swatch_count > 0 and block.settings.color_variant_shape != 'none'
+                if block.settings.picker_type == 'dropdown' and show_color_as_button
+                  assign picker_type = 'swatch'
+                elsif block.settings.picker_type == 'dropdown'
+                  assign picker_type = 'swatch_dropdown'
+                else
+                  assign picker_type = 'swatch'
+                endif
+              elsif is_color and block.settings.color_variant_shape != 'none'
+                if block.settings.picker_type == 'dropdown' and show_color_as_button
+                  assign picker_type = 'swatch'
+                elsif block.settings.picker_type == 'dropdown'
+                  assign picker_type = 'swatch_dropdown'
+                else
+                  assign picker_type = 'swatch'
+                endif
+              endif
+
+              assign variant_option_name = option.name | downcase | handle
+              assign sizechart_option_name = block.settings.option_name | downcase | handle
+            %}
+            {% capture variant_heading %} 
+              <div class="variant-swatches-text body-font">
+                <strong>{{ option.name | capitalize }} : </strong>
+                <span id="{{ section_id }}-option{{ option.position }}" class="text-small" selected-variant-value>{{ option.selected_value }} </span>
+              </div>
+            {% endcapture %}
+          
+            {%- liquid
+              assign should_show_button = false
+              if block.settings.picker_type == 'button'
+                assign should_show_button = true
+              elsif block.settings.picker_type == 'dropdown' and show_color_as_button and block.settings.color_variant_shape != 'none'
+                if is_color or swatch_count > 0
+                  assign should_show_button = true
+                endif
+              endif
+            -%}
+            
+            {%- if should_show_button -%}
+              <div class="variant-selector-box {% if picker_type == 'swatch' %}color-swatches-box{% else %}product-swatches-box{% endif %}">
+                {{ variant_heading }}
+                <div class="variant-swatches-box">
+                  <ul class="variant-swatches-list {{ block.settings.variant_size }} {% if picker_type == 'swatch' %}{{block.settings.color_variant_shape}}{% else %}{{block.settings.other_variant_shape}}{% endif %}">
+                    {%- for option_value in option.values -%}
+                      {% liquid
+                        assign has_image = false
+                        assign swatch_focal_point = null
+                        if settings.product_card_variant == 'variant_image'
+                          if option_value.variant.featured_media != blank
+                            assign image_url = option_value.variant.featured_media | image_url: width: 50
+                            assign swatch_value = 'url(' | append: image_url | append: ')'
+                            assign swatch_focal_point = option_value.variant.featured_media.presentation.focal_point
+                            assign has_image = true
+                          else
+                            # Case: if variant has no image, then category metafield swatch will appear
+                            if option_value.swatch.image
+                              assign image_url = option_value.swatch.image | image_url: width: 50
+                              assign swatch_value = 'url(' | append: image_url | append: ')'
+                              assign swatch_focal_point = option_value.swatch.image.presentation.focal_point
+                              assign has_image = true
+                            elsif option_value.swatch.color
+                              assign swatch_value = 'rgb(' | append: option_value.swatch.color.rgb | append: ')'
+                              assign has_image = false
+                            else
+                              assign swatch_value = option_value
+                              assign has_image = false
+                            endif
+                          endif
+                        elsif settings.product_card_variant == 'color_swatch'
+                          if option_value.swatch.image
+                            assign image_url = option_value.swatch.image | image_url: width: 50
+                            assign swatch_value = 'url(' | append: image_url | append: ')'
+                            assign swatch_focal_point = option_value.swatch.image.presentation.focal_point
+                            assign has_image = true
+                          elsif option_value.swatch.color
+                            assign swatch_value = 'rgb(' | append: option_value.swatch.color.rgb | append: ')'
+                            assign has_image = false
+                          else
+                            assign swatch_value = option_value
+                            assign has_image = false
+                          endif
+                        endif
+
+
+                        assign option_disabled = true
+                        if option_value.available
+                          assign option_disabled = false
+                        endif
+                      %}
+                      
+                      <li class="swatches-list-item{% if option.selected_value == option_value %} active{% endif %}{% if option_disabled %} variant-disabled{% endif %}{% if has_image %} has-swatch-image{% endif %}"{%- if picker_type == 'swatch' -%} data-tooltip {%- endif -%}>
+                        <input
+                          type="radio"
+                          class="swatch-input{% if option_disabled %} variant-input-disabled{% endif %}"
+                          id="{{ section_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
+                          name="{{ option.name }}"
+                          value="{{ option_value | escape }}"
+                          form="{{ product_form_id }}"
+                          {% if option.selected_value == option_value %}
+                            checked
+                          {% endif %}
+                          {% unless option_value.variant.available %}
+                            class="disabled"
+                          {% endunless %}
+                          data-product-url="{{ option_value.product_url }}"
+                          data-variant-id="{{ option_value.variant.id }}"
+                          data-option-value-id="{{ option_value.id }}"
+                          data-option-value="{{ option_value | escape }}"
+                        >
+                        {%- if picker_type == 'swatch' -%}
+                          
+                          <label
+                            for="{{ section_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
+                            {% if settings.product_card_variant == 'variant_image' %}
+                              {% if swatch_value %}
+                                class="swatch-label"
+                                style="{% if option_value.variant.featured_media or option_value.swatch.image %}--swatchImage:{% elsif option_value.swatch.color %}--colorPalette:{% else %}--colorPalette:{% endif %} {{ swatch_value }};{% if swatch_focal_point %} --swatch-focal-point: {{ swatch_focal_point }};{% endif %}"
+                              {% else %}
+                                class="swatch-label swatch-unavailable"
+                              {% endif %}
+
+                            {% elsif settings.product_card_variant == 'color_swatch' %}
+                              {% if swatch_value %}
+                                class="swatch-label"
+                                style="{% if option_value.swatch.image %}--swatchImage:{% elsif option_value.swatch.color %}--colorPalette:{% else %}--colorPalette:{% endif %} {{ swatch_value }};{% if swatch_focal_point %} --swatch-focal-point: {{ swatch_focal_point }};{% endif %}"
+                              {% else %}
+                                class="swatch-label swatch-unavailable"
+                              {% endif %}
+                            {% endif %}
+                            
+                          >
+                            <span class="visually-hidden">{{ swatch_value }}</span>
+                          </label>
+                          <div class="tooltip body-font">{{ option_value | escape }}</div>
+                        {%- elsif picker_type == 'button' -%}
+                          <label
+                            for="{{ section_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
+                            class="swatch-label"
+                          >
+                            <span class="visually-hidden">{{ swatch_value }}</span>
+                            {{ option_value | escape }}
+                          </label>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
+              </div>
+              {% if block.settings.enable_sizechart and variant_option_name == sizechart_option_name %}
+                {% render 'size-chart', block:block, section:section %}
+              {% endif %}
+            {%- else -%}
+              <div class=" variant-selector-box"
+                data-option-index="option{{ forloop.index }}"
+                data-option-slug="{{ option.name | handleize }}"
+              >
+              <div class="variant-swatches-text body-font">
+                <strong>{{ option.name | capitalize }}</strong>
+              </div>
+                <div class="variant-swatches-box select-box">
+                    <select
+                      id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                      class="form-control"
+                      name="options[{{ option.name | escape }}]"
+                      form="{{ product_form_id }}"
+                      aria-label="Product variants"
+                    >
+                      {%- for option_value in option.values -%}
+                        {% liquid
+                          assign option_disabled = true
+                          if option_value.available
+                            assign option_disabled = false
+                          endif
+                        %}
+                        <option
+                          id="{{ input_id }}"
+                          value="{{ option_value | escape }}"
+                          {% if option_value.selected %}
+                            selected="selected"
+                          {% endif %}
+                          data-product-url="{{ option_value.product_url }}"
+                          data-variant-id="{{ option_value.variant.id }}"
+                          data-option-value-id="{{ option_value.id }}"
+                          data-option-value="{{ option_value | escape }}"
+                        >
+                          {{- option_value -}}
+                        </option>
+                      {% endfor %}
+                    </select>
+                </div>
+              </div>
+              {% if block.settings.enable_sizechart and variant_option_name == sizechart_option_name %}
+                {% render 'size-chart', block:block %}
+              {% endif %}
+            {%- endif -%}         
+          {%- endfor -%}
+          <script type="application/json" data-selected-variant>
+            {{ product.selected_or_first_available_variant | json }}
+          </script>
+        {% else %}
+        {% endif %}
+      </variant-selects>
+      <noscript>
+        <div class="product-block product-block-variant-picker">
+          <div class="variant-swatches-text body-font">
+            <label class="form-label" for="variants-{{ section.id }}-{{ product.id }}"><strong>{{ 'products.product.product_variants' | t }} :</strong></label>
+          </div>
+         
+          <div class="variant-swatches-box">
+            <select class="form-control" id="variants-{{ section.id }}-{{ product.id }}" name="id" form="{{ product_form_id }}">
+              {%- for variant in product.variants -%}
+                <option value="{{ variant.id }}" {% if variant.available == false %}disabled{% endif %}>
+                {{ variant.title }} - {{ variant.price | money }}
+                {% if variant.available == false %} ({{ 'products.product.sold_out' | t }}) {% endif %}
+              </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        </div>
+      </noscript>
+  {%- endunless -%}
+{% else %}
+   {% assign section_id = section.id %}
+    <variant-selects class="product-block product-block-variant-picker" {{ block.shopify_attributes }}>
+      {%- if block.settings.picker_type == 'button' -%}
+          <div class="variant-selector-box color-swatches-box">
+              <div class="variant-swatches-text body-font">
+                <strong>{{ 'products.product.options.onboarding.option1.label' | t }} : </strong>
+                <span id="{{ section_id }}-option1" class="text-small" selected-variant-value>{{ 'products.product.options.onboarding.option1.value1' | t }}</span>
+              </div>
+              <div class="variant-swatches-box">
+                  <ul class="variant-swatches-list {{ block.settings.variant_size }} {{block.settings.color_variant_shape}}">
+                      <li class="swatches-list-item active">
+                          <input type="radio" id="{{ section_id }}-option1-1" name="color" class="swatch-input" checked>
+                          <label
+                            for="{{ section_id }}-option1-1"
+                            class="swatch-label"
+                            style="--colorPalette: rgb(255, 0, 0);"
+                            data-tooltip
+                          >
+                            <span class="visually-hidden">{{ 'products.product.options.onboarding.option1.value1' | t }}</span>
+                            <div class="tooltip body-font">{{ 'products.product.options.onboarding.option1.value1' | t }}</div>
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option1-2" name="color" class="swatch-input">
+                          <label
+                            for="{{ section_id }}-option1-2"
+                            class="swatch-label"
+                            style="--colorPalette:rgb(10, 204, 20);"
+                            data-tooltip
+                          >
+                          <span class="visually-hidden">{{ 'products.product.options.onboarding.option1.value2' | t }}</span>
+                            <div class="tooltip body-font">{{ 'products.product.options.onboarding.option1.value2' | t }}</div>
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option1-3" name="color" class="swatch-input">
+                          <label
+                            for="{{ section_id }}-option1-3"
+                            class="swatch-label"
+                            style="--colorPalette:rgb(41, 27, 165);"
+                            data-tooltip
+                          >
+                          <span class="visually-hidden">{{ 'products.product.options.onboarding.option1.value3' | t }}</span>
+                            <div class="tooltip body-font">{{ 'products.product.options.onboarding.option1.value3' | t }}</div>
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option1-4" name="color" class="swatch-input">
+                          <label
+                            for="{{ section_id }}-option1-4"
+                            class="swatch-label"
+                            style="--colorPalette:rgb(202, 167, 9);"
+                            data-tooltip
+                          >
+                          <span class="visually-hidden">{{ 'products.product.options.onboarding.option1.value4' | t }}</span>
+                            <div class="tooltip body-font">{{ 'products.product.options.onboarding.option1.value4' | t }}</div>
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option1-5" name="color" class="swatch-input">
+                          <label
+                            for="{{ section_id }}-option1-5"
+                            class="swatch-label"
+                            style="--colorPalette:rgb(243, 0, 182);"
+                            data-tooltip
+                          >
+                          <span class="visually-hidden">{{ 'products.product.options.onboarding.option1.value5' | t }}</span>
+                            <div class="tooltip body-font">{{ 'products.product.options.onboarding.option1.value5' | t }}</div>
+                          </label>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+          <div class="variant-selector-box product-swatches-box">
+              <div class="variant-swatches-text body-font">
+                <strong>{{ 'products.product.options.onboarding.option2.label' | t }} : </strong>
+                <span id="{{ section_id }}-option2" class="text-small" selected-variant-value>{{ 'products.product.options.onboarding.option2.value1' | t }}</span>
+              </div>
+              <div class="variant-swatches-box">
+                  <ul class="variant-swatches-list {{ block.settings.variant_size }} {{block.settings.other_variant_shape}}">
+                      <li class="swatches-list-item active">
+                          <input type="radio" id="{{ section_id }}-option2-1" name="size" class="swatch-input" checked>
+                          <label
+                            for="{{ section_id }}-option2-1"
+                            class="swatch-label"
+                          >
+                            <span class="visually-hidden">{{ 'products.product.options.onboarding.option2.value1' | t }}</span>
+                           {{ 'products.product.options.onboarding.option2.value1' | t }}
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option2-2" name="size" class="swatch-input">
+                          <label
+                             for="{{ section_id }}-option2-2"
+                            class="swatch-label"
+                          >
+                            <span class="visually-hidden">{{ 'products.product.options.onboarding.option2.value2' | t }}</span>
+                          {{ 'products.product.options.onboarding.option2.value2' | t }}
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option2-3" name="size" class="swatch-input">
+                          <label
+                           for="{{ section_id }}-option2-3"
+                            class="swatch-label"
+                          >
+                            <span class="visually-hidden">{{ 'products.product.options.onboarding.option2.value3' | t }}</span>
+                         {{ 'products.product.options.onboarding.option2.value3' | t }}
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option2-4" name="size" class="swatch-input">
+                         <label
+                            for="{{ section_id }}-option2-4"
+                            class="swatch-label"
+                          >
+                            <span class="visually-hidden">{{ 'products.product.options.onboarding.option2.value4' | t }}</span>
+                            {{ 'products.product.options.onboarding.option2.value4' | t }}
+                          </label>
+                      </li>
+                      <li class="swatches-list-item">
+                          <input type="radio" id="{{ section_id }}-option2-5" name="size" class="swatch-input">
+                         <label
+                            for="{{ section_id }}-option2-5"
+                            class="swatch-label"
+                          >
+                            <span class="visually-hidden">{{ 'products.product.options.onboarding.option2.value5' | t }}</span>
+                           {{ 'products.product.options.onboarding.option2.value5' | t }}
+                          </label>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      {%- else -%}
+      <div class="variant-selector-box" data-option-index="option1">
+            <div class="variant-swatches-text body-font">
+                <strong>{{ 'products.product.options.onboarding.option1.label' | t }}</strong>
+              </div>
+                    <div class="variant-swatches-box">
+                      <div class="select-control">
+                        <select
+                          id="Option1-{{ section_id }}"
+                          class="form-control"
+                          name="options[{{ 'products.product.options.onboarding.option1.label' | t }}]"
+                          aria-label="Product variants"
+                        >
+                           <option
+                              id="Option-{{ section_id }}-option1"
+                              value="{{ 'products.product.options.onboarding.option1.value1' | t }}"
+                                selected="selected"
+                            >
+                               {{ 'products.product.options.onboarding.option1.value1' | t }}
+                            </option>
+                             <option
+                              id="Option-{{ section_id }}-option2"
+                              value="{{ 'products.product.options.onboarding.option1.value2' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option1.value2' | t }}
+                            </option>
+                             <option
+                              id="Option-{{ section_id }}-option3"
+                              value="{{ 'products.product.options.onboarding.option1.value3' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option1.value3' | t }}
+                            </option>
+                            <option
+                              id="Option-{{ section_id }}-option4"
+                              value="{{ 'products.product.options.onboarding.option1.value4' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option1.value4' | t }}
+                            </option>
+                            <option
+                              id="Option-{{ section_id }}-option5"
+                              value="{{ 'products.product.options.onboarding.option1.value5' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option1.value5' | t }}
+                            </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="variant-selector-box" data-option-index="option2">
+                   <div class="variant-swatches-text body-font">
+                <strong>{{ 'products.product.options.onboarding.option2.label' | t }}</strong>
+              </div>
+                  <div class="variant-swatches-box">
+                      <div class="select-control">
+                        <select
+                          id="Option2-{{ section_id }}"
+                          class="form-control"
+                          name="options[{{ 'products.product.options.onboarding.option2.label' | t }}]"
+                          aria-label="Product variants"
+                        >
+                           <option
+                              id="Option2-{{ section_id }}-option1"
+                              value="{{ 'products.product.options.onboarding.option2.value1' | t }}"
+                                selected="selected"
+                            >
+                               {{ 'products.product.options.onboarding.option2.value1' | t }}
+                            </option>
+                             <option
+                              id="Option2-{{ section_id }}-option2"
+                              value="{{ 'products.product.options.onboarding.option2.value2' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option2.value2' | t }}
+                            </option>
+                             <option
+                              id="Option2-{{ section_id }}-option3"
+                              value="{{ 'products.product.options.onboarding.option2.value3' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option2.value3' | t }}
+                            </option>
+                            <option
+                              id="Option2-{{ section_id }}-option4"
+                              value="{{ 'products.product.options.onboarding.option2.value4' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option2.value4' | t }}
+                            </option>
+                            <option
+                              id="Option2-{{ section_id }}-option5"
+                              value="{{ 'products.product.options.onboarding.option2.value5' | t }}"
+                            >
+                               {{ 'products.product.options.onboarding.option2.value5' | t }}
+                            </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+      {%- endif -%}
+    </variant-selects>
+{% endif %}

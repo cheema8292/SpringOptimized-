@@ -1,0 +1,337 @@
+{% comment %} {% stylesheet %}
+{% endstylesheet %} {% endcomment %}
+ {{ 'store-selector.css' | asset_url | stylesheet_tag }}
+{% render 'store-selector-drawer', section: section, source: 'store-locator-view' %}
+<style>
+  #shopify-section-{{ section.id }} .text-highlight-color{
+   --highlightColor:{{ section.settings.text_color }};
+   }
+    #shopify-section-{{ section.id }} .text-highlight-gradiant{
+      --highlightColor:{{ section.settings.gradiant_color }};
+    }
+</style>
+{% schema %}
+{
+  "name": "t:sections.store-selector.name",
+  "class": "store-selector-section",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["custom.Overlay"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:sections.all.headers.heading",
+      "default": "Find A Store",
+      "info": "t:sections.all.settings.heading_info.info"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "t:sections.all.settings.heading_tag.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        },
+        {
+          "value": "div",
+          "label": "Div"
+        },
+        {
+          "value": "span",
+          "label": "Span"
+        },
+        {
+          "value": "p",
+          "label": "P"
+        }
+      ],
+      "default": "h6"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "t:sections.all.settings.heading_size.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:sections.all.settings.heading_size.options.heading_xl"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.settings.heading_size.options.heading_l"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.settings.heading_size.options.heading_m"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.settings.heading_size.options.heading_s"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.settings.heading_size.options.heading_xs"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+        }
+      ],
+      "default": "h6"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:sections.all.headers.description",
+      "default": "Find nearby stores to shop with convenience."
+    },
+    {
+      "type": "select",
+      "id": "description_size",
+      "label": "t:sections.all.settings.description_size.label",
+      "options": [
+        {
+          "value": "text-xlarge",
+          "label": "t:sections.all.settings.description_size.options.text-xlarge"
+        },
+        {
+          "value": "text-large",
+          "label": "t:sections.all.settings.description_size.options.text-large"
+        },
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        },
+        {
+          "value": "text-xsmall",
+          "label": "t:sections.all.settings.description_size.options.text-xsmall"
+        }
+      ],
+      "default": "text-small"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.highlight_content"
+    },
+    {
+      "type": "select",
+      "id": "highlight_text",
+      "label": "t:sections.all.settings.highlight_text.label",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.all.settings.highlight_text.options.none"
+        },
+        {
+          "value": "underline",
+          "label": "t:sections.all.settings.highlight_text.options.underline"
+        },
+        {
+          "value": "color",
+          "label": "t:sections.all.settings.highlight_text.options.markertextcolor"
+        },
+        {
+          "value": "gradiant",
+          "label": "t:sections.all.settings.highlight_text.options.markergradiant"
+        }
+      ],
+      "default": "color"
+    },
+    {
+      "type": "select",
+      "id": "highlight_font",
+      "label": "t:sections.all.settings.fontStyle.label",
+      "options": [
+        {
+          "value": "heading-font",
+          "label": "t:sections.all.settings.fontStyle.options.headingFont"
+        },
+        {
+          "value": "body-font",
+          "label": "t:sections.all.settings.fontStyle.options.bodyFont"
+        },
+        {
+          "value": "accent-font",
+          "label": "t:sections.all.settings.fontStyle.options.accent"
+        }
+      ],
+      "default": "heading-font"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.all.headers.markertextcolor",
+      "visible_if": "{{ section.settings.highlight_text == 'color' }}",
+      "default": "#0424A7"
+    },
+    {
+        "type": "color_background",
+        "id": "gradiant_color",
+        "label": "t:sections.all.headers.markertextcolor",
+        "default": "linear-gradient(54deg, rgba(239, 37, 18, 1) 4%, rgba(239, 95, 18, 1) 52.518%, rgba(241, 163, 28, 1) 100%)",
+        "visible_if": "{{ section.settings.highlight_text == 'gradiant' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.button"
+    },
+    {
+      "type": "text",
+      "id": "button_title",
+      "label": "t:sections.all.settings.button.label",
+      "default": "Set as my store"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:sections.all.settings.button.style.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.button.style.options.primaryButton",
+          "value": "primary-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.secondaryButton",
+          "value": "secondary-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.primaryOutlinedButton",
+          "value": "primary-button outlined-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.secondaryOutlinedButton",
+          "value": "secondary-button outlined-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.underlineButton",
+          "value": "button-underline"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "store",
+      "name": "t:sections.store-selector.blocks.store.name",
+      "settings": [
+        {
+          "type": "select",
+          "id": "store_media",
+          "label": "t:sections.all.settings.media_type.label",
+          "options": [
+            {
+              "value": "image",
+              "label": "t:sections.all.settings.media_type.option_0.label"
+            },
+            {
+              "value": "map",
+              "label": "t:sections.all.settings.media_type.option_2.label"
+            }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "image_picker",
+          "id": "store_image",
+          "label": "t:sections.all.headers.image",
+          "visible_if": "{{ block.settings.store_media == 'image' }}"
+        },
+        {
+          "type": "text",
+          "id": "store_map",
+          "label": "t:sections.store-selector.blocks.store.settings.map_address.label",
+          "visible_if": "{{ block.settings.store_media == 'map' }}"
+        },
+        {
+          "type": "text",
+          "id": "store_name",
+          "label": "t:sections.store-selector.blocks.store.settings.store_name.label",
+          "default": "My store",
+          "info": "t:sections.store-selector.blocks.store.settings.store_name.info"
+        },
+        {
+          "type": "text",
+          "id": "pickup_price",
+          "label": "t:sections.store-selector.blocks.store.settings.pickup_price.label",
+          "default": "Free"
+        },
+        {
+          "type": "text",
+          "id": "pickup_time",
+          "label": "t:sections.store-selector.blocks.store.settings.pickup_time.label",
+          "default": "Usually ready in 24 hrs"
+        },
+        {
+          "type": "textarea",
+          "id": "store_address",
+          "label": "t:sections.store-selector.blocks.store.settings.store_address.label",
+          "default": "123 John Doe StreetYour Town, YT 12345"
+        },
+        {
+          "type": "text",
+          "id": "store_phone",
+          "label": "t:sections.store-selector.blocks.store.settings.store_phone.label",
+          "default": "12345678"
+        },
+        {
+          "type": "textarea",
+          "id": "store_working_Hours",
+          "label": "t:sections.store-selector.blocks.store.settings.store_hours.label",
+          "default": "Mon-Fri: 9:00 - 17:00 Sat: 10:00 - 13:00"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.store-selector.name",
+      "blocks": [{ "type": "store" }]
+    }
+  ]
+}
+{% endschema %}

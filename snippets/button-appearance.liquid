@@ -1,0 +1,31 @@
+{% comment %}
+  Renders a list of button apearance
+
+  Accepts:
+  - button_text: {string} button text
+  - button_url: {string} button url
+  - button_style: {string} button class
+  - is_open_in_new_tab: {Boolean} open in new tab
+  - class : {string} extra class
+  - extra_attribute : {string} for any js operation
+  Usage:
+  {% render 'button-appearance', button_text: 'Button text', button_url: 'example.com', button_style: 'primary', is_open_in_new_tab:true, extra_attribute:'' %}
+{% endcomment %}
+{% liquid
+  assign tag = 'button'
+  if button_url != blank
+    assign tag = 'a'
+  endif
+%}
+<{{ tag }} {% if tag == 'a' %} href="{{ button_url }}" {% if is_open_in_new_tab %}target="_blank"{% endif %}{% endif %}
+  class="button robin {{ button_style }} {% if class != blank %}{{ class }}{% endif %}"
+  aria-label="{{ button_text }}"
+  {% if extra_attribute != blank %}
+    {{- extra_attribute -}}
+  {% endif %}
+>
+  <span class="button-text">{{ button_text }}</span>
+  <span class="button-icon">
+    {% render 'svg-icons', icon_type: 'arrow-right' %}
+  </span>
+</{{ tag }}>

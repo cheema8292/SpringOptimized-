@@ -1,0 +1,91 @@
+{% if section.blocks.size > 0 %}
+{{ 'lookbook-banner.css' | asset_url | stylesheet_tag }}
+<lookbook-swiper
+  class="lookbook-banner-wrapper {% if section.blocks.size > 3 %}swiper{% endif %}"
+  {% if section.blocks.size > 2 %}
+    data-swiper='
+      {
+        "loop": false,
+        "autoHeight": false,
+        "slidesPerView": 1.5,
+        "spaceBetween": {{ section.settings.column_gap }},
+        "navigation": {
+          "nextEl": ".swiper-nav-next-{{ section.id }}",
+          "prevEl": ".swiper-nav-prev-{{ section.id }}"
+        },
+         "pagination": {
+                "el": ".swiper-pagination-{{ section.id }}",
+                "type": "progressbar"
+                     },
+        "centeredSlides": false,
+        "breakpoints": {
+          "768": {
+            "slidesPerView": 3
+          },
+          "1025": {
+            "slidesPerView": {% if section.block.size > 3 %}3.5{% else %}3{% endif %}
+          },
+          "1280": {
+            "slidesPerView": {% if section.block.size > 4 %}4.5{% else %}4{% endif %}
+          }
+        }
+      }
+    '
+  {% endif %}
+>
+  <div class="lookbook-banner-items {% if section.blocks.size > 3 %}swiper-wrapper{% endif %} {% if section.settings.enable_mobile_swipe %}mobile-swipe{% endif %} mobile-stacked mobile-column-{{ section.settings.columns_mobile }}">
+    {{ lookbook_slides }}
+  </div>
+</lookbook-swiper>
+{% if section.blocks.size > 3 %}
+  <div class="swiper-controls">
+    <div class="swiper-pagination-progressbar swiper-pagination-horizontal swiper-pagination-{{ section.id }} d-none md-block">
+      <span class="swiper-pagination-progressbar-fill" style=""></span>
+    </div>
+    {% render 'swiper-navigation', id: section.id, extra_class: 'd-none md-flex' %}
+  </div>
+{% endif %}
+{% endif %}
+
+
+
+<style>
+    #shopify-section-{{ section.id }} {
+    --topSpacer: {{ section.settings.top_space_desktop }}px;
+    --bottomSpacer: {{ section.settings.bottom_space_desktop }}px;
+    --mediaHeight: {{ section.settings.desktop_custom_height }}px;
+    --blockRadius :{{ section.settings.border_radius }}px;
+    --columnGap:{{ section.settings.column_gap }}px;
+  }
+
+
+  @media only screen and (max-width: 767px) {
+    #shopify-section-{{ section.id }} {
+      --topSpacer: {{ section.settings.top_space_mobile }}px;
+      --bottomSpacer: {{ section.settings.bottom_space_mobile }}px;
+      --mediaHeight: {{ section.settings.mobile_custom_height }}px;
+      --columnGap:{{ section.settings.mobile_column_gap }}px;
+      {% if section.settings.border_radius > 10 %}
+        --blockRadius: calc( {{ section.settings.border_radius }}px / 2);
+      {% else %}
+        --blockRadius: {{ section.settings.border_radius }}px ;
+      {% endif %}
+    }
+
+  }
+
+  {% if section.settings.section_visibility == 'large' %}
+    @media (max-width: 767px) {
+      #shopify-section-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {% elsif section.settings.section_visibility == 'small' %}
+    @media (min-width: 768px) {
+      #shopify-section-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {% endif %}
+</style>
+

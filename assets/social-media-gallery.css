@@ -1,0 +1,88 @@
+  .social-media-gallery-wrapper { 
+    align-items: flex-start;
+    grid-template-columns: repeat(var(--columnCount, 4), 1fr); 
+    gap: var(--columnGap); 
+  }
+
+  .social-media-gallery-img {
+    border-radius: var(--blockRadius);
+  }
+
+  .social-media-gallery-items {
+    display: grid;
+    gap: var(--columnGap);
+  }
+  .social-media-gallery-item:has(.social-media-gallery-item-inner:focus-visible) {
+      outline: 2px solid var(--keyboardFocus);
+  }
+  
+  .social-media-gallery-content {
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+    right: 0;
+    width: calc(100% - 12px);
+    margin: 0 auto;
+    background: color-mix(in srgb, var(--cardBackground) 50%, transparent);
+    backdrop-filter: blur(10px);
+    border-radius: var(--blockRadius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .social-media-gallery-content-title {
+    color: var(--cardText);
+  }
+  
+  .social-media-gallery-content-info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .social-media-gallery-content-img {
+    width: 24px;
+    border-radius: 100%;
+    overflow: hidden;
+    @media (min-width:768px) {
+      width: 32px;
+    }
+  }
+
+  .social-media-gallery-content-icon {
+    display: inline-flex;
+    --svgSize: 20px;
+    color: var(--cardText);
+  }
+
+  .social-media-gallery-main.horizontal-position {
+    display: grid;
+    gap: 20px; 
+  }
+
+  .social-media-gallery-button {
+    margin-block-start: 25px;
+  }  
+  
+  @media (min-width:768px) {
+    .social-media-gallery-main.horizontal-position{
+      grid-template-columns: 1fr;
+      align-items: center; 
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .social-media-gallery-main.horizontal-position:has(.section-header-block) {
+        gap: 50px;
+        grid-template-columns: 0.3fr 1fr;
+    }
+  }
+
+  @media (max-width:767px) {
+    .mobile-swipe .social-media-gallery-items {
+      display: contents;
+  } 
+}

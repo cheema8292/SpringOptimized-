@@ -1,0 +1,44 @@
+<country-province>
+  <div class="form-group">
+    <label class="form-label" for="address-country">{{ 'sections.cart.cart_shipping_country_title' | t }}</label>
+    <div class="select-box pos-relative">
+      <select
+        id="shippingCountry"
+        class="form-control"
+        name="address[country]"
+        data-default="{{ shop.address.country }}"
+        autocomplete="country"
+        data-country-select
+        shippingCountry
+      >
+        {{ all_country_option_tags }}
+      </select>
+    </div>
+  </div>
+  <div class="form-group" id="province-container" id="shippingProvinceContainer">
+    <label class="form-label" for="address-country">{{ 'sections.cart.cart_shipping_country_city' | t }}</label>
+    <div class="select-box pos-relative">
+      <select
+        id="shippingProvince"
+        class="form-control"
+        name="address[province]"
+        autocomplete="address-level1"
+        aria-label="Shipping province"
+        shippingProvince
+      ></select>
+    </div>
+  </div>
+</country-province>
+<div class="form-group">
+  <label class="form-label" for="shippingZip">{{ 'sections.cart.cart_shipping_pincode' | t }}</label>
+  <input type="text" name="address[zip]" id="shippingZip" class="form-control" placeholder="Pincode">
+</div>
+<div class="form-group">
+  <button type="submit" class="button" id="fetch-sipping-estimates" aria-label="Submit">
+    <span class="button-text">{{ 'sections.cart.cart_shipping_estimate' | t }}</span>
+    <span class="button-icon">
+      {% render 'svg-icons', icon_type: 'arrow-right' %}
+    </span>
+  </button>
+</div>
+<div id="ShippingWrapperResponse" class="hidden" data-shipping-result></div>

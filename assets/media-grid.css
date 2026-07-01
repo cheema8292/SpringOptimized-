@@ -1,0 +1,95 @@
+.media-grid-media {
+    border-radius: var(--blockRadius);
+}
+
+.custom-grid-item:has(.media-grid-media ) {
+    display: grid;
+}
+ .custom-grid-item .media-grid-media,
+ .custom-grid-item .media-grid-content {grid-column-start: 1;
+    grid-row-start: 1;}
+    
+ .media-grid-content{
+    padding: 2rem;
+    position: relative; 
+    flex-direction: column;
+ }
+ 
+.media-grid-content-inner { 
+    gap: 10px;  
+}
+
+.media-grid-content-inner .button-block {
+    margin-block-start: 10px;
+}
+
+.media-grid-content.text-right {
+    padding-right: var(--horizontalTextIndent);
+} 
+.media-grid-content.text-left {
+    padding-left: var(--horizontalTextIndent);
+} 
+.media-grid-content.content-top{
+    padding-top: var(--verticalTextIndent);
+}
+.media-grid-content.content-bottom{
+    padding-bottom: var(--verticalTextIndent);
+}
+.media-grid-description-block+.media-grid-button-block {
+    margin-top: 15px;
+}
+
+/* css from stylesheet tag */
+  .sticker-wrapper{  
+      background: var(--stickerBg); 
+      box-sizing: border-box; 
+      position: absolute; 
+      max-width: var(--svgSize);
+      width: var(--svgSize);
+      height: var(--svgSize);
+      inset-inline-start: max(0px,calc(var(--stickerHorizontalPosition) - var(--svgSize)));
+      inset-block-start: max(0px,calc(var(--stickerVerticalPosition) - var(--svgSize)));
+      transform: rotate(var(--stickerRotate)); 
+      display: flex; 
+       align-items: center;
+       justify-content: center;
+      .sticker-text {
+           color: var(--stickerTextColor);
+           font-size: var(--fontSize);
+           line-height: 1;
+           width: 100%; 
+           .text-highlight{
+                font-size: var(--emphasizeFontSize);
+            } 
+      }
+      .svg-wrapper{ 
+          /* color: var(--stickerBg);  */
+              width: 0; 
+              height: 0;
+              position: absolute;
+      }
+      img.sticker-custom-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+  } 
+  .sticker-wrapper-shape{
+      padding: 15px; 
+  } 
+  /* css from stylesheet tag new */
+@media (max-width:1440px) {
+    .media-grid-content {
+        padding: 1.5rem;
+    }
+}
+ 
+
+@media (min-width:768px) {
+    .media-grid-wrapper {
+        grid-auto-rows: minmax(var(--desktopHeight), auto);
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+    } 
+}
+
+ 

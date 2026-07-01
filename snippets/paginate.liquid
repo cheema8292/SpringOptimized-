@@ -1,0 +1,82 @@
+<style>
+    .collection-loader{
+    padding-top: 20px;
+    }
+</style>
+{% if pagination_type %}
+
+    {% if paginate.next %}
+        {% if pagination_type == 'infinite' %}
+            <load-more class="infinte-scroll" data-scroll-event data-mode="infinite">
+            <a
+                href="{{ paginate.next.url }}"
+                aria-label="Loading"
+                data-current-page="{{ paginate.current_page }}"
+                data-product-count="{{ section.settings.products_limit }}"
+                data-total-product="{{ collection.products_count }}"
+                >Loading</a
+            >
+            <div class="collection-loader text-center hidden" data-infinite-scroll>
+                <svg
+                width="40"
+                height="40"
+                style="shape-rendering: auto; animation-play-state: running; animation-delay: 0s; background: none;"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid"
+                >
+                <circle cx="50" cy="50" fill="none" stroke="#d9e2ed" stroke-width="6" r="35"
+                    stroke-dasharray="164.93361431346415 56.97787143782138"
+                    style="animation-play-state: running; animation-delay: 0s;"
+                    transform="rotate(115.597 50 50)">
+                    <animateTransform attributeName="transform" type="rotate" calcMode="linear"
+                        values="0 50 50;360 50 50" keyTimes="0;1" dur="1s" begin="0s"
+                        repeatCount="indefinite">
+                    </animateTransform>
+                </circle>
+                </svg>
+            </div>
+            </load-more>
+        {% elsif pagination_type == 'load-more' %}
+            <load-more class="d-block collection-loader text-center infinte-scroll" data-mode="load-more">
+            <a
+                class="collection-load-more button"
+                href="{{ paginate.next.url }}"
+                aria-label="Load-more"
+                data-products-load
+                data-current-page="{{ paginate.current_page }}"
+                data-product-count="{{ section.settings.products_limit }}"
+                data-total-product="{{ collection.products_count }}"
+            >
+                <span>Load more</span>
+            </a>
+            <div class="collection-loader text-center hidden" data-infinite-scroll>
+                <svg
+                width="40"
+                height="40"
+                style="shape-rendering: auto; animation-play-state: running; animation-delay: 0s; background: none;"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid"
+                >
+                <circle cx="50" cy="50" fill="none" stroke="#d9e2ed" stroke-width="6" r="35"
+                    stroke-dasharray="164.93361431346415 56.97787143782138"
+                    style="animation-play-state: running; animation-delay: 0s;"
+                    transform="rotate(115.597 50 50)">
+                    <animateTransform attributeName="transform" type="rotate" calcMode="linear"
+                        values="0 50 50;360 50 50" keyTimes="0;1" dur="1s" begin="0s"
+                        repeatCount="indefinite">
+                    </animateTransform>
+                </circle>
+                </svg>
+            </div>
+            </load-more>
+        {% endif %}
+    {% endif %}
+
+    {% if paginate.pages > 1 and pagination_type == 'page-number' %}
+        {% render 'pagination', paginate: paginate %}
+    {% endif %}
+    {% else %}
+        {% if paginate.pages > 1 %}
+        {% render 'pagination', paginate: paginate %}
+        {% endif %}
+{% endif %}

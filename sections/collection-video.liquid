@@ -1,0 +1,319 @@
+
+{% liquid
+  assign target_collection = section.settings.collection
+  if target_collection == blank
+    assign target_collection = collection
+  endif
+
+  assign mf_heading = target_collection.metafields.custom.video_heading
+  assign mf_subheading = target_collection.metafields.custom.video_subheading
+  assign mf_video_url = target_collection.metafields.custom.video_source
+
+  assign heading_html = ''
+  if mf_heading != blank
+    assign heading_html = mf_heading | metafield_tag
+  endif
+
+  assign subheading_html = ''
+  if mf_subheading != blank
+    assign subheading_html = mf_subheading | metafield_tag
+  endif
+
+  assign video_url = ''
+  if mf_video_url != blank
+    assign video_url = mf_video_url.value | strip
+  endif
+
+  assign is_youtube = false
+  assign is_vimeo = false
+  if video_url contains 'youtube.com' or video_url contains 'youtu.be'
+    assign is_youtube = true
+  endif
+  if video_url contains 'vimeo.com'
+    assign is_vimeo = true
+  endif
+
+  assign show_section = false
+  if video_url != ''
+    assign show_section = true
+  endif
+%}
+
+{% if show_section %}
+  <section class="cvh cvh--{{ section.id }}">
+    <div class="cvh__inner">
+      {% if heading_html != '' %}
+        <div class="cvh__heading">
+          {%- comment -%}
+            Rich text outputs wrapped elements; we normalize to an H2 look.
+          {%- endcomment -%}
+          <div class="cvh__headingText">
+            {{ heading_html }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if subheading_html != '' %}
+        <div class="cvh__subheading">
+          {{ subheading_html }}
+        </div>
+      {% endif %}
+
+      {% if video_url != '' %}
+        <div class="cvh__media">
+          <div class="cvh__mediaFrame">
+            {% if is_youtube %}
+              {% liquid
+                assign yt_id = video_url
+
+                if video_url contains 'youtu.be/'
+                  assign yt_id = video_url | split: 'youtu.be/' | last | split: '?' | first
+                elsif video_url contains 'v='
+                  assign yt_id = video_url | split: 'v=' | last | split: '&' | first
+                endif
+              %}
+             <div class="yt-mask">
+  <iframe
+    class="cvh__iframe"
+    src="https://www.youtube.com/embed/{{ yt_id }}?controls=0&rel=0&modestbranding=1&playsinline=1&fs=0&disablekb=1"
+    title="Video"
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+  </iframe>
+</div>
+<style>
+  .yt-mask{
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16/9; /* or your ratio */
+}
+
+.yt-mask iframe{
+  position: absolute;
+  inset: -60px 0 0 0!important; /* push iframe up to hide top overlays */
+  width: 100%!important;
+  height: calc(100% + 104px)!important; /* compensate height */
+  border: 0;
+}
+.cvh__iframe{
+  border-radius: 24px;
+}
+@media (max-width: 749px){
+.yt-mask iframe {
+    position: absolute;
+    inset: -54px 0 0 0 !important;
+    width: 100% !important;
+    height: calc(100% + 96px) !important;}
+}
+</style>
+
+
+            {% elsif is_vimeo %}
+              {% liquid
+                assign vimeo_id = video_url | split: 'vimeo.com/' | last | split: '?' | first
+              %}
+              <iframe
+                class="cvh__iframe"
+                src="https://player.vimeo.com/video/{{ vimeo_id }}"
+                title="Video"
+                loading="lazy"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+
+            {% else %}
+              <video
+                class="cvh__video"
+                controls
+                preload="metadata"
+                {% if section.settings.autoplay %} autoplay {% endif %}
+                {% if section.settings.muted %} muted {% endif %}
+                {% if section.settings.loop %} loop {% endif %}
+                playsinline
+              >
+                <source src="{{ video_url }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+  <style>
+    .cvh--{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+
+    .cvh--{{ section.id }} .cvh__inner {
+      margin: 0 auto;
+      padding: 0 20px;
+      max-width: {{ section.settings.max_width }}px;
+    }
+
+    .cvh--{{ section.id }} .cvh__heading {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    /* Normalize rich text heading output */
+    .cvh--{{ section.id }} .cvh__headingText,
+    .cvh--{{ section.id }} .cvh__headingText > * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .cvh--{{ section.id }} .cvh__headingText {
+      font-size: clamp(22px, 2.2vw, 32px);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.15;
+      font-weight: 500;
+    }
+
+    .cvh--{{ section.id }} .cvh__subheading {
+      text-align: center;
+      max-width: 860px;
+      margin: 0 auto 26px auto;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Rich text spacing control */
+    .cvh--{{ section.id }} .cvh__subheading > * {
+      margin: 0;
+    }
+
+    .cvh--{{ section.id }} .cvh__media {
+      display: flex;
+      justify-content: center;
+    }
+
+    .cvh--{{ section.id }} .cvh__mediaFrame {
+      width: 100%;
+      max-width: {{ section.settings.media_max_width }}px;
+      background: transparent;
+      border-radius: {{ section.settings.radius }}px;
+      overflow: hidden;
+    }
+
+    .cvh--{{ section.id }} .cvh__video,
+    .cvh--{{ section.id }} .cvh__iframe {
+      width: 100%;
+      height: auto;
+      display: block;
+      aspect-ratio: {{ section.settings.aspect_ratio }};
+    }
+
+    .cvh--{{ section.id }} .cvh__iframe {
+      height: 100%;
+      border: 0;
+    }
+
+    @media (max-width: 749px) {
+      .cvh--{{ section.id }} .cvh__inner {
+        padding: 0 16px;
+      }
+      .cvh--{{ section.id }} .cvh__subheading {
+        margin-bottom: 18px;
+      }
+      .cvh__headingText h2{
+        font-size: 28px!important;
+    line-height: 1;}
+    }
+    
+  </style>
+
+  {% schema %}
+  {
+    "name": "Collection video hero",
+    "tag": "section",
+    "class": "section",
+    "settings": [
+      {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection (optional)",
+        "info": "Leave blank to use the current collection on collection pages."
+      },
+      {
+        "type": "range",
+        "id": "max_width",
+        "label": "Content max width",
+        "min": 800,
+        "max": 1600,
+        "step": 20,
+        "default": 1400
+      },
+      {
+        "type": "range",
+        "id": "media_max_width",
+        "label": "Video max width",
+        "min": 800,
+        "max": 1600,
+        "step": 20,
+        "default": 1200
+      },
+      {
+        "type": "text",
+        "id": "aspect_ratio",
+        "label": "Aspect ratio",
+        "default": "16 / 9",
+        "info": "Examples: 16 / 9, 21 / 9, 4 / 3"
+      },
+      {
+        "type": "range",
+        "id": "radius",
+        "label": "Media corner radius",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "autoplay",
+        "label": "Autoplay (MP4 only)",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "muted",
+        "label": "Muted (MP4 only)",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "loop",
+        "label": "Loop (MP4 only)",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Padding top",
+        "min": 0,
+        "max": 120,
+        "step": 4,
+        "default": 40
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Padding bottom",
+        "min": 0,
+        "max": 160,
+        "step": 4,
+        "default": 60
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection video hero"
+      }
+    ]
+  }
+  {% endschema %}
+

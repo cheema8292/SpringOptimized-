@@ -1,0 +1,87 @@
+.marquee-wrapper {
+    display: flex;
+    overflow: hidden;
+}
+
+.scrolling-text-block+.scrolling-text-block {
+    padding-block-start: 15px;
+}
+
+.scrolling-text-inner {
+    background: var(--marqueeBackground);
+}
+
+.marquee-node {
+    flex: 0 0 auto;
+    display: flex;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-duration: var(--duration);
+    animation-play-state: paused;
+    width: max-content;
+}
+
+.marquee-autoplay .marquee-node {
+    animation-play-state: running;
+}
+
+.marquee-direction-ltr .marquee-node {
+    animation-name: scrolling-left;
+}
+
+.marquee-direction-rtl .marquee-node {
+    animation-name: scrolling-right;
+}
+
+
+
+.marquee-wrapper.pause-on-hover:hover .marquee-node,
+.marquee-paused .marquee-node {
+    animation-play-state: paused;
+}
+
+.marquee-item {
+    display: flex; 
+} 
+.marquee-item-wrap {
+    padding: var(--verticalSpacing) calc(var(--horizontalSpacing) / 2);
+    align-self: var(--alignSelf, center);
+    display: flex;
+}
+
+.marquee-text {
+    color: var(--marqueeTextColor);
+    white-space: nowrap;
+    font-size: var(--textSize);
+}
+
+.marquee-item-wrap.text-gradient .marquee-text {
+    background: var(--marqueeTextColor);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.marquee-item-wrap .svg-wrapper {
+    color: var(--separatorColor);
+}
+
+.marquee-item-image img {
+    width: var(--mediaWidth);
+}
+
+.scrolling-text-inner.bidirection-enabled {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.scrolling-text-inner.bidirection-enabled .marquee-wrapper:first-child {
+    mask-image: linear-gradient(to right, rgb(255 255 255) 12.5%, rgb(255 255 255) 87.5%, transparent 100%);
+}
+
+.scrolling-text-inner.bidirection-enabled .marquee-wrapper:last-child {
+    mask-image: linear-gradient(to left, rgb(255 255 255) 12.5%, rgb(255 255 255) 87.5%, transparent 100%);
+}
+
+.scrolling-text-inner.bidirection-enabled:has(.pause-on-hover):hover .marquee-wrapper .marquee-node {
+    animation-play-state: paused;
+}

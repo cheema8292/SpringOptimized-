@@ -1,0 +1,36 @@
+{% liquid
+  assign column_count = 1
+  if link.links.size == 1
+    assign column_count = 1
+  else
+    assign column_count = 2
+  endif
+%}
+<div class="dropdown-wrapper masonry-wrapper">
+  <div class="dropdown-contain">
+    <ul class="masonry-menu-nav" style="--columnCount:{{ column_count }}">
+      {% for innerLink in link.links %}
+        <li class="masonry-menu-item">
+          <div class="masonry-menu-item-inner">
+            <a href="{{ innerLink.url }}" class="masonry-menu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font">
+              {{- innerLink.title }}
+            </a>
+            {% if innerLink.links.size > 0 %}
+              <div class="masonry-submenu">
+                <ul class="masonry-submenu-nav">
+                  {% for grandChlid in innerLink.links %}
+                    <li class="masonry-submenu-item">
+                      <a href="{{ grandChlid.url }}" class="masonry-submenu-link link-animation {{ settings.header_third_level_menus_size }} {{ settings.header_third_level_menus_font }}-font">
+                        {{- grandChlid.title }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

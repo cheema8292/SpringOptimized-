@@ -1,0 +1,87 @@
+{% if blocks.size > 0 %}
+  {% assign is_highlight_products = false %}
+  {%- for block in blocks -%}
+    {%- if block.type == 'product_highlights' -%}
+      {% assign is_highlight_products = true %}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if is_highlight_products %}
+    <product-key-highlight class="product-block product-block-key-highlights border d-block">
+      <div class="key-highlights-wrapper">
+        {% for block in blocks %}
+          {%- case block.type -%}
+            {%- when 'product_highlights' -%}
+              {% assign image_setting = section.settings.aspect_ratio %}
+              {% assign image_ratio = section.settings.aspect_ratio %}
+              {%- liquid
+                assign image = block.settings.image
+                assign description = block.settings.description
+                assign heading = block.settings.heading
+              -%}
+              {%- liquid
+                assign has_content = false
+                assign has_image = false
+                if heading != blank or description != blank
+                  assign has_content = true
+                endif
+                if image != blank
+                  assign has_image = true
+                endif
+              -%}
+              {% if has_image or has_content %}
+                <div class="key-highlights-item" {{ block.shopify_attributes }}>
+                  {% if block.settings.choose_highlight == 'custom-icon' %}
+                    {% if image != blank %}
+                      {% if image_setting == 'auto' %}
+                        {% assign image_ratio = image.aspect_ratio %}
+                      {% endif %}
+                      <div class="key-highlights-media">
+                        <div class="media-card media-adapt" style="--imageRatio:{{ image_ratio }}">
+                          {% liquid
+                            assign default_alt = 'Product key highlight image'
+                            assign image_alt = image.alt | default: default_alt
+                            assign image_sizes = '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, 100vw'
+                            assign image_widths = '320, 440, 560, 680, 800, 920, 1040, 1160, 1200'
+                          %}
+                          {{
+                            image
+                            | image_url: width: 1200, format: 'webp'
+                            | image_tag:
+                              sizes: image_sizes,
+                              widths: image_widths,
+                              decoding: 'async',
+                              loading: 'lazy',
+                              fetchpriority: 'auto',
+                              alt: image_alt
+                          }}
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% elsif block.settings.choose_highlight == 'list' and block.settings.icon_choose != 'none' %}
+                    {% render 'svg-list-icons', icon_type: block.settings.icon_choose, extra_class: '' %}
+                  {% endif %}
+                  {% if heading != blank or description != blank %}
+                    <div class="key-highlights-content">
+                      {% if heading != blank %}
+                        <p class="heading-font text key-highlights-heading">{{ heading }}</p>
+                      {% endif %}
+                      {% if description != blank %}
+                        <div class="text-small key-highlights-desc rte">
+                          {{
+                            description
+                            | replace: '<table', '<div class="table-responsive"><table'
+                            | replace: '</table>', '</table></div>'
+                          }}
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+          {%- endcase -%}
+        {% endfor %}
+      </div>
+    </product-key-highlight>
+  {% endif %}
+{%- endif -%}

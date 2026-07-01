@@ -1,0 +1,217 @@
+<style>
+  .tab-mega-menu{
+    --columnCount:{{ block.menu_columns  }};
+    --overlayTextColor:{{ block.tab_promo_color_text }};
+  {% if block.enable_overlay %}
+      {% if block.overlay_style == 'gradient' %}
+        --imageOverlay: {{ block.overlay_gradient }};
+      {% else %}
+        --imageOverlay: rgba({{ block.overlay_solid.rgba }});
+      {% endif %}
+    {% endif %}
+  }
+</style>
+{% assign check_sub_menu = false %}
+{% for menu in block.menu.links %}
+  {% if menu.links.size > 0 %}
+    {% assign check_sub_menu = true %}
+  {% endif %}
+{% endfor %}
+
+  <div class="mega-menu-wrapper tab-mega-menu">
+    <div class="mega-menu-container">
+      <div class="mega-menu-contain">
+        {% if block.menu.links.size > 0 %}
+          {% if check_sub_menu %}
+            <tab-mega-menu class="mega-menu-tab-wrapper">
+              <ul class="mega-menu-tabs">
+                {% assign index = 1 %}
+                {% for menu in block.menu.links %}
+                  {% if menu.links.size > 0 %}
+                    <li class="mega-menu-tab-item">
+                      <a
+                        href="{{ menu.url }}"
+                        class="mega-menu-tab-item-link text {{ settings.header_first_level_menus_size }} {{ settings.header_first_level_menus_font }}-font {% if index == 1 %}active{% endif %}"
+                        tab-menu
+                      >
+                        {{ menu.title }}
+                      </a>
+                    </li>
+                    {% assign index = index | plus: 1 %}
+                  {% endif %}
+                {% endfor %}
+              </ul>
+              {% assign number_of_columns = block.menu_columns %}
+              {% assign content_index = 1 %}
+
+              <div class="mega-menu-tab-blocks">
+                {% for menu in block.menu.links %}
+                  {% if menu.links.size > 0 %}
+                    <div class="mega-menu-tab-block {% if content_index == 1 %}active{% endif %}" tab-content>
+                      {% assign container1 = '' %}
+                      {% assign container2 = '' %}
+                      {% assign container3 = '' %}
+                      {% assign container4 = '' %}
+                      {% assign container5 = '' %}
+                      {% assign container6 = '' %}
+
+                      {% assign container1_count = 0 %}
+                      {% assign container2_count = 0 %}
+                      {% assign container3_count = 0 %}
+                      {% assign container4_count = 0 %}
+                      {% assign container5_count = 0 %}
+                      {% assign container6_count = 0 %}
+
+                      {% for innerLink in menu.links %}
+                        {% capture item_html %}
+                          <div class="mega-menu-item-wrapper">
+                            <a href="{{ innerLink.url }}" class="mega-menu-link mega-menu-link-main {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font focus-inside">
+                              {{ innerLink.title }}
+                            </a>
+                            {% if innerLink.links.size > 0 %}
+                              <ul class="mega-menu-item-inner">
+                                {% for nestedinnerLink in innerLink.links %}
+                                  <li>
+                                    <a href="{{ nestedinnerLink.url }}" class="mega-menu-link link-animation {{ settings.header_third_level_menus_size }} {{ settings.header_third_level_menus_font }}-font focus-inside">
+                                      {{ nestedinnerLink.title }}
+                                    </a>
+                                  </li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                          </div>
+                        {% endcapture %}
+
+                        {%- comment -%} Determine the column with minimum count {%- endcomment -%}
+                        {% assign min_count = container1_count %}
+                        {% assign target = 'container1' %}
+
+                        {% if number_of_columns > 1 and container2_count < min_count %}
+                          {% assign min_count = container2_count %}
+                          {% assign target = 'container2' %}
+                        {% endif %}
+                        {% if number_of_columns > 2 and container3_count < min_count %}
+                          {% assign min_count = container3_count %}
+                          {% assign target = 'container3' %}
+                        {% endif %}
+                        {% if number_of_columns > 3 and container4_count < min_count %}
+                          {% assign min_count = container4_count %}
+                          {% assign target = 'container4' %}
+                        {% endif %}
+                        {% if number_of_columns > 4 and container5_count < min_count %}
+                          {% assign min_count = container5_count %}
+                          {% assign target = 'container5' %}
+                        {% endif %}
+                        {% if number_of_columns > 5 and container6_count < min_count %}
+                          {% assign min_count = container6_count %}
+                          {% assign target = 'container6' %}
+                        {% endif %}
+
+                        {% case target %}
+                          {% when 'container1' %}
+                            {% assign container1 = container1 | append: item_html %}
+                            {% assign container1_count = container1_count | plus: 1 %}
+                          {% when 'container2' %}
+                            {% assign container2 = container2 | append: item_html %}
+                            {% assign container2_count = container2_count | plus: 1 %}
+                          {% when 'container3' %}
+                            {% assign container3 = container3 | append: item_html %}
+                            {% assign container3_count = container3_count | plus: 1 %}
+                          {% when 'container4' %}
+                            {% assign container4 = container4 | append: item_html %}
+                            {% assign container4_count = container4_count | plus: 1 %}
+                          {% when 'container5' %}
+                            {% assign container5 = container5 | append: item_html %}
+                            {% assign container5_count = container5_count | plus: 1 %}
+                          {% when 'container6' %}
+                            {% assign container6 = container6 | append: item_html %}
+                            {% assign container6_count = container6_count | plus: 1 %}
+                        {% endcase %}
+                      {% endfor %}
+
+                      <div class="mega-menu-items">
+                        {% if container1 != '' %}
+                          <div class="mega-menu-item column-1">{{ container1 }}</div>
+                        {% endif %}
+                        {% if number_of_columns > 1 and container2 != '' %}
+                          <div class="mega-menu-item column-2">{{ container2 }}</div>
+                        {% endif %}
+                        {% if number_of_columns > 2 and container3 != '' %}
+                          <div class="mega-menu-item column-3">{{ container3 }}</div>
+                        {% endif %}
+                        {% if number_of_columns > 3 and container4 != '' %}
+                          <div class="mega-menu-item column-4">{{ container4 }}</div>
+                        {% endif %}
+                        {% if number_of_columns > 4 and container5 != '' %}
+                          <div class="mega-menu-item column-5">{{ container5 }}</div>
+                        {% endif %}
+                        {% if number_of_columns > 5 and container6 != '' %}
+                          <div class="mega-menu-item column-6">{{ container6 }}</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    {% assign content_index = content_index | plus: 1 %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </tab-mega-menu>
+          {% endif %}
+        {% endif %}
+        {% if block.tab_promo_image != blank %}
+          <div class="mega-menu-promo">
+            {% if block.tab_promo_link != blank %}
+              <a href="{{ block.tab_promo_link }}" class="header-promotion-banner-item mega-menu-item">
+            {% else %}
+              <div class="header-promotion-banner-item mega-menu-item">
+            {% endif %}
+            <div class="header-promotion-banner-media">
+              <div class="media-card media-adapt media-card-overlay ttest" style="--imageRatio:1;">
+                {% liquid                  
+                  assign image_alt = block.tab_promo_image.alt | default: 'Mega menu' | escape
+                  assign image_sizes = '(max-width: 600px) 100vw, 540px'
+                  assign image_widths = '180,360,540'
+                %}
+                {{
+                  block.tab_promo_image
+                  | image_url: width: 540, format: 'webp'
+                  | image_tag:
+                    sizes: image_sizes,
+                    widths: image_widths,
+                    decoding: 'async',
+                    loading: 'lazy',
+                    fetchpriority: 'auto',
+                    class: 'hamburger-promotion-media-image',
+                    alt: image_alt
+                }}
+              </div>
+            </div>
+            {%- if block.tab_promo_heading != blank or block.tab_promo_description != blank -%}
+              <div class="header-promotion-banner-content-wrapper">
+                {%- if block.tab_promo_heading != blank -%}
+                  <h6 class="header-promotion-banner-heading overlay-text {{ block.tab_promo_heading_size }}">
+                    {{ block.tab_promo_heading }}
+                  </h6>
+                {%- endif -%}
+                {%- if block.tab_promo_description != blank -%}
+                  <p class="header-promotion-banner-desc overlay-text {{ block.tab_promo_description_size }}">
+                    {{ block.tab_promo_description }}
+                  </p>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            {% if block.tab_promo_link != blank %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script src="{{ 'tab-mega-menu.js' | asset_url }}" defer="defer"></script>
+
+{% comment %}
+  {% javascript %}
+  {% endjavascript %}
+{% endcomment %}

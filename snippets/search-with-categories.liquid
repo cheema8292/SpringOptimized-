@@ -1,0 +1,187 @@
+{{ 'search.css' | asset_url | stylesheet_tag }}
+{{ 'search-result-popup.css' | asset_url | stylesheet_tag }}
+
+{% comment %} {{ 'collection-list.css' | asset_url | stylesheet_tag }}performance changes {% endcomment %}
+<style>
+  .header-search{
+
+    {% if settings.search_collection_enable_overlay %}
+        {% if settings.search_collection_overlay_style == 'gradient' %}
+          --imageOverlay: {{ settings.search_collection_overlay_gradient }};
+        {% else %}
+          --imageOverlay: rgba({{ settings.search_collection_overlay_solid.rgba }});
+        {% endif %}
+      {% endif %}
+  }
+</style>
+{% liquid
+  assign is_data_search_content = false
+  assign is_product_recomendation_box = false
+  if settings.search_product_recommendations_enabled and settings.search_product_recommendations_product_list.count > 0
+    assign is_data_search_content = true
+    assign is_product_recomendation_box = true
+  endif
+  if settings.search_popular_collections_enabled and settings.search_collection_list.count > 0
+    assign is_data_search_content = true
+    assign is_product_recomendation_box = true
+  endif
+  if settings.search_recommendations_enabled and settings.search_recommendations_links.links.size > 0
+    assign is_data_search_content = true
+  endif
+%}
+<search-with-categories class="d-block header-search" data-popup="{{ is_popup_open }}">
+  <form action="{{ routes.search_url }}" method="get" role="search">
+    <div class="header-search-container">
+      <div class="search-categories-menu" select-categories tabindex="0">
+        <div class="search-categories-button">
+          {% render 'svg-icons', icon_type: 'categories' %}
+          <span class="search-categories-button-label" data-type-value="All Categories">All Categories</span>
+        </div>
+        <div class="search-categories-dropdown" role="menu">
+          {% for type in shop.types %}
+            <button
+              type="button"
+              class="search-categories-dropdown-link"
+              role="menuitem"
+              data-value="{{ type }}"
+              aria-label="Menu"
+              tabindex="0"
+            >
+              {{ type | default: 'All Categories' }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="header-search-form">
+        <div class="header-search-form-input-wrapper">
+          <input type="hidden" name="filter.p.product_type" value="" ;>
+          <input type="hidden" name="type" value="product">
+          <label class="visually-hidden" for="searchCategories">Search</label>
+          <input
+            type="search"
+            class="form-control"
+            name="q"
+            placeholder="What are you looking for?"
+            aria-label="Search"
+            autocomplete="off"
+            id="searchCategories"
+          >
+          <button type="reset" value="Reset" class="search-icon" data-search-icon aria-label="Search">
+            {% render 'svg-icons', icon_type: 'search' %}
+          </button>
+          {% if is_popup_open %}
+            <button
+              type="reset"
+              value="Reset"
+              class="text-small text-underline search-clear hidden"
+              data-search-clear=""
+              aria-label="Clear search input"
+            >
+              Clear
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div
+    class="search-content {{ settings.search_color_scheme }} {% if is_data_search_content == false %}hidden {% endif %}"
+    search-content
+    data-content-search="{{ is_data_search_content }}"
+  >
+    <div class="container-small">
+      <div class="search-box">
+        <div class="search-box-inner">
+          <div class="predictive-search-suggestion hidden" predictive-search-suggestion></div>
+          {% if settings.enable_recent_searches %}
+            <div class="predictive-search-suggestion hidden" recent-searched-box>
+              <div class="predictive-search-suggestion-box">
+                <div class="clear-recent-search">
+                  <span class="predictive-search-label heading-font text">Recent search</span>
+                  <button class="clear-recent-search-text" clear-recent-search>Clear</button>
+                </div>
+                <ul class="predictive-search-suggestion-inner" recent-list></ul>
+              </div>
+            </div>
+          {% endif %}
+          <div class="predictive-search-suggestion-wrapper">
+            {% if is_product_recomendation_box %}
+              <div class="predictive-search-popular-suggestion" product-recommendation-box>
+                {% if settings.search_product_recommendations_enabled
+                  and settings.search_product_recommendations_product_list.count > 0
+                %}
+                  <div class="predictive-search-popular-product">
+                    {% if settings.search_product_recommendations_heading != blank %}
+                      <span class="predictive-search-label heading-font {{ settings.search_product_recommendations_heading_size }}">
+                        {{- settings.search_product_recommendations_heading -}}
+                      </span>
+                    {% endif %}
+                    <div class="predictive-search-products-list" predictive-search-product-list>
+                      {% for product in settings.search_product_recommendations_product_list %}
+                        {% render 'horizontal-product-card', product: product, loading: 'lazy' %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+                {% if settings.search_popular_collections_enabled and settings.search_collection_list.count > 0 %}
+                  <div class="predictive-popupar-categories">
+                    {% if settings.search_popular_collections_heading != blank %}
+                      <span class="predictive-search-label heading-font {{ settings.search_popular_collections_heading_size }}">
+                        {{- settings.search_popular_collections_heading -}}
+                      </span>
+                    {% endif %}
+                    {% if settings.search_collection_list.count > 0 %}
+                      <div class="search-collection-tab-list">
+                        <div class="search-collection-list-grid">
+                          {% for collection in settings.search_collection_list %}
+                            {% liquid
+                              assign aspect_ratio_image = settings.search_collection_aspect_ratio
+                              if aspect_ratio_image == 'auto' and collection.featured_image != blank
+                                assign aspect_ratio_image = collection.featured_image.aspect_ratio
+                              elsif aspect_ratio_image == 'auto'
+                                assign aspect_ratio_image = '1/1'
+                              endif
+                            %}
+                            {% render 'collection-card',
+                              collection: collection,
+                              section: section,
+                              image_size: aspect_ratio_image,
+                              placeholder_image: 'collection-apparel-1',
+                              extra_class: ''
+                            %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            <div class="predictive-search-result-tabs hidden" predictive-search-result-tab></div>
+            {% if settings.search_recommendations_enabled and settings.search_recommendations_links.links.size > 0 %}
+              <div class="predictive-search-categories">
+                <div class="search-menus">
+                  {% if settings.search_recommendations_heading != blank %}
+                    <span class="predictive-search-label heading-font {{ settings.search_recommendations_heading_size }}">
+                      {{- settings.search_recommendations_heading -}}
+                    </span>
+                  {% endif %}
+                  {% if settings.search_recommendations_links.links.size > 0 %}
+                    <ul class="predictive-search-categories-lists">
+                      {% for link in settings.search_recommendations_links.links %}
+                        <li>
+                          <a href="{{ link.url }}" class="text-small">{{ link.title }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</search-with-categories>

@@ -1,0 +1,96 @@
+ .image-with-text-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+      @media (max-width: 767px) {
+        gap: 20px
+       }
+    &.content-top {
+      align-items: flex-start;
+    }
+    &.content-middle {
+      align-items: center;
+    }
+    &.content-bottom {
+      align-items: flex-end;
+    }
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    @media (min-width: 1025px) {
+      gap: 50px;
+    }
+    @media (min-width: 1441px) {
+      gap: 70px;
+    }
+  }
+
+  .image-with-text-content-wrapper {
+    display: flex;
+    padding: 30px;
+  }
+
+  .image-with-text-subheading {
+    margin-bottom: 15px;
+       @media (max-width: 767px) {
+         margin-bottom: 10px;
+       }
+  }
+
+  .image-with-text-desc {
+    margin-top: 20px;
+    @media (max-width: 767px) {
+      margin-top: 10px;
+    }
+  }
+
+  .image-with-text-btn {
+    margin-top: 60px;
+    @media (max-width: 767px) {
+      margin-top: 30px;
+    }
+  }
+
+  .image-with-text-media {
+    border-radius: var(--blockRadius);
+    overflow: hidden;
+    height: var(--mediaHeight);
+  }
+  .image-with-text-btn:has(+.image-with-text-btn), .image-with-text-btn +.image-with-text-btn {
+      display: inline-block;
+      margin-inline-start:2px;
+      margin-inline-end:2px;
+  }
+
+  .image-with-text-wrapper {
+    .image-with-text-media-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px; 
+      @media (max-width: 767px) { 
+        gap: 15px; 
+      }
+    } 
+    @media (max-width: 767px) {
+      .image-with-text-content-wrapper { 
+        padding: 0px;
+      }
+    } 
+    &.image-second {
+      .image-with-text-content-wrapper {
+        @media (min-width: 768px) {
+          grid-area: 1/1;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 767px) {
+    .image-with-text-btn {
+      margin-top: 20px;
+    } 
+    .image-with-text-wrapper .media-card.mobile-media-adapt {
+        aspect-ratio: var(--imageRatioMobile);
+    }
+  }

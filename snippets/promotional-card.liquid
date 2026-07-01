@@ -1,0 +1,88 @@
+
+{% for block in section.blocks %}
+  {% if block.type == 'promotional_card' %}
+    <div class="promotion-media-card pos-relative{% if block.settings.promotion_aspect_ratio == 'adaptProduct' %} height-100{% endif %} {{ block.settings.color_scheme_promotion }}">
+      <div class="promotion-media media-wrapper{% if block.settings.promotion_aspect_ratio == 'adaptProduct' %} media-fixed adapt-mobile-height{% endif %} media-card-overlay">
+       
+        {% assign meta_image = collection.metafields.custom.promotion_image %}
+        {% assign prmotion_image = block.settings.image_promotion %}
+        {% assign image_ratio = block.settings.promotion_aspect_ratio %}
+        {% if meta_image != blank %}
+          {% assign prmotion_image = meta_image %}
+        {% endif %}
+        {% if prmotion_image != blank %}
+          {% if block.settings.promotion_aspect_ratio == 'auto' %}
+            {% assign image_ratio = prmotion_image.aspect_ratio %}
+          {% endif %}
+          <div class="media-card  {% if  block.settings.promotion_aspect_ratio == 'adaptProduct' %}media-fixed {% else %}media-adapt {% endif %}" style="--imageRatio:{{ image_ratio }};"
+          {% if settings.image_animation_type != 'none' %}
+            animate-element="true" 
+            data-animate="{{ settings.image_animation_type }}"
+            data-zoom-initial="1.1" 
+            data-zoom-final="1.0" 
+            data-zoom-duration="1.5"
+            data-zoom-ease="power3.out"
+            data-delay="0.3"
+          {% endif %}          
+          >
+            {% liquid              
+              assign default_alt =  'Card image'
+              assign image_alt = prmotion_image.alt | default: section.settings.heading | default:  default_alt            
+              assign fetch_priority = 'auto'
+              if loading == 'eager'
+                assign fetch_priority = 'high'
+              endif              
+              assign image_sizes = '(max-width: 767px) 100vw, (max-width: 1024px) 60vw, (max-width: 1367px) 60vw, (max-width: 1599px) 60vw, 60vw'
+              assign image_widths = '300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000'
+            %}
+            {{ prmotion_image | image_url: width: 1000, format: 'webp' | image_tag: 
+               sizes: image_sizes, 
+               widths: image_widths, 
+               decoding: 'async', 
+               loading: loading,
+               fetchpriority: fetch_priority,
+               class: 'collection-list-promotion',
+               alt: image_alt
+            }}
+          </div>  
+        {% else %}
+          {% assign image_ratio = block.settings.promotion_aspect_ratio %}
+          {% if block.settings.promotion_aspect_ratio == 'auto' %}
+            {% assign image_ratio = '3/4' %}
+          {% endif %}
+          <div class="media-card{% if  block.settings.promotion_aspect_ratio == 'adaptProduct' %} media-fixed adapt-mobile-height{% else %} media-adapt{% endif %}" style="--imageRatio:{{ image_ratio }};">
+            {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          </div> 
+        {% endif %} 
+      </div>
+      <div class="promotion-media-content {{ block.settings.content_position }}">
+          {% if block.settings.promotion_subheading != blank %}
+            <p class="promotion-media-content-subheading overlay-text">{{ block.settings.promotion_subheading }}</p>
+          {% endif %}
+          {% capture description_data %}
+            {% if block.settings.promotion_description != blank %}
+                <p class="promotion-media-content-desc overlay-text {{ block.settings.promotion_description_size }}">{{ block.settings.promotion_description | newline_to_br }}</p>
+            {% endif %}
+          {% endcapture %}
+          {% render 'section-heading',
+            section_heading_tag: block.settings.promotion_heading_tag,
+            section_heading_size: block.settings.promotion_heading_size,
+            section_heading_content: block.settings.promotion_heading,
+            section_heading_highlight_text: block.settings.promotion_highlight_text,
+            section_heading_highlight_font: block.settings.promotion_highlight_font,
+            section_extra_classes: 'promotion-media-content-heading overlay-text',
+            extra_html_content: description_data
+          %}
+          {% if block.settings.button_title != blank %}
+            {% render 'button-appearance',
+              button_text: block.settings.button_title,
+              button_url: block.settings.button_link,
+              button_style: block.settings.button_style,
+              is_open_in_new_tab: block.settings.is_open_in_new_tab,
+              class: 'promotional-card-button'
+            %}
+          {% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endfor %}

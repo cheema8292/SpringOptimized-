@@ -1,0 +1,58 @@
+{% if block.settings.highlight_text != blank %}
+  <span class="slideshow-highlight-heading heading-font {{ block.settings.highlight_text_size }} {%  if block.settings.enable_text_marquee %}marquee-enable{% endif %}">
+    {{ block.settings.highlight_text | replace: '<a', '<a class="text-underline"' }}
+  </span>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.slideshow.blocks.hero_text.name",
+  "class": "hero-text-block",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "label": "t:sections.all.headers.text",
+      "id": "highlight_text",
+      "default": "Highlight text"
+    },
+    {
+      "type": "select",
+      "label": "t:sections.all.settings.heading_size.label",
+      "id": "highlight_text_size",
+      "default": "hd1",
+      "options": [
+        {
+          "label": "t:sections.all.settings.heading_size.options.xx-large",
+          "value": "hd2"
+        },
+        {
+          "label": "t:sections.all.settings.heading_size.options.x-large",
+          "value": "hd1"
+        },
+        {
+          "label": "t:sections.all.settings.heading_size.options.large",
+          "value": "h0"
+        } 
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_image_text",
+      "label": "t:sections.slideshow.settings.slide.enable_image_text.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_text_marquee",
+      "label": "t:sections.slideshow.settings.slide.enable_text_marquee.label",
+      "default": true,
+      "visible_if": "{{ block.settings.enable_image_text }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.slideshow.blocks.hero_text.name"
+    }
+  ]
+}
+{% endschema %}

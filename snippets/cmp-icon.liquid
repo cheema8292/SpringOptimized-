@@ -1,0 +1,13 @@
+{% assign state = state | default: 'check' %}
+{% if state == 'check' %}
+  <svg class="cmp__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M20 6L9 17l-5-5" stroke="var(--cmp-check)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+{% elsif state == 'cross' %}
+  <svg class="cmp__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="11" fill="var(--cmp-cross-bg)"/>
+    <path d="M8 8l8 8M16 8l-8 8" stroke="var(--cmp-cross)" stroke-width="2.8" stroke-linecap="round"/>
+  </svg>
+{% else %}
+  <span style="display:block; width: var(--cmp-icon); height: var(--cmp-icon);" aria-hidden="true"></span>
+{% endif %}

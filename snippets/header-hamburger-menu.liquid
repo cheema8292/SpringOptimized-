@@ -1,0 +1,123 @@
+{{ 'header-hamburger.css' | asset_url | stylesheet_tag: preload: true }}
+<link rel="stylesheet" href="{{ 'header-hamburger.css' | asset_url }}" media="print" onload="this.media='all'">
+{% liquid
+ assign open_menu_style = section.settings.open_menu_items_on
+  assign link_style = section.settings.submenu_position 
+  assign link_style_class = ''
+  if link_style == "below_the_menu"
+  assign link_style_class = 'hamburger-link-accordion'
+   elsif link_style == "adjacent"
+  assign link_style_class = 'hamburger-link-transform-up'
+
+  endif 
+%}
+{% if section.settings.menu.links.size > 0 %}
+  <hamburger-wrapper class="hamburger-wrapper" data-open-menu="{{ open_menu_style }}" tabindex="0" aria-label="Hamburger wrapper"  role="dialog">
+    <div class="page-overlay"></div>
+    <div class="hamburger-navigation-main">
+      <div class="hamburger-top">
+      <button class="hamburger-close" aria-label="Close" hamburger-close>
+        {% render 'svg-icons', icon_type: 'cross-icon' %}
+      </button> 
+    {%- liquid
+        assign logo = section.settings.hamburger_logo
+      -%}
+      {% if logo != blank %}
+          <a href="{{ routes.root_url }}" class="hamburger-header-logo" aria-label="Logo">
+            {{
+              section.settings.hamburger_logo
+              | image_url: width: logo.width
+              | image_tag:
+                class: 'hamburger-header-logo-img',
+                widths: widths,
+                height: logo_height,
+                width: range_width,
+                alt: "",
+                sizes: sizes,
+                preload: true
+            }}
+          </a>
+          {% else %}
+          <a
+            href="{{ routes.root_url }}"
+            class="store-name text-medium heading-font"
+          >
+          {{ shop.name }}
+          </a>
+      {% endif %}
+    </div>
+      <nav class="hamburger-navigation-wrapper">
+        <ul class="hamburger-navigation-list">
+          {% for link in section.settings.menu.links %} 
+            {% if link.links != blank %}
+              <li class="hamburger-menu-item has-submenu menu-click" nav-links tabindex="0">
+                <div class="hamburger-menu-item-inner">
+              <div class="hamburger-menu-link {{ settings.header_first_level_menus_size }} {{ settings.header_first_level_menus_font }}-font" >
+                {{ link.title }}
+              </div>
+              {% render 'svg-icons', icon_type: 'angle-right' %}
+              </div>
+                <div class="hamburger-submenu">
+                  <div class="hamburger-submenu-inner">
+                    <ul class="hamburger-submenu-list {{ link_style_class }}">
+                      {% for submenu in link.links %}
+                        {% if submenu.links != blank %}
+                          <li class="hamburger-submenu-item has-submenu-menu menu-click" nav-child-links>
+                            <div class="hamburger-submenu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font" submenu-link  tabindex="0" >
+                              {{- submenu.title }}
+                              {% if submenu.type == 'collection_link' %}
+                                <sup class="text submenu-col-count">
+                                  {{ submenu.object.all_products_count }}
+                                </sup>
+                              {% endif %}
+                            </div>
+                            <div class="hamburger-submenu-menu">
+                              <ul class="hamburger-submenu-menu-list" hamburger-submenu-menu-list>
+                                {% for childmenu in submenu.links %}
+                                  <li class="hamburger-submenu-menu-item">
+                                    <a href="{{ childmenu.url }}" class="hamburger-submenu-menu-link {{ settings.header_third_level_menus_size }} {{ settings.header_third_level_menus_font }}-font focus-inside">
+                                      {{- childmenu.title -}}
+                                    </a>
+                                  </li>
+                                {% endfor %} 
+                              </ul> 
+                            </div>
+                          </li>
+                        {% else %}
+                          <li class="hamburger-submenu-item">
+                            <a href="{{ submenu.url }}" class="hamburger-submenu-link {{ settings.header_second_level_menus_size }} {{ settings.header_second_level_menus_font }}-font focus-inside">
+                              {{- submenu.title }}
+                              {% if submenu.type == 'collection_link' %}
+                                <sup>
+                                  {{ submenu.object.all_products_count }}
+                                </sup>
+                              {% endif %}
+                            </a>
+                          </li>
+                        {% endif %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </li>
+            {% else %}
+              <li class="hamburger-menu-item">
+                <a href="{{ link.url }}" class="hamburger-menu-link {{ settings.header_first_level_menus_size }} {{ settings.header_first_level_menus_font }}-font">{{ link.title }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </nav>
+      {% if section.settings.show_social_icons %}
+        <div class="hamburger-social-icons">
+         {% render 'social-icons',
+            section: section,
+            icons: false,
+            icon_size: 'icon-large'
+          %}
+       </div>
+      {% endif %}
+    </div>
+  </hamburger-wrapper>
+{% endif %}
+<script src="{{ 'header-hamburger-menu.js' | asset_url }}" defer="defer"></script> 

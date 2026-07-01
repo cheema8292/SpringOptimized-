@@ -1,0 +1,60 @@
+{% comment %} {% stylesheet %}
+{% endstylesheet %} {% endcomment %}
+ {{ 'pagination.css' | asset_url | stylesheet_tag }}
+{%- if paginate.parts.size > 0 -%}
+  <div class="pagination-wrapper" data-page="{{ paginate.current_page }}">
+    <nav class="pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+      <ul class="pagination-items list-unstyled" role="list">
+        {%- if paginate.previous -%}
+          <li class="pagination-item">
+            <a
+              href="{{ paginate.previous.url }}{{ anchor }}"
+              class="pagination-link pagination-item-next pagination-item-arrow"
+              aria-label="{{ 'general.pagination.previous' | t }}"
+            >
+              {% render 'svg-icons', icon_type: 'navigation-left' %}
+            </a>
+          </li>
+        {%- endif -%}
+
+        {%- for part in paginate.parts -%}
+          <li class="pagination-item">
+            {%- if part.is_link -%}
+              <a
+                href="{{ part.url }}{{ anchor }}"
+                class="pagination-link"
+                aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+              >
+                {{- part.title -}}
+              </a>
+            {%- else -%}
+              {%- if part.title == paginate.current_page -%}
+                <span
+                  class="pagination-link pagination-item-current"
+                  aria-current="page"
+                  aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+                >
+                  {{- part.title -}}
+                </span>
+              {%- else -%}
+                <span class="pagination-link">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+
+        {%- if paginate.next -%}
+          <li class="pagination-item">
+            <a
+              href="{{ paginate.next.url }}{{ anchor }}"
+              class="pagination-link pagination-item-prev pagination-item-arrow"
+              aria-label="{{ 'general.pagination.next' | t }}"
+            >
+              {% render 'svg-icons', icon_type: 'navigation-right' %}
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+    </nav>
+  </div>
+{%- endif -%}

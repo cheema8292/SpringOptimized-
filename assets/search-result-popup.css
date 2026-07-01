@@ -1,0 +1,105 @@
+.search-popup .popup-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+  }
+
+  .search-popup .header-search {
+    padding-block: 0px;
+  }
+
+  .search-popup .header-search-container {
+    gap: 0;
+  }
+
+  .search-popup .search-categories-button {
+    min-height: 44px;
+    padding: 10px 20px;
+    border-radius: var(--formRadius) 0 0 var(--formRadius);
+  }
+
+  .search-popup .form-control {
+    border-left: 0;
+    border-radius: 0 var(--formRadius) var(--formRadius) 0;
+  }
+ 
+  .search-popup .predictive-search-suggestion-wrapper,
+  .search-popup .predictive-search-result-main-content {
+    display: grid;
+    grid-template-columns: 1fr 0.2fr;
+  }
+
+  .predictive-search-popular-suggestion {
+    display: grid;
+    grid-template-columns: 0.6fr 1fr;
+     @media (min-width: 1200px) { 
+      grid-template-columns: 0.5fr 1fr;
+     }
+    @media (max-width: 767px) { 
+      grid-template-columns: 1fr;
+      gap: 30px;
+    } 
+  }
+
+  .search-popup .predictive-search-popular-suggestion .predictive-popupar-categories {
+    padding-inline: 40px;
+    border-right: 1px solid var(--borderColor);
+  }
+
+  .search-popup .search-collection-tab-list {
+    --columnCount: 3;
+    --columnGap: 20px;
+  }
+
+  .search-popup .predictive-search-label {
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .search-popup .search-menus {
+    margin-top: 0;
+  }
+
+  .search-popup .collection-list-img {
+    border-radius: var(--blockRadius);
+    overflow: hidden;
+  }
+
+  .search-popup .horizontal-product-card-media {
+    width: 80px;
+  }
+
+  .search-popup-content {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    max-height: 90%;
+  }
+
+  .search-popup-body {
+    height: 100%;
+    overflow-y: auto;
+    margin-top: 40px;
+  }
+
+  .search-popup .predictive-search-tabcontent .card-list-view {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .search-popup
+    .predictive-search-tabcontent
+    .predictive-search-products-list
+    .horizontal-product-card
+    + .horizontal-product-card,
+  .search-popup .predictive-search-tabcontent .card-list-view .horizontal-product-card + .horizontal-product-card {
+    margin-top: 0;
+  }
+
+  .search-popup .predictive-search-tabcontent .search-collection-tab-list {
+    --columnCount: 4;
+  }
+
+  .quick-search-view-all {
+    margin-top: 20px;
+  }

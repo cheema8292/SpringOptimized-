@@ -1,0 +1,6 @@
+{{ 'compare-drawer-button.css' | asset_url | stylesheet_tag }}
+<compare-drawer-button class="btn-compare cursor-pointer" tabindex="0">
+  {% render 'svg-icons', icon_type: 'compare-vertical-icon' %}
+  Compare
+  <span class="compare-count" id="compare-item-count">0</span>
+</compare-drawer-button>

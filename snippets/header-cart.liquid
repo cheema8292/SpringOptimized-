@@ -1,0 +1,9 @@
+<a href="{{ routes.cart_url }}" class="header-icon-link" data-header-cart-trigger aria-label="{{ 'accessibility.cart' | t }}">
+ {% if section.settings.icons_style == 'icon' or section.settings.icons_style == 'text-with-icon' %}
+  {% render 'svg-icons', icon_type: 'cart' %}
+ {% endif %}
+ {% if section.settings.icons_style == 'text' or section.settings.icons_style == 'text-with-icon' %}
+    <span class="d-none md-block">{{ 'templates.cart.cart' | t }}</span>
+  {% endif %}
+  <span id="main-cart-count-header-right" class="header-cart-count{% if cart.item_count == 0 %} hidden{% endif %}">{{ cart.item_count }}</span>
+</a>

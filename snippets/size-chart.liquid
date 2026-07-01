@@ -1,0 +1,43 @@
+{{ 'size-chart.css' | asset_url | stylesheet_tag }}
+{% if block.settings.sizechart_heading != blank and block.settings.select_page != blank %}
+  <size-chart data-section-id="{{ section.id }}">
+    <button class="size-cart-btn" size-chart-btn aria-label="Size chart">
+      {% render 'svg-icons', icon_type: 'size-icon' %}
+      {{ block.settings.sizechart_heading }}
+    </button>
+    <div class="hidden" data-size-chart-content>
+      <template>
+        <size-chart-pop-up
+          id="size-chart-{{ section.id }}"
+          class="size-chart-popup popup position-center {{ settings.drawer_popup_color_scheme }}"
+          tabindex="0"
+          size-chart-popup
+        >
+          <div class="page-overlay" data-popup-close-overlay></div>
+          <div class="popup-dialog width-large">
+            <div class="popup-content">
+              <div class="popup-head">
+                <h2>
+                  {{ block.settings.sizechart_heading }}
+                </h2>
+                <button class="popup-close" data-popup-close aria-label="Close">
+                  {% render 'svg-icons', icon_type: 'cross-icon' %}
+                </button>
+              </div>
+              <div class="size-chart-popup-body">
+                {{
+                  block.settings.select_page.content
+                  | replace: '<table', '<div class="table-responsive"><table'
+                  | replace: '</table>', '</table></div>'
+                }}
+              </div>
+            </div>
+          </div>
+        </size-chart-pop-up>
+      </template>
+    </div>
+  </size-chart>
+{% endif %}
+{% comment %} {% javascript %}
+{% endjavascript %} {% endcomment %}
+ <script src="{{ 'size-chart.js' | asset_url }}" defer="defer"></script> 

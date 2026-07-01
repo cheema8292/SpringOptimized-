@@ -1,0 +1,77 @@
+  .compare-drawer-body {
+    padding: 24px 20px;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    height: 100%;
+    gap: 30px;
+    @media (min-width: 1025px){
+      padding: 15px;
+    }
+  }
+  .compare-drawer-items {
+    height: 100%;
+    overflow-y: auto;
+  }
+  .compare-drawer-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    padding: 20px;
+    border-radius: var(--productCardRadius);
+  }
+  .compare-drawer-card-media {
+    width: 80px;
+    border-radius: calc(var(--productCardRadius) / 2);
+    overflow: hidden;
+  }
+  .compare-drawer-card-info {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline-end: 30px;
+  }
+  .compare-btn-remove {
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    --svgSize: 10px;
+     transition: .3s ease all;
+    border-radius: 4px; 
+    &:hover {
+        border: 1px solid var(--buttonBorderHover);
+        background: var(--buttonBackgroundHover);
+        color: var(--buttonColorHover);
+        .svg-wrapper {
+              transform: rotate(180deg);
+          }
+    }
+    & .svg-wrapper {
+        transition: .3s ease all;
+    } 
+  }
+
+  .compare-drawer-item.compare-drawer-item-placeholder {
+    min-height: 120px;
+    border: 1px dashed var(--borderColor);
+    display: flex;
+    align-items: center;
+    border-radius: var(--productCardRadius);
+    padding: 20px;
+  }
+  .compare-drawer-item-placeholder .place-holder-item {
+    --svgSize: 40%;
+  }
+  .compare-drawer-item + .compare-drawer-item {
+    margin-top: 15px;
+  }
+  .compare-drawer-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }

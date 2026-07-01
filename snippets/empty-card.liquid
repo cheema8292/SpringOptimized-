@@ -1,0 +1,45 @@
+<div class="empty-card">
+{% if source == '404-page' %}
+    {% render 'svg-icons', icon_type: '404-icon' %}
+    <div class="empty-card-content">
+      <h2 class="h2 heading-font empty-card-heading">{{ 'templates.404.title' | t }}</h2>
+      <p class="empty-card-desc">{{ 'templates.404.subtext' | t }}</p>
+        {% assign btn_txt = 'templates.404.button_text' | t %}
+        {% render 'button-appearance', 
+          button_text: btn_txt ,
+          button_url: shop.url , 
+          button_style: 'primary-button', 
+          is_open_in_new_tab:false 
+        %}
+    </div>
+  {% elsif source == 'predictive-search' %}
+    {% render 'svg-icons', icon_type: 'search-not-found-icon' %}
+    <div class="empty-card-content"> 
+      <h5 class="h5 heading-font empty-card-heading">{{ 'templates.search.no_results' | t: terms: terms }}</h5>
+      <p class="empty-card-desc">{{ 'templates.search.no_results_desc' | t }}</p>
+    </div>
+  {% elsif source == "main-collection" %}
+    {% render 'svg-icons', icon_type: 'no-product-found-icon' %}
+    <div class="empty-card-content">
+      <h5 class="h5 heading-font empty-card-heading">{{ 'templates.search.no_results' | t: terms: terms }}</h5>
+      <p class="empty-card-desc">{{ 'templates.search.no_results_desc' | t }}</p>
+    </div>
+  {% elsif source == "main-cart" or source == "cart-drawer" %}
+      {% render 'svg-icons', icon_type: 'empty-cart' %}
+      <div class="empty-card-content">
+        <h2 class="h2 heading-font empty-card-heading">{{ 'sections.cart.empty' | t }}</h2>
+        {% if settings.empty_button_link != blank %}
+          {% assign link = settings.empty_button_link %}
+        {% else %}
+          {% assign link = routes.all_products_collection_url %}
+        {% endif %}
+        {% assign btn_txt = 'general.continue_shopping' | t %}
+        {% render 'button-appearance', 
+          button_text: btn_txt ,
+          button_url: link , 
+          button_style: 'primary-button', 
+          is_open_in_new_tab:false 
+        %} 
+      </div>
+{% endif %}
+</div>

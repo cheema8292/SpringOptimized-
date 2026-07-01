@@ -1,0 +1,43 @@
+  .collection-list-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--columnCount), 1fr);
+      gap: var(--columnGap, 0px);
+      align-items: flex-start;
+  }
+
+  .overlay-content .collection-list-heading {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      max-height: 100%;
+      overflow: hidden;
+      overflow-y: auto;
+      color: var(--overlayTextColor);
+      margin: 0;
+  } 
+
+  .collection-list-media {
+      border-radius: var(--blockRadiusSmall);
+      overflow: hidden;
+  }
+
+  .collection-list-heading {
+      margin-block-start: 12px;
+      color: var(--headingColor);
+      @media (max-width: 1199px){
+        font-size: var(--textSmall);
+      }
+  }
+
+  .collection-list-heading span {
+      position: relative;
+      display: inline-block;
+  }
+
+  @media (max-width: 767px) {
+      .overlay-content .collection-list-heading {
+          padding: 10px;
+      }
+  }

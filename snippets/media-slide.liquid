@@ -1,0 +1,14 @@
+<div
+  class="product-media-item{% if has_multiple_items %} swiper-slide{% endif %}"
+  data-media-type="{{ media.media_type }}"
+  data-pswp-index="{{ pswp_i }}"
+  data-index="{{ index }}"
+>
+
+<div class="product-media-container">
+  <div class="media-card media-adapt" style="--imageRatio:{{ aspect_ratio }};">
+    {% render 'media-product', media: media, section: section, source: source %}
+  </div>
+</div>
+
+</div>

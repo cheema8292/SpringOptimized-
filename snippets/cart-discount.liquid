@@ -1,0 +1,35 @@
+<form
+  is="cart-discount"
+  class="cart-discount-form"
+  action="{{ routes.cart_url }}"
+  method="POST"
+  data-source="{{ source }}"
+>
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <div class="applied-cart-discounts hidden">
+      {%- for discount in cart.cart_level_discount_applications -%}
+        <span class="discount" data-discount-code="{{ discount.title | escape }}"> </span>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+  <div class="form-field">
+    <label class="visually-hidden" for="CartCouponForm-{{ section.id }}">Coupon</label>
+    <input
+      id="CartCouponForm-{{ section.id }}"
+      class="form-control"
+      name="discount"
+      placeholder="Enter discount code here"
+      required=""
+      aria-required="true"
+    >
+  </div>
+  <div class="form-submit">
+    <button class="button full-button" type="submit" aria-label="Submit">
+      <span class="button-text">{{ 'sections.cart.coupon_apply' | t }}</span>
+      <span class="button-icon">
+        {% render 'svg-icons', icon_type: 'arrow-right' %}
+      </span>
+    </button>
+  </div>
+  <div class="form-message form-message-error text-xsmall hidden" tabindex="-1" form-error></div>
+</form>

@@ -1,0 +1,99 @@
+  .custom-grid-wrapper {
+    display: grid;
+    grid-auto-rows: minmax(var(--mobileHeight), auto);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--columnGap, 0);
+
+    @media (min-width: 768px) {
+      grid-auto-rows: minmax(var(--desktopHeight), auto);
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+  }
+
+  .custom-grid-item {
+    grid-area: span var(--row) / span var(--column);
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--blockRadius);
+  }
+
+  .custom-grid-wrapper .slideshow-wrapper,
+  .custom-grid-wrapper .slideshow-media,
+  .custom-grid-wrapper .countdown-wrapper,
+  .custom-grid-wrapper .lookbook-media .media-card,
+  .custom-grid-wrapper .lookbook-media,
+  .custom-grid-wrapper .countdown-media,
+  .custom-grid-wrapper .video-banner-media {
+    height: 100%;
+  }
+
+  .custom-grid-item .slideshow-content-wrapper {
+    padding-top: 2rem;
+    @media (max-width: 991px){
+       padding-top: 1.5rem;
+    }
+  }
+  .custom-grid-item .content-block {
+    gap: 8px;
+  }
+  .custom-grid-item .countdown-content .rich-text-block > * + * {
+    margin: 12px 0 0;
+    @media (min-width: 768px) {
+        margin: 18px 0 0;
+    }
+  }
+
+  .custom-grid-wrapper .countdown-content .countdown-content-inner {
+    @media (min-width: 768px) {
+      width: 100%;
+      overflow-x: auto;
+    }
+  }
+
+  .custom-grid-item {
+    .video-play-btn {
+      --svgSize: 24px;
+      .video-play-btn-text {
+        font-size: var(--textMedium);
+        padding-inline-end: 0;
+      }
+    }
+    .countdown-wrapper {
+      .countdown-content:has(.countdown-time-timer) {
+        overflow-x: auto;
+      }
+      .countdown-content .countdown-time-timer:has(.flipdown-main) {
+        white-space: nowrap;
+      }
+    }
+  }
+
+ 
+  .custom-grid-wrapper .countdown-content {
+    padding-block: 2rem;
+    padding-inline: 2rem;
+    @media (max-width: 1024px) {
+      padding-block: 1.5rem;
+      padding-inline: 1.5rem;
+    }  
+  }
+ .custom-grid-wrapper .lookbook-content{
+    @media (max-width: 767px) {
+      padding: 1.5rem;
+    }
+  }
+  .custom-grid-wrapper .countdown-time-block {
+    gap: 4px;
+    padding: 10px;
+    flex-wrap: wrap;
+    justify-content: center; 
+   
+    @media (max-width: 767px) {
+      padding: 5px;
+    }
+    [class*="countdown"]{
+      @media (min-width: 768px) {
+        white-space: nowrap;
+      }
+    }
+  }

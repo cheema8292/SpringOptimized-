@@ -1,0 +1,43 @@
+.product-comparison-drawer .btn-compare {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    writing-mode: sideways-lr;
+    transform: translate(100%, -50%);
+    opacity: 0;
+    visibility: hidden;
+    transform-origin: bottom right;
+    padding: 16px 8px;
+    /* border-radius: var(--blockRadiusSmall) 0px 0 var(--blockRadiusSmall); */
+    border-radius: 4px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--background);
+    color: var(--textColor);
+    transition: transform 0.3s ease, visibility 0.3s, opacity 0.3s;
+    --svgSize: 12px;
+    font-size: var(--textSmall);
+  }
+ .compare-count {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bubbleBackground);
+    border-radius: 2px;
+    color: var(--bubbleColor);
+    padding: 5px 1px;
+    min-height: 24px;
+}
+
+  .btn-compare.cursor-pointer.show-drawer-button {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%);
+  }
+  .btn-compare.show-drawer-button.is-open {
+    transform: translate(-600px, -50%);
+    transition-delay: 0.3s;
+    z-index: 21;
+  }

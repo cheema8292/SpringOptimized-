@@ -1,0 +1,6 @@
+{{ 'main-404.css' | asset_url | stylesheet_tag }}
+<div class="container">
+  <div class="not-found-box">
+    {% render 'empty-card', source: '404-page' %}
+  </div>
+</div>

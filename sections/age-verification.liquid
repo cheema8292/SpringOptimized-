@@ -1,0 +1,351 @@
+{{ 'age-verification.css' | asset_url | stylesheet_tag }}
+{% if section.blocks.size > 0 %}
+  <age-verifier
+    class="{{ section.settings.color_scheme }} age-verification-popup position-center popup"
+    id="AgeVerifier"
+    data-drawer="age-verifier"
+    data-section-id="{{ section.id }}"
+    data-frequency="{{ section.settings.age_verify_popup_cookie }}"
+    data-display-mode="{{ section.settings.age_verification_display_mode }}"
+    data-is-account="{% if customer %}true{% else %}false{% endif %}"
+    data-account-holder="{{section.settings.account_holders }}"
+  >
+    <div class="page-overlay"></div>
+    <div class="popup-dialog width-small">
+      <div class="popup-content with-border">
+        <div class="age-verification-popup-body" data-age-verifier>
+          <div class="age-verification-popup-text">
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'heading' %}
+                  {% render 'section-heading',
+                    section_heading_tag: block.settings.heading_tag,
+                    section_heading_size: block.settings.heading_size,
+                    section_heading_content: block.settings.heading,
+                    section_heading_highlight_text: block.settings.highlight_text,
+                    section_heading_highlight_font: block.settings.highlight_font,
+                    section_extra_classes: 'text-center',
+                    simple_heading:'only-heading'
+                    extra_html_content: ''
+                  %}
+                {% when 'description' %} 
+                  <div class="age-verification-description text-center {{ block.settings.description_size }}">
+                    {{ block.settings.description | newline_to_br }}
+                  </div>
+                {% when 'button' %}
+                  <div class="age-verification-popup-actions">
+                    {% assign button_text_translation = 'sections.age-verification.decline_button' | t %}
+                    {% assign approve_button_text_translation =  'sections.age-verification.approve_button'  | t %}
+                    {% assign button_text = block.settings.decline_button_text  | default: button_text_translation %}
+                    {% render 'button-appearance',
+                      button_text: button_text,
+                      button_url: block.settings.decline_button_url,
+                      button_style: 'primary-button',
+                      is_open_in_new_tab: false,
+                      class: 'decline-age',
+                      extra_attribute: 'data-decline-age'
+                    %}
+                    <button class="button secondary-button submit-age" aria-label="Approve" role="button" data-submit-age>
+                      <span class="button-text">
+                        {{-  block.settings.approve_button_text  |  default: approve_button_text_translation -}}
+                      </span>
+                      <span class="button-icon">
+                        {% render 'svg-icons', icon_type: 'arrow-right' %}
+                      </span>
+                    </button>
+                  </div>
+              {% endcase %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </age-verifier>
+{% endif %}
+<style>
+  #shopify-section-{{ section.id }} .text-highlight-color{
+    {%  for block in section.blocks %}
+      --highlightColor:{{ block.settings.text_color }};
+    {% endfor %}
+  }
+</style>
+<script src="{{ 'age-verification.js' | asset_url }}" defer="defer"></script> 
+{% schema %}
+{
+  "name": "t:sections.age-verification.name",
+  "class": "age-verification-section",
+  "limit": 1,
+  "max_blocks": 3,
+  "enabled_on": {
+    "groups": ["custom.Overlay"]
+  },
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "t:sections.all.headers.heading",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "t:sections.all.headers.heading",
+          "default": "You must be 18 or older to enter",
+          "info": "t:sections.all.settings.heading_info.info"
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "t:sections.all.settings.heading_tag.label",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            },
+            {
+              "value": "h4",
+              "label": "H4"
+            },
+            {
+              "value": "h5",
+              "label": "H5"
+            },
+            {
+              "value": "h6",
+              "label": "H6"
+            },
+            {
+              "value": "div",
+              "label": "Div"
+            },
+            {
+              "value": "span",
+              "label": "Span"
+            },
+            {
+              "value": "p",
+              "label": "P"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "t:sections.all.settings.heading_size.label",
+          "options": [
+            {
+              "value": "h3",
+              "label": "t:sections.all.settings.heading_size.options.heading_m"
+            },
+            {
+              "value": "h4",
+              "label": "t:sections.all.settings.heading_size.options.heading_s"
+            },
+            {
+              "value": "h5",
+              "label": "t:sections.all.settings.heading_size.options.heading_xs"
+            },
+            {
+              "value": "h6",
+              "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+            }
+          ],
+          "default": "h3"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.all.headers.highlight_content"
+        },
+        {
+          "type": "select",
+          "id": "highlight_text",
+          "label": "t:sections.all.settings.highlight_text.label",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:sections.all.settings.highlight_text.options.none"
+            },
+            {
+              "value": "underline",
+              "label": "t:sections.all.settings.highlight_text.options.underline"
+            },
+            {
+              "value": "color",
+              "label": "t:sections.all.settings.highlight_text.options.markertextcolor"
+            },
+            {
+              "value": "gradiant",
+              "label": "t:sections.all.settings.highlight_text.options.markergradiant"
+            }
+          ],
+          "default": "color"
+        },
+        {
+          "type": "select",
+          "id": "highlight_font",
+          "label": "t:sections.all.settings.fontStyle.label",
+          "options": [
+            {
+              "value": "heading-font",
+              "label": "t:sections.all.settings.fontStyle.options.headingFont"
+            },
+            {
+              "value": "body-font",
+              "label": "t:sections.all.settings.fontStyle.options.bodyFont"
+            },
+            {
+              "value": "accent-font",
+              "label": "t:sections.all.settings.fontStyle.options.accent"
+            }
+          ],
+          "default": "heading-font"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "t:sections.all.headers.markertextcolor",
+          "visible_if": "{{ block.settings.highlight_text == 'color' }}",
+          "default": "#0424A7"
+        },
+        {
+          "type": "color_background",
+          "id": "gradiant_color",
+          "label": "t:sections.all.headers.markertextcolor",
+          "default": "linear-gradient(54deg, rgba(239, 37, 18, 1) 4%, rgba(239, 95, 18, 1) 52.518%, rgba(241, 163, 28, 1) 100%)",
+          "visible_if": "{{ block.settings.highlight_text == 'gradiant' }}"
+        },
+      ]
+    },
+    {
+      "type": "description",
+      "name": "t:sections.all.headers.description",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "t:sections.all.headers.description",
+          "default": "To access this site, you must confirm that you are at least 18 years old. by continuing you acknowledge that you requirement"
+        },
+        {
+          "type": "select",
+          "id": "description_size",
+          "label": "t:sections.all.settings.description_size.label",
+          "options": [
+            {
+              "value": "text-xlarge",
+              "label": "t:sections.all.settings.description_size.options.text-xlarge"
+            },
+            {
+              "value": "text-large",
+              "label": "t:sections.all.settings.description_size.options.text-large"
+            },
+            {
+              "value": "text-medium",
+              "label": "t:sections.all.settings.description_size.options.text-medium"
+            },
+            {
+              "value": "text",
+              "label": "t:sections.all.settings.description_size.options.text"
+            },
+            {
+              "value": "text-small",
+              "label": "t:sections.all.settings.description_size.options.text-small"
+            },
+            {
+              "value": "text-xsmall",
+              "label": "t:sections.all.settings.description_size.options.text-xsmall"
+            }
+          ],
+          "default": "text-medium"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "t:sections.all.headers.button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "approve_button_text",
+          "label": "t:sections.age-verification.blocks.button.settings.approve_button_text.label",
+          "default": "I am Over 18"
+        },
+        {
+          "type": "text",
+          "id": "decline_button_text",
+          "label": "t:sections.age-verification.blocks.button.settings.decline_button_text.label",
+          "default": "I am Under 18"
+        },
+        {
+          "type": "url",
+          "id": "decline_button_url",
+          "label": "t:sections.age-verification.blocks.button.settings.decline_button_text.link"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "age_verification_display_mode",
+      "label": "t:sections.age-verification.settings.display_mode.label",
+      "default": "enable",
+      "info": "t:sections.age-verification.settings.display_mode.info",
+      "options": [
+        {
+          "label": "t:sections.age-verification.settings.display_mode.option_0.label",
+          "value": "enable"
+        },
+        {
+          "label": "t:sections.age-verification.settings.display_mode.option_1.label",
+          "value": "test_mode"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "checkbox",
+      "label": "t:sections.age-verification.settings.account_holders.label",
+      "id": "account_holders"
+    },
+    {
+      "type": "range",
+      "id": "age_verify_popup_cookie",
+      "label": "t:sections.age-verification.settings.age_verify_popup_cookie.label",
+      "info": "t:sections.age-verification.settings.age_verify_popup_cookie.info",
+      "default": 7,
+      "step": 1,
+      "min": 1,
+      "max": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.age-verification.name",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "description"
+        },
+        {
+          "type": "button"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,33 @@
+
+<script src="{{ 'search-drawer.js' | asset_url }}" defer="defer"></script>
+{{ 'search.css' | asset_url | stylesheet_tag: preload: true }}
+<search-drawer-wrapper id="shopify-section-search-drawer" class="search-drawer-main-wrapper" aria-label="Search drawer" role="dialog">
+{% render 'search-drawer' %}
+</search-drawer-wrapper>
+<style> 
+   #shopify-section-{{ section.id }} {
+       {% if settings.search_collection_enable_overlay %}
+        {% if settings.search_collection_overlay_style == 'gradient' %}
+          --imageOverlay: {{ settings.search_collection_overlay_gradient }};
+        {% else %}
+          --imageOverlay: rgba({{ settings.search_collection_overlay_solid.rgba }});
+        {% endif %}
+      {% endif %}
+     }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.search-drawer.name",
+  "class": "serach-drawer-section",
+  "enabled_on": {
+    "groups": ["custom.Overlay"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.search-drawer.info"
+    }
+  ]
+}
+{% endschema %}

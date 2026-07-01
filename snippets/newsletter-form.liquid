@@ -1,0 +1,83 @@
+{{ 'newsletter-form.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign section_id = section.id
+  assign section_settings = section.settings
+  if source == 'pop-up'
+    assign section_id = block_setting.id
+    assign section_settings = block_setting.settings
+  endif
+-%}
+{% assign id = 'newsletter-form-' | append: section_id %}
+{% form 'customer', class: 'newsletter-form', id: id %}
+  <input type="hidden" name="contact[tags]" value="newsletter">
+  <div class="newsletter-form-inner {{ design }}">
+    <div class="form-group">
+        <label class="form-label{% unless is_email %} hidden{% endunless %}" for="NewsletterForm--{{ section_id }}">
+          {{ 'newsletter.label' | t }}
+        </label>
+
+      <input
+        id="NewsletterForm--{{ section_id }}"
+        name="contact[email]"
+        type="email"
+        placeholder="{{ 'newsletter.label' | t }}"
+        value="{{ form.email }}"
+        class="form-control"
+        autocorrect="off"
+        autocapitalize="off"
+        autocomplete="email"
+        aria-label="Newsletter form"
+        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        {% if form.errors %}
+          autofocus
+          aria-invalid="true"
+          aria-describedby="Newsletter-error--{{ section_id }}"
+        {% elsif form.posted_successfully? %}
+          aria-describedby="Newsletter-success--{{ section_id }}"
+        {% endif %}
+        required
+        tabindex="0"
+
+      >
+    </div>
+    <button
+      type="submit"
+      name="subscribe" 
+      id="subscribe-{{ section_id }}"
+      role="button"
+      class="button-subscribe button {{ section_settings.button_style }} full-button"
+      aria-label="Subscribe"
+    >
+      {% unless source == 'pop-up' %}
+        {% assign default_label = 'newsletter.button_label' | t %}
+        {% assign label = section_settings.button_title | default: default_label %}
+        <span
+          class="button-text"
+          id="Subscribe-{{ section_id }}"
+          aria-label="{{ label }}"
+        >
+          {{- label -}}
+        </span>
+      {% endunless %}
+      <span class="button-icon">
+        {% render 'svg-icons', icon_type: 'arrow-right' %}
+      </span>
+    </button>
+  </div>
+  {%- if form.errors -%}
+    <div class="form-message form-message-error text-small"  id="Newsletter-error--{{ section_id }}">
+      {{- form.errors.translated_fields.email | capitalize }}
+      {{ form.errors.messages.email -}}
+    </div>
+  {%- endif -%}
+  {%- if form.posted_successfully? -%}
+    <div class="form-message form-message-success text-small" tabindex="-1" id="Newsletter-success--{{ section_id }}" autofocus>
+      {{- 'newsletter.success' | t }}
+    </div>
+  {%- endif -%}
+  {% if section_settings.term_policy_text != blank %}
+    <div class="term-description {{ section_settings.term_policy_text_size }} rte">
+      {{ section_settings.term_policy_text | replace: '<a', '<a class="text-underline"' }}
+    </div>
+  {% endif %}
+{% endform %}

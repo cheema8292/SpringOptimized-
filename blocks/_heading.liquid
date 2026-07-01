@@ -1,0 +1,246 @@
+<style>
+  #shopify-block-{{block.id}}{
+        --headingColor: rgba({{ block.settings.heading_color.rgba }});
+      }
+
+  #shopify-block-{{ block.id }} .custom-heading-size{
+   --headingCustomSize:{{ block.settings.heading_custom_size }}px;
+   font-size:var(--headingCustomSize);
+   }
+   #shopify-block-{{ block.id }} .text-highlight-color{
+   --highlightColor:{{ block.settings.text_color }};
+   }
+  #shopify-block-{{ block.id }} .text-highlight-gradiant{
+    --highlightColor:{{ block.settings.gradiant_color }};
+  }
+  @media only screen and (max-width: 767px) {
+    #shopify-block-{{ block.id }} .custom-heading-size{
+     --headingCustomSize: calc({{ block.settings.heading_custom_size }}px / 2);
+     font-size:var(--headingCustomSize);
+     }
+  }
+</style>
+{% liquid
+  assign highlight_text_class = ''
+  assign plain_text = block.settings.text | strip_newlines | strip_html | strip
+  assign highlight_text_setting = block.settings.highlight_text
+  assign highlight_text_font = block.settings.highlight_font
+  if highlight_text_setting == 'underline'
+    assign highlight_text_class = 'text-underline'
+  elsif highlight_text_setting == 'color'
+    assign highlight_text_class = 'text-highlight-color'
+  elsif highlight_text_setting == 'gradiant'
+    assign highlight_text_class = 'text-highlight-gradiant'
+  endif
+%}
+
+{% capture attributes %}
+  class="text-block text-block--{{ block.id }} {{ block.settings.heading_size }}"
+  {{ block.shopify_attributes }}
+{% endcapture %}
+
+{% if plain_text != blank %}
+  {% assign highlight_start = '<span class="text-highlight '
+    | append: highlight_text_class
+    | append: ' '
+    | append: highlight_text_font
+    | append: '">'
+  %}
+  {% assign highlight_end = '</span>' %}
+
+  <{{ block.settings.type_preset }}
+    {{ attributes }}
+    {% if settings.enable_heading_transition %}
+      animate-element="true" data-animate="{{ settings.heading_animation_type }}"
+    {% endif %}
+  >
+    {{
+      block.settings.text
+      | replace: '[', highlight_start
+      | replace: ']', highlight_end
+      | replace: '++', '<br/>'
+      | replace: '<a', '<a class="text-underline"'
+      | newline_to_br
+    }}
+  </{{ block.settings.type_preset }}>
+{% endif %}
+{% schema %}
+{
+  "name": "t:sections.all.headers.heading",
+  "class": "heading-block",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "t:sections.all.headers.heading",
+      "default": "Add heading",
+      "info": "t:sections.all.settings.heading_info.info"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:sections.all.settings.heading_tag.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        },
+        {
+          "value": "div",
+          "label": "Div"
+        },
+        {
+          "value": "span",
+          "label": "Span"
+        },
+        {
+          "value": "p",
+          "label": "P"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "t:sections.all.settings.heading_size.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:sections.all.settings.heading_size.options.heading_xl"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.settings.heading_size.options.heading_l"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.settings.heading_size.options.heading_m"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.settings.heading_size.options.heading_s"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.settings.heading_size.options.heading_xs"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+        },
+        {
+          "value": "custom-heading-size",
+          "label": "t:sections.all.headers.custom_size"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "range",
+      "id": "heading_custom_size",
+      "label": "t:sections.all.headers.heading_custom_size",
+      "default": 30,
+      "min": 30,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ block.settings.heading_size == 'custom-heading-size' }}"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "t:sections.all.settings.heading_color.label",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.highlight_content"
+    },
+    {
+      "type": "select",
+      "id": "highlight_text",
+      "label": "t:sections.all.settings.highlight_text.label",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.all.settings.highlight_text.options.none"
+        },
+        {
+          "value": "underline",
+          "label": "t:sections.all.settings.highlight_text.options.underline"
+        },
+        {
+          "value": "color",
+          "label": "t:sections.all.settings.highlight_text.options.markertextcolor"
+        },
+        {
+          "value": "gradiant",
+          "label": "t:sections.all.settings.highlight_text.options.markergradiant"
+        }
+      ],
+      "default": "color"
+    },
+    {
+      "type": "select",
+      "id": "highlight_font",
+      "label": "t:sections.all.settings.fontStyle.label",
+      "options": [
+        {
+          "value": "heading-font",
+          "label": "t:sections.all.settings.fontStyle.options.headingFont"
+        },
+        {
+          "value": "body-font",
+          "label": "t:sections.all.settings.fontStyle.options.bodyFont"
+        },
+        {
+          "value": "accent-font",
+          "label": "t:sections.all.settings.fontStyle.options.accent"
+        }
+      ],
+      "default": "heading-font"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.all.headers.markertextcolor",
+      "default": "#0424A7",
+      "visible_if": "{{ block.settings.highlight_text == 'color' }}"
+    },
+    {
+      "type": "color_background",
+      "id": "gradiant_color",
+      "label": "t:sections.all.headers.markertextcolor",
+      "default": "linear-gradient(54deg, rgba(239, 37, 18, 1) 4%, rgba(239, 95, 18, 1) 52.518%, rgba(241, 163, 28, 1) 100%)",
+      "visible_if": "{{ block.settings.highlight_text == 'gradiant' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.all.headers.heading",
+      "category": "Basic"
+    }
+  ]
+}
+{% endschema %}

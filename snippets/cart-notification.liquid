@@ -1,0 +1,25 @@
+{% comment %}
+  Renders cart notification
+
+  Accepts:
+  - color_scheme: {String} sets the color scheme of the notification (optional)
+  - desktop_menu_type: {String} passes the desktop menu type which allows us to use the right css class (optional)
+
+  Usage:
+  {% render 'cart-notification' %}
+{% endcomment %}
+ {{ 'cart-notification.css' | asset_url | stylesheet_tag }}
+<cart-notification id="cart-notification" class="cart-notification">
+  <div class="cart-notification-drawer" id="cart-notification-product" data-cart-notification-trigger>
+    <div class="cart-notification-item-count">
+      {% render 'svg-icons', icon_type: 'cart' %}
+      <span class="cart-notification-item-count-text text"></span>
+    </div>
+    <div class="cart-notification-item-price">
+      <span class="cart-notification-item-price-text text font-bold"></span>
+    </div>
+  </div>
+</cart-notification>
+
+{% comment %} {% stylesheet %}
+{% endstylesheet %} {% endcomment %}

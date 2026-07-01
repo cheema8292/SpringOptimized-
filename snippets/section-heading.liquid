@@ -1,0 +1,43 @@
+{% liquid
+  assign highlight_text_class = ''
+  assign plain_text = section_heading_content | strip_newlines | strip_html | strip
+  assign highlight_text_setting = section_heading_highlight_text
+  assign highlight_text_font = section_heading_highlight_font
+  if highlight_text_setting == 'underline'
+    assign highlight_text_class = 'text-underline'
+  elsif highlight_text_setting == 'color'
+    assign highlight_text_class = 'text-highlight-color'
+  elsif highlight_text_setting == 'gradiant'
+    assign highlight_text_class = 'text-highlight-gradiant'
+  endif
+  assign highlight_start = '<span class="text-highlight ' | append: highlight_text_class | append: ' ' | append: highlight_text_font | append: '">'
+  assign highlight_end = '</span>'
+%}
+{% capture section_header_only %}
+  {% if plain_text != blank %}
+    <{{ section_heading_tag }} class="section-heading heading-font {{ section_heading_size }} {% if simple_heading and simple_heading == 'only-heading' %}{% if section_extra_classes != blank %} {{ section_extra_classes }}{% endif %}{% endif %}"
+    {% if simple_heading and simple_heading == 'only-heading' %}
+      {% if themeblock %}{{ themeblock.shopify_attributes }}{% endif %}
+    {% endif %}
+    >
+        {{
+          section_heading_content
+          | replace: '[', highlight_start
+          | replace: ']', highlight_end
+          | replace: '++', '<br/>'
+          | newline_to_br 
+        }}
+    </{{ section_heading_tag }}>
+  {% endif %}
+{% endcapture %}
+{% if simple_heading and simple_heading == 'only-heading' %}
+  {{ section_header_only }}
+{% else %}
+  {% if plain_text != blank or extra_html_content != blank %}
+    <div class="section-header-block{% if section_extra_classes != blank %} {{ section_extra_classes }}{% endif %}" {% if themeblock %}{{ themeblock.shopify_attributes }}{% endif %} {% if settings.enable_heading_transition %}animate-element="true" data-animate="{{ settings.heading_animation_type }}" data-duration="{{ animation_duration }}"{% endif %}> 
+      {{ section_header_only }}
+      {% if extra_html_content != blank %}{{ extra_html_content }}{% endif %}
+    </div>
+  {% endif %}
+{% endif %}
+ 

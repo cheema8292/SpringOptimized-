@@ -1,0 +1,30 @@
+{%- if gift_wrapping != null -%}
+  <gift-wrapping
+    class="gift-wrapping"
+    data-gift-wrap-id="{{ gift_wrap_id }}"
+    data-gift-wrapping="{{ cart.attributes.gift-wrapping | escape }}"
+    cart-items-size="{{ cart.items.size }}"
+    gift-wraps-in-cart="{{ gift_wraps_in_cart }}"
+    items-in-cart="{{ items_in_cart }}"
+    data-id="{{ section_id }}"
+    data-source="{{ source }}"
+  >
+    <div class="gift-wrap-box custom-checkbox custom-checkbox-square">
+      <input
+        class="checkbox-input"
+        type="checkbox"
+        id="GiftWrap-{{ section_id }}"
+        name="attributes[gift-wrapping]"
+        value="1"
+        {%- if gift_wraps_added %}
+          checked
+        {% endif -%}
+      >
+      {% if settings.gift_wrap_text %}
+        <label for="GiftWrap-{{ section_id }}" class="custom-checkbox-label text-small">
+          {{- settings.gift_wrap_text -}}
+        </label>
+      {% endif %}
+    </div>
+  </gift-wrapping>
+{%- endif -%}

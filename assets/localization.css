@@ -1,0 +1,142 @@
+  .localization-toggler {
+    --svgSize: 10px;
+    display: flex;
+    align-items: center;
+    column-gap: 0.625rem;
+    cursor: pointer;
+    white-space: nowrap;
+
+    .header-main & {
+      color: var(--headerTextColor);
+      cursor: pointer;
+    }
+
+    body:has(.shopify-section.slideshow-section:first-child)
+      .section-header:not(.scrolled-header)
+      .header-main.desktop-transparent
+      & {
+      color: var(--transparentTextColor);
+    }
+  }
+
+  .localization-country-flag {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .localization-wrapper {
+    position: fixed;
+    width: 100%;
+    min-width: 340px;
+    max-width: 340px;
+    max-height: 210px;
+    overflow-y: auto;
+    z-index: 99;
+    background-color: var(--headerBackground);
+    border-radius: 8px;
+    text-align: left;
+    transition: 0.3s ease-in-out;
+
+    .header-localization & {
+      top: calc(var(--announcementDynamicHeight) + var(--headerDynamicHeight));
+      right: 40px;
+    }
+  }
+
+  .localization-switch-buttons {
+    padding-block: 24px;
+    padding-inline: 30px;
+    border-bottom: var(--borderWidth) var(--borderStyle) var(--borderColor);
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .localization-forms {
+    display: grid;
+    padding-block: 20px;
+    padding-inline: 30px;
+  }
+
+  .localization-formbox {
+    grid-column-start: 1;
+    grid-row-start: 1;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: 0.3s ease-in-out;
+
+    &.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    .countries {
+      .country-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .country-img {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    img {
+      width: 24px;
+      height: 24px;
+      border-radius: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .switch-button.active {
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 0.4em;
+  }
+
+  .countries {
+    .country + .country {
+      margin-top: 5px;
+    }
+  }
+
+  .footer-copyright-inner {
+    .localization {
+      position: relative;
+    }
+  }
+
+  .footer-copyright-wrapper {
+    .localization-wrapper {
+      top: auto;
+      bottom: 100%;
+      right: auto;
+      left: 0;
+      background-color: var(--background);
+    }
+  }
+
+  .localization-inner-heading-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+  }

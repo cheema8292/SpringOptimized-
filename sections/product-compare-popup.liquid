@@ -1,0 +1,1164 @@
+{{ 'product-comparison.css' | asset_url | stylesheet_tag: preload: true }}
+{% liquid
+  assign loading = 'lazy'
+  assign fetch_priority = 'auto'
+  if section.index <= 3
+    assign loading = 'eager'
+    assign fetch_priority = 'high'
+  endif
+  assign product_summary = false
+  assign column_limit = settings.max_product_compare
+  if section.blocks.size > 0
+    for block in section.blocks
+      if block.type == 'summary'
+        assign product_summary = true
+        break
+      endif
+    endfor
+  endif
+  assign image_ratio = section.settings.aspect_ratio
+%}
+{%- if settings.product_compare -%}
+  {%- render 'compare-drawer-button' -%}
+  {%- render 'compare-drawer', color_scheme: section.settings.color_scheme -%}
+{%- endif -%}
+
+<compare-drawer-section
+  data-section="?section_id={{ section.id }}&type=product&q="
+  data-block-size="{{ section.blocks.size }}"
+>
+  <div class="hidden" aside-drawer-data>
+    {% for product in search.results %}
+      <li class="compare-drawer-item">
+        <div class="compare-drawer-card border">
+          {% if product != blank %}
+            <a href="{{ product.url }}" class="compare-drawer-card-media">
+          {% else %}
+            <div class="compare-drawer-card-media">
+          {% endif %}
+          <div class="media-card media-adapt" style="--imageRatio:1/1;">
+            {% if product != blank %}
+              {% liquid
+                assign default_alt = product.title | escape
+                assign product_image_alt = product.featured_image.alt | default: default_alt
+              %}
+              {{ product.featured_image | image_url: width: 3840, format: 'webp' | image_tag:
+                sizes: '(max-width: 479px) 100vw, (max-width: 767px) 100vw, (max-width: 1023px) 100vw, 100vw',
+                widths: '180, 240, 320, 375, 480, 600, 768, 900, 1024, 1280, 1600, 1920, 2560, 3840',
+                decoding: 'async',
+                loading: loading,
+                fetchpriority: fetch_priority,
+                alt: product_image_alt
+              }}
+            {% else %}
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          </div>
+          {% if product != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+
+          <div class="compare-drawer-card-info">
+            <div class="compare-drawer-card-title font-bold">
+              {% if product.title != blank %}
+                {{- product.title -}}
+              {% else %}
+                {{ 'onboarding.product_title' | t }}
+              {% endif %}
+            </div>
+            {% render 'product-card-price',
+              product: product,
+              section: section,
+              use_variant: true,
+              price_context: 'card'
+            %}
+            <button
+              type="button"
+              class="pos-absolute compare-btn-remove"
+              aria-label="Remove"
+              data-product-id="{{ product.id }}"
+            >
+              {% render 'svg-icons', icon_type: 'cross-icon' %}
+            </button>
+          </div>
+        </div>
+      </li>
+    {% endfor %}
+    {% if search.results.size < settings.max_product_compare %}
+      {% assign remaining = settings.max_product_compare | minus: search.results.size %}
+      {% for i in (1..remaining) %}
+        <li class="compare-drawer-item compare-drawer-item-placeholder">
+          {% render 'svg-icons', icon_type: 'product-compare-dummy', extra_class: 'place-holder-item' %}
+        </li>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <div
+    class="product-comparison-popup popup position-center {{ section.settings.color_scheme }}"
+    compare-popup-data-body
+    tabindex="0"
+  >
+    <div class="page-overlay" pop-up-drawer-overlay></div>
+    <div class="popup-dialog " style="--numberItems:{{ search.results.size }}">
+      <div class="popup-content">
+        <div class="popup-head">
+          <{{ section.settings.heading_tag }} class="compare-drawer-title {{ section.settings.heading_size }} text-center">
+            {{- section.settings.heading | replace: '<a', '<a class="text-underline"' -}}
+          </{{ section.settings.heading_tag }}>
+          <button class="popup-close" aria-label="Close" pop-up-drawer-close>
+            {% render 'svg-icons', icon_type: 'cross-icon' %}
+          </button>
+        </div>
+        <div class="compare-table-container table-responsive border">
+          <table class="compare-table">
+            {% if section.blocks.size > 0 %}
+              {% if product_summary %}
+                <thead>
+                  <tr>
+                    <th class="compare-table-header">
+                      <div class="product-compare-content-holder text-center visually-hidden">Products</div>
+                    </th>
+                    {% for block in section.blocks %}
+                      {%- case block.type -%}
+                        {%- when 'summary' -%}
+                          {% if search.results.size > 0 %}
+                            {% for product in search.results %}
+                              {% render 'comparison-grid-card',
+                                product: product,
+                                loading: loading,
+                                image_ratio: image_ratio,
+                                block_settings: block.settings,
+                                source: 'summary',
+                                section_execute: 'product-compare'
+                              %}
+                            {% endfor %}
+                          {% else %}
+                            {% for i in (1..column_limit) %}
+                              {%- capture current -%}{% cycle section.id: 1, 2, 3, 4 %}{%- endcapture -%}
+                              {% render 'comparison-grid-card',
+                                product: '',
+                                loading: loading,
+                                image_ratio: image_ratio,
+                                block_settings: block.settings,
+                                cycleIndex: current,
+                                source: 'summary'
+                              %}
+                            {% endfor %}
+                          {% endif %}
+                      {%- endcase -%}
+                    {% endfor %}
+                  </tr>
+                </thead>
+              {% endif %}
+              <tbody>
+                {% for block in section.blocks %}
+                  {%- case block.type -%}
+                    {%- when 'type' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.type' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">{{ product.type }}</div>
+                            </td>
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">-</div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'description' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.description' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center description-holder">
+                                {{ product.description | strip_html }}
+                              </div>
+                              {% if block.settings.show_more and block.settings.description_limit > '0' %}
+                                <comparison-product-grid-read-more
+                                  data-show-less="Show less"
+                                  data-show-more="Show more"
+                                >
+                                  <a href="#" class="expand-button button-underline button">Show more</a>
+                                </comparison-product-grid-read-more>
+                              {% endif %}
+                            </td>
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center description-holder">-</div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'title' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.title' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">
+                                {% if product.title != blank %}
+                                  {{- product.title -}}
+                                {% else %}
+                                  {{ 'onboarding.product_title' | t }}
+                                {% endif %}
+                              </div>
+                            </td>
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">
+                                {{ 'onboarding.product_title' | t }}
+                              </div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'price' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.price' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">
+                                {% render 'product-card-price',
+                                  product: product,
+                                  section: section,
+                                  use_variant: true,
+                                  price_context: 'card'
+                                %}
+                              </div>
+                            </td>
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">-</div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'vendor' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.vendor' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">
+                                {% if product.vendor != blank %}
+                                  {{ product.vendor }}
+                                {% else %}
+                                  -
+                                {% endif %}
+                              </div>
+                            </td>
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">-</div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'weight' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.weight' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">
+                                {% if product.variants.first.weight != blank %}
+                                  {{ product.variants.first.weight | weight_with_unit }}
+                                {% else %}
+                                  -
+                                {% endif %}
+                              </div>
+                            </td>
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">-</div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'all-variant' -%}
+                      <tr>
+                        <th class="product-compare-table-cell-th">
+                          <div class="product-compare-table-title d-flex align-items-center">
+                            {% render 'svg-list-icons',
+                              icon_type: block.settings.field_icon,
+                              extra_class: 'product-compare-title-icon d-flex'
+                            %}
+                            {% if block.settings.field_name != blank %}
+                              {{ block.settings.field_name }}
+                            {% else %}
+                              {{ 'sections.product-comparison-grid.variant_all' | t }}
+                            {% endif %}
+                          </div>
+                        </th>
+                        {% if search.results.size > 0 %}
+                          {% for product in search.results %}
+                            {% render 'comparison-grid-card',
+                              product: product,
+                              loading: '',
+                              image_ratio: '',
+                              block_settings: '',
+                              source: 'all-variant'
+                            %}
+                          {% endfor %}
+                        {% else %}
+                          {% for i in (1..column_limit) %}
+                            <td class="product-compare-table-cell">
+                              <div class="product-compare-content-holder text-center">-</div>
+                            </td>
+                          {% endfor %}
+                        {% endif %}
+                      </tr>
+                    {%- when 'variant' -%}
+                      {% if block.settings.option_name != blank %}
+                        <tr>
+                          <th class="product-compare-table-cell-th">
+                            <div class="product-compare-table-title d-flex align-items-center">
+                              {% render 'svg-list-icons',
+                                icon_type: block.settings.field_icon,
+                                extra_class: 'product-compare-title-icon d-flex'
+                              %}
+                              {% if block.settings.field_name != blank %}
+                                {{ block.settings.field_name }}
+                              {% else %}
+                                {{ block.settings.option_name }}
+                              {% endif %}
+                            </div>
+                          </th>
+                          {% if search.results.size > 0 %}
+                            {% for product in search.results %}
+                              {% render 'comparison-grid-card',
+                                product: product,
+                                loading: '',
+                                image_ratio: '',
+                                block_settings: block.settings,
+                                source: 'variant'
+                              %}
+                            {% endfor %}
+                          {% else %}
+                            {% for i in (1..column_limit) %}
+                              <td class="product-compare-table-cell">
+                                <div class="product-compare-content-holder text-center">-</div>
+                              </td>
+                            {% endfor %}
+                          {% endif %}
+                        </tr>
+                      {% endif %}
+                  {%- endcase -%}
+                {% endfor %}
+              </tbody>
+            {% endif %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</compare-drawer-section>
+
+<style>
+  compare-drawer-button{
+   --background:{{ section.settings.button_background }};
+   --textColor:{{ section.settings.button_color }};
+   --bubbleBackground:{{ section.settings.bubble_background }};
+   --bubbleColor:{{ section.settings.bubble_color }};
+  }
+</style>
+{% schema %}
+{
+  "name": "Product compare",
+  "class": "product-comparison-drawer",
+  "enabled_on": {
+    "groups": ["custom.Overlay"]
+  },
+  "blocks": [
+    {
+      "type": "summary",
+      "name": "Product summary",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This will always appear at the top of the grid."
+        },
+        {
+          "type": "checkbox",
+          "id": "product_image",
+          "label": "Show product image",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "product_title",
+          "label": "Show product title",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "product_button",
+          "label": "Show product info button",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "t:sections.all.headers.text",
+          "default": "Button text",
+          "visible_if": "{{ block.settings.product_button == true}}"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "t:sections.all.button.button_style",
+          "visible_if": "{{ block.settings.product_button == true }}",
+          "options": [
+            {
+              "label": "t:sections.all.button.primaryButton",
+              "value": "primary-button"
+            },
+            {
+              "label": "t:sections.all.button.secondaryButton",
+              "value": "secondary-button"
+            },
+            {
+              "label": "t:sections.all.button.underlineButton",
+              "value": "button-underline"
+            },
+            {
+              "label": "t:sections.all.button.outlinedButton",
+              "value": "outlined-button"
+            }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "label": "t:sections.all.button.is_open_in_new_tab",
+          "id": "is_open_in_new_tab",
+          "default": false,
+          "visible_if": "{{ block.settings.product_button == true }}"
+        }
+      ]
+    },
+    {
+      "type": "type",
+      "name": "Type",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Type"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "type-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Vendor"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "vendor-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Product title",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Product title"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "title-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Description"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "description-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "description_limit",
+          "label": "Text line limit",
+          "options": [
+            {
+              "label": "No limit",
+              "value": "0"
+            },
+            {
+              "label": "1 line",
+              "value": "1"
+            },
+            {
+              "label": "2 lines",
+              "value": "2"
+            },
+            {
+              "label": "3 lines",
+              "value": "3"
+            },
+            {
+              "label": "4 lines",
+              "value": "4"
+            },
+            {
+              "label": "5 lines",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "label": "Show view more button",
+          "id": "show_more",
+          "default": false,
+          "info": "This button displays when text is limited to a specific number of lines.",
+          "visible_if": "{{ block.settings.description_limit > '0' }}"
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "name": "Product price",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Price"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "price-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "weight",
+      "name": "Weight",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Weight"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "price-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "variant",
+      "name": "Variant option",
+      "settings": [
+        {
+          "type": "text",
+          "id": "option_name",
+          "label": "Option name",
+          "info": "This should be the name of the variant option."
+        },
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Variant option"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "variant-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "all-variant",
+      "name": "All variant option",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "field_name",
+          "label": "Field name",
+          "default": "Product variants"
+        },
+        {
+          "type": "select",
+          "id": "field_icon",
+          "label": "Icon",
+          "default": "allvariant-cmp",
+          "options": [
+            {
+              "label": "Title",
+              "value": "title-cmp"
+            },
+            {
+              "label": "Type",
+              "value": "type-cmp"
+            },
+            {
+              "label": "Vendor",
+              "value": "vendor-cmp"
+            },
+            {
+              "label": "Price",
+              "value": "price-cmp"
+            },
+            {
+              "label": "Description",
+              "value": "description-cmp"
+            },
+            {
+              "label": "Variant",
+              "value": "variant-cmp"
+            },
+            {
+              "label": "Weight",
+              "value": "weight-cmp"
+            },
+            {
+              "label": "All variant",
+              "value": "allvariant-cmp"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "Compare button"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Bubble"
+    },
+    {
+      "type": "color",
+      "id": "bubble_background",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "bubble_color",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:sections.all.headers.heading",
+      "default": "Product comparison table",
+      "info": "t:sections.all.settings.heading_info.info"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "t:sections.all.settings.heading_tag.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        },
+        {
+          "value": "div",
+          "label": "Div"
+        },
+        {
+          "value": "span",
+          "label": "Span"
+        },
+        {
+          "value": "p",
+          "label": "P"
+        }
+      ],
+      "default": "h4"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "t:sections.all.settings.heading_size.label",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:sections.all.settings.heading_size.options.heading_xl"
+        },
+        {
+          "value": "h2",
+          "label": "t:sections.all.settings.heading_size.options.heading_l"
+        },
+        {
+          "value": "h3",
+          "label": "t:sections.all.settings.heading_size.options.heading_m"
+        },
+        {
+          "value": "h4",
+          "label": "t:sections.all.settings.heading_size.options.heading_s"
+        },
+        {
+          "value": "h5",
+          "label": "t:sections.all.settings.heading_size.options.heading_xs"
+        },
+        {
+          "value": "h6",
+          "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+        }
+      ],
+      "default": "h4"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "t:sections.all.settings.aspect_ratio.label",
+      "default": "1/1",
+      "options": [
+        {
+          "label": "t:sections.all.settings.aspect_ratio.options__1.label",
+          "value": "auto"
+        },
+        {
+          "label": "t:sections.all.settings.aspect_ratio.options__2.label",
+          "value": "1/1"
+        },
+        {
+          "label": "t:sections.all.settings.aspect_ratio.options__3.label",
+          "value": "3/4"
+        },
+        {
+          "label": "t:sections.all.settings.aspect_ratio.options__4.label",
+          "value": "2/3"
+        },
+        {
+          "label": "t:sections.all.settings.aspect_ratio.options__5.label",
+          "value": "4/3"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,85 @@
+{% render 'newsletter-form', section: block, is_email: false, design: 'design-2',source:'block' %}
+{% schema %}
+{
+  "name": "t:sections.all.headers.newsletter",
+  "class": "newsletter-block",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.newsletter.settings.form.label"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "term_policy_text",
+      "label": "t:sections.newsletter.settings.form.text",
+      "default": "By subscribing you agree to the <a>Terms of Use</a> & <a>Privacy Policy.</a>"
+    },
+    {
+      "type": "select",
+      "id": "term_policy_text_size",
+      "label": "t:sections.all.settings.description_size.text",
+      "options": [
+        {
+          "value": "text-medium",
+          "label": "t:sections.all.settings.description_size.options.text-medium"
+        },
+        {
+          "value": "text",
+          "label": "t:sections.all.settings.description_size.options.text"
+        },
+        {
+          "value": "text-small",
+          "label": "t:sections.all.settings.description_size.options.text-small"
+        },
+        {
+          "value": "text-xsmall",
+          "label": "t:sections.all.settings.description_size.options.text-xsmall"
+        }
+      ],
+      "default": "text-xsmall"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.button"
+    },
+    {
+      "type": "text",
+      "id": "button_title",
+      "label": "t:sections.all.settings.button.label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:sections.all.settings.button.style.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.button.style.options.primaryButton",
+          "value": "primary-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.secondaryButton",
+          "value": "secondary-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.primaryOutlinedButton",
+          "value": "primary-button outlined-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.secondaryOutlinedButton",
+          "value": "secondary-button outlined-button"
+        },
+        {
+          "label": "t:sections.all.settings.button.style.options.underlineButton",
+          "value": "button-underline"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter"
+    }
+  ]
+}
+{% endschema %}

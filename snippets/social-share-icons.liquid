@@ -1,0 +1,118 @@
+{%- if settings.share_facebook
+  or settings.share_twitter
+  or settings.share_pinterest
+  or settings.share_telegram
+  or settings.share_whatsapp
+  or settings.share_email
+-%}
+  {% unless source %}
+    <div class="share-label share-button__button">
+      {% render 'svg-icons', icon_type: 'share-icon' %}
+      {{ share_label | escape }}
+    </div>
+  {% endunless %}
+  <ul class="social-icons list-unstyled">
+    {%- if settings.share_facebook -%}
+      <li class="social-icon-item icon-large">
+        <a
+          target="_blank"
+          rel="noopener"
+          class="social-icon-link"
+          is="magnet-link"
+          aria-label="{{ 'general.social.alt_text.share_on_facebook' | t | escape }}"
+          href="//www.facebook.com/sharer.php?u={{ share_link }}"
+          title="{{ 'general.social.alt_text.share_on_facebook' | t | escape }}"
+        >
+          {%- render 'icons-social', icon: 'facebook' -%}
+        </a>
+      </li>
+    {%- endif -%}
+    {%- if settings.share_twitter -%}
+      <li class="social-icon-item icon-large">
+        <a
+          target="_blank"
+          rel="noopener"
+          class="social-icon-link"
+          is="magnet-link"
+          aria-label="{{ 'general.social.alt_text.share_on_twitter' | t | escape }}"
+          href="//twitter.com/intent/tweet?text={{ share_title | url_param_escape }}&amp;url={{ share_link }}"
+          title="{{ 'general.social.alt_text.share_on_twitter' | t | escape }}"
+        >
+          {%- render 'icons-social', icon: 'twitter' -%}
+        </a>
+      </li>
+    {%- endif -%}
+
+    {%- if settings.share_pinterest -%}
+      <li class="social-icon-item icon-large">
+        <a
+          target="_blank"
+          rel="noopener"
+          class="social-icon-link"
+          aria-label="{{ 'general.social.alt_text.share_on_pinterest' | t | escape }}"
+          is="magnet-link"
+          href="//pinterest.com/pin/create/button/?url={{ share_link }}&amp;media={{ share_image | image_url: width: 1024, height: 1024 }}&amp;description={{ share_title | url_param_escape }}"
+          title="{{ 'general.social.alt_text.share_on_pinterest' | t | escape }}"
+        >
+          {%- render 'icons-social', icon: 'pinterest' -%}
+        </a>
+      </li>
+    {%- endif -%}
+
+    {%- if settings.share_telegram -%}
+      <li class="social-icon-item icon-large">
+        <a
+          target="_blank"
+          rel="noopener"
+          class="social-icon-link"
+          is="magnet-link"
+          aria-label="{{ 'general.social.alt_text.share_on_telegram' | t | escape }}"
+          href="//telegram.me/share/url?url={{ share_link }}&amp;media={{ share_image | image_url: width: 1024, height: 1024 }}"
+          title="{{ 'general.social.alt_text.share_on_telegram' | t | escape }}"
+        >
+          {%- render 'icons-social', icon: 'telegram' -%}
+        </a>
+      </li>
+    {%- endif -%}
+
+    {%- if settings.share_whatsapp -%}
+      {%- liquid
+        assign encoded_share_link = 'Check this out: ' | append: share_link | url_encode
+      -%}
+      <li class="social-icon-item icon-large">
+        <a
+          href="#"
+          onclick="
+            var link = 'whatsapp://send?text={{ encoded_share_link }}';
+            window.location = link;
+            setTimeout(function() {
+                window.open('https://wa.me/?text={{ encoded_share_link }}', '_blank');
+            }, 500);
+          "
+          aria-label="{{ 'general.social.alt_text.share_on_whatsapp' | t | escape }}"
+          title="{{ 'general.social.alt_text.share_on_whatsapp' | t | escape }}"
+          class="social-icon-link"
+          is="magnet-link"
+        >
+          {%- render 'icons-social', icon: 'whatsapp' -%}
+        </a>
+      </li>
+    {%- endif -%}
+
+    {%- if settings.share_email -%}
+      <li class="social-icon-item icon-large">
+        <a
+          target="_blank"
+          rel="noopener"
+          class="social-icon-link"
+          is="magnet-link"
+          aria-label="{{ 'general.social.alt_text.share_by_email' | t | escape }}"
+          href="mailto:?&subject={{ share_title | url_param_escape }}&body={{ share_link }}"
+          title="{{ 'general.social.alt_text.share_by_email' | t | escape }}"
+        >
+          {%- render 'icons-social', icon: 'email' -%}
+        </a>
+      </li>
+    {%- endif -%}
+  </ul>
+{% endif %}

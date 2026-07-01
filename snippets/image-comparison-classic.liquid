@@ -1,0 +1,165 @@
+{{ 'image-comparison-classic.css' | asset_url | stylesheet_tag }}
+{% liquid
+  assign loading = 'lazy'
+  assign fetch_priority = 'auto'
+  if section.index <= 3
+    assign loading = 'eager'
+    assign fetch_priority = 'high'
+  endif
+  assign before_image = section.blocks | first
+  assign after_image = section.blocks | last
+
+  if section.settings.desktop_media_height == 'adapt_to_image'
+    assign media_desktop_class = 'desktop-media-adapt'
+  else
+    assign media_desktop_class = 'desktop-media-fixed-height'
+  endif
+
+  if section.settings.mobile_media_height == 'adapt_to_image'
+    assign media_mobile_class = 'mobile-media-adapt'
+  else
+    assign media_mobile_class = 'mobile-media-fixed-height'
+  endif
+%}
+
+<image-comparison
+  class="image-comparison-classic-wrapper d-block pos-relative overflow-hidden separator-{{ section.settings.separator_color }} {%  if section.settings.rounded_corners == "all" %}{{ section.settings.rounded_corners_type }}{% endif %}"
+  data-section="{{ section.id }}"
+  data-parent-wrapper
+  style="--percent:50%"
+>
+  {%- if before_image != blank -%}
+    {% assign desktop_image = before_image.settings.desktop_image %}
+    {% assign mobile_image = before_image.settings.mobile_image | default: desktop_image %}
+    <div class="image-comparison-classic-media image-comparison-classic-before">
+      <div class="image-comparison-classic-content pos-absolute bottom-left">
+        <p class="h6 heading-font overlay-text">{{- before_image.settings.subheading -}}</p>
+      </div>
+      <div
+        class="media-card {{ media_desktop_class }} {{ media_mobile_class }} d-none md-block"
+        {% if settings.image_animation_type != 'none' %}
+          animate-element="true"
+          data-animate="{{ settings.image_animation_type }}"
+        {% endif %}
+      >
+        {% if desktop_image != blank %}
+          {% liquid
+            assign desktop_image_default_alt = 'Image comparison before image' | escape
+            assign desktop_image_alt = desktop_image.alt | default: desktop_image_default_alt
+          %}
+          {{
+            desktop_image
+            | image_url: width: 3840, format: 'webp'
+            | image_tag:
+              sizes: '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, (max-width: 1367px) 100vw, (max-width: 1599px) 100vw, 100vw',
+              widths: '600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600, 3840',
+              decoding: 'async',
+              loading: loading,
+              fetchpriority: fetch_priority,
+              alt: desktop_image_alt
+          }}
+        {% else %}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      </div>
+      <div
+        class="media-card {{ media_desktop_class }} {{ media_mobile_class }} d-block md-none"
+        {% if settings.image_animation_type != 'none' %}
+          animate-element="true"
+          data-animate="{{ settings.image_animation_type }}"
+        {% endif %}
+      >
+        {% if mobile_image != blank %}
+          {% liquid
+            assign mobile_image_default_alt = 'Image comparison before image' | escape
+            assign mobile_image_alt = mobile_image.alt | default: mobile_image_default_alt
+          %}
+          {{
+            mobile_image
+            | image_url: width: 1440, format: 'webp'
+            | image_tag:
+              sizes: '(max-width: 767px) 100vw',
+              widths: '320, 480, 640, 750, 828, 1200, 1440',
+              decoding: 'async',
+              loading: loading,
+              fetchpriority: fetch_priority,
+              alt: mobile_image_alt
+          }}
+        {% else %}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+  {%- if after_image != blank -%}
+    {% assign desktop_image = after_image.settings.desktop_image %}
+    {% assign mobile_image = after_image.settings.mobile_image | default: desktop_image %}
+    <div class="image-comparison-classic-media image-comparison-classic-after">
+      <div class="image-comparison-classic-content pos-absolute bottom-right">
+        <p class="h6 heading-font overlay-text">{{- after_image.settings.subheading -}}</p>
+      </div>
+
+      <div
+        class="media-card {{ media_desktop_class }} {{ media_mobile_class }} d-none md-block"
+        {% if settings.image_animation_type != 'none' %}
+          animate-element="true"
+          data-animate="{{ settings.image_animation_type }}"
+        {% endif %}
+      >
+        {% if desktop_image != blank %}
+          {% liquid
+            assign desktop_after_image_default_alt = 'Image comparison after image' | escape
+            assign desktop_after_image_alt = desktop_image.alt | default: desktop_after_image_default_alt
+          %}
+          {{
+            desktop_image
+            | image_url: width: 3840, format: 'webp'
+            | image_tag:
+              sizes: '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, (max-width: 1367px) 100vw, (max-width: 1599px) 100vw, 100vw',
+              widths: '600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600, 3840',
+              decoding: 'async',
+              loading: loading,
+              fetchpriority: fetch_priority,
+              alt: desktop_after_image_alt
+          }}
+        {% else %}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      </div>
+      <div
+        class="media-card {{ media_desktop_class }} {{ media_mobile_class }} d-block md-none"
+        {% if settings.image_animation_type != 'none' %}
+          animate-element="true"
+          data-animate="{{ settings.image_animation_type }}"
+        {% endif %}
+      >
+        {% if mobile_image != blank %}
+          {% liquid
+            assign mobile_after_image_default_alt = 'Image comparison after image' | escape
+            assign mobile_after_image_alt = mobile_image.alt | default: mobile_after_image_default_alt
+          %}
+          {{
+            mobile_image
+            | image_url: width: 1440, format: 'webp'
+            | image_tag:
+              sizes: '(max-width: 767px) 100vw',
+              widths: '320, 480, 640, 750, 828, 1200, 1440',
+              decoding: 'async',
+              loading: loading,
+              fetchpriority: fetch_priority,
+              alt: mobile_after_image_alt
+          }}
+        {% else %}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+  <after-before-drag>
+    <button class="image-comparison-classic-button" data-cursor aria-label="Image comparsion">
+      <span class="image-comparison-classic-button-icon">
+        {% render 'svg-icons', icon_type: 'compare-icon' %}
+      </span>
+    </button>
+  </after-before-drag>
+</image-comparison>

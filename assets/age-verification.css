@@ -1,0 +1,24 @@
+.age-verification-popup {
+  --overlayOpacity: 1;
+}
+.age-verification-popup .popup-dialog.width-small {
+  max-width: 560px;
+}
+.age-verification-popup-text > * + * {
+  padding-top: 20px;
+}
+.age-verification-popup-actions {
+  gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr;
+  @media (min-width: 576px) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (min-width: 768px) {
+    gap: 15px;
+    /*  */
+  }
+}
+.age-verification-popup-actions:has(.button:only-child) {
+  grid-template-columns: 1fr;
+}

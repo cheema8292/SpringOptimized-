@@ -1,0 +1,176 @@
+{{ 'bundle-product-card.css' | asset_url | stylesheet_tag }}
+{% liquid
+  if loading_image
+    assign loading = loading_image
+  else
+    assign loading = 'lazy'
+  endif
+  assign array = 'product-apparel-1,product-apparel-1,product-apparel-2,product-apparel-3,product-apparel-4,product-apparel-1,product-apparel-2' | split: ','
+%}
+<bundle-card class="product-card" data-product-id="{{ product_card.id }}">
+  <div class="product-card-inner product-card-{{ settings.product_card_style }} height-100">
+    <div class="product-card-media">
+      {% if product_card != blank %}
+        <a href="{{ product_card.url }}" class="product-media focus-inside">
+      {% else %}
+        <div class="product-media focus-inside">
+      {% endif %}
+      {%- if product_card.featured_media != blank -%}
+        <div
+          class="media-card media-adapt"
+          style="--imageRatio:{{ aspect_ratio_image }}"
+          id="mediaProduct-{{ product_card.id }}"
+          data-product-media-wrapper
+        >
+          {% liquid
+            assign image_alt = product_card.featured_media.preview_image.alt | default: product_card.title | default: 'Product image' | escape
+
+            assign fetch_priority = 'auto'
+            if loading == 'eager'
+              assign fetch_priority = 'high'
+            endif
+
+            assign image_sizes = '(max-width: 767px) 50vw, (max-width: 1024px) 33vw, (max-width: 1367px) 25vw, (max-width: 1599px) 20vw, 16vw'
+            assign image_widths = '200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000'
+          %}
+          {{
+            product_card.featured_media.preview_image
+            | image_url: width: 3840, format: 'webp'
+            | image_tag:
+              sizes: image_sizes,
+              widths: image_widths,
+              decoding: 'async',
+              loading: loading,
+              fetchpriority: fetch_priority,
+              class: 'product-card-image',
+              alt: image_alt
+          }}
+        </div>
+      {% else %}
+        <div
+          class="media-card media-adapt"
+          style="--imageRatio:{{ aspect_ratio_image }}"
+          id="mediaProduct-{{ product_card.id }}"
+        >
+          {{ array[index_loop] | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {%- endif -%}
+      {% if product_card != blank %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %}
+      {% render 'product-card-badge', product: product_card, section: section %}
+    </div>
+    <div class="product-card-detail text-{{ settings.product_card_alignment }}">
+      <div class="product-card-detail-inner">
+        <div class="product-card-detail-content">
+          {% if product_card != blank %}
+            <a
+              href="{{ product_card.url }}"
+              class="product-title {{ settings.card_font_family }}-font focus-inside"
+              bundle-product-title
+            >
+          {% else %}
+            <div class="product-title {{ settings.card_font_family }}-font" bundle-product-title>
+          {% endif %}
+          {% if product_card.title != blank %}
+            {{- product_card.title -}}
+          {% else %}
+            {{ 'onboarding.product_title' | t }}
+          {% endif %}
+          {% if product_card != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+          <div class="product-bundle-price" bundle-product-price>
+            {% render 'product-card-price',
+              product: product_card,
+              section: section,
+              use_variant: true,
+              price_context: 'card'
+            %}
+          </div>
+          {%- liquid
+            assign check_against_inventory = true
+            if product_card.selected_or_first_available_variant.inventory_management != 'shopify' or product_card.selected_or_first_available_variant.inventory_policy == 'continue'
+              assign check_against_inventory = false
+            endif
+            if product_card.selected_or_first_available_variant.quantity_rule.min > product_card.selected_or_first_available_variant.inventory_quantity and check_against_inventory
+              assign quantity_rule_soldout = true
+            endif
+          -%}
+          {% if product_card != blank and product_card.variants.size > 0 %}
+            <div
+              class="select-box bundle-product-card-option {% if product_card.variants.size == 1 %}hidden{% endif %}"
+              bundle-variant-option-main
+            >
+              <label
+                for="bundle-product-{{ section.id }}-{{ product_card.id }}"
+                class="visually-hidden"
+              >
+                {{ 'products.product.choose_options' | t }}
+              </label>
+
+              <select
+                class="form-control form-control-sm"
+                id="bundle-product-{{ section.id }}-{{ product_card.id }}"
+                data-bundle-variant-select
+              >
+                {% unless product_card.variants.size == 1 %}
+                  <option disabled selected>
+                    {{ 'products.product.choose_options' | t }}
+                  </option>
+                {% endunless %}
+
+                {% for variant in product_card.variants %}
+                  <option
+                    class="custom-select-option"
+                    value="{{ variant.id }}"
+                    data-variant-id="{{ variant.id }}"
+                    data-variant-price="{{ variant.price }}"
+                    data-variant-price-with-money="{{ variant.price | money }}"
+                    data-variant-name="{{ variant.title | escape }}"
+                    {% if variant.featured_image != blank %}
+                      data-variant-image="{{ variant.featured_image.src | image_url: width: variant.featured_image.width }}"
+                    {% endif %}
+                    {% unless variant.available %}
+                      disabled
+                    {% endunless %}
+                    {% if product_card.variants.size == 1 %}
+                      selected
+                    {% endif %}
+                  >
+                    {% if variant.available %}
+                      {{ variant.title }} ({{ variant.price | money }})
+                    {% else %}
+                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+                    {% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+        </div>
+        {% unless product_card.selected_or_first_available_variant.available == false
+          or quantity_rule_soldout
+          or product_card.selected_or_first_available_variant == null
+        %}
+          <button
+            class="bundle-card-icon"
+            data-product-id="{{ product_card.id }}"
+            aria-label="Bundle add to cart"
+            button-add-to-bundle
+            aria-label="Bundle Add To cart"
+          >
+            {% render 'svg-icons', icon_type: 'add-to-cart' %}
+          </button>
+        {% endunless %}
+      </div>
+    </div>
+  </div>
+  <script type="application/ld+json">
+    {{ product_card | json }}
+  </script>
+</bundle-card>

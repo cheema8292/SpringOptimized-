@@ -1,0 +1,35 @@
+  .not-found-box {
+    --svgSize: 400px;
+    min-height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 700px;
+    margin: 60px auto;
+    border: 1px solid var(--borderColor);
+    box-shadow: 0px 4px 17.3px 0px #00000012;
+    border-radius: var(--blockRadiusSmall);
+    @media (max-width: 767px) {
+      --svgSize: 200px;
+      margin: 30px auto;
+      min-height: 50vh;
+    }
+  }
+  .not-found-box .svg-wrapper {
+    height: auto;
+  }
+
+  .not-found-box .empty-card svg {
+    width: 100%;
+  }
+  .not-found-box .empty-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+  .not-found-box .empty-card-heading {
+    margin-bottom: 0px;
+  }

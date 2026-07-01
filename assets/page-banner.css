@@ -1,0 +1,45 @@
+.page-banner-wrapper {
+	min-height: var(--mediaHeight);
+}
+
+.page-banner-media {
+	position: absolute;
+	left: 0;
+	top: 0;
+	overflow: hidden;
+}
+
+.page-banner-content {
+	padding-block: 30px;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+}
+
+.page-banner-content:not([class*='container-']) {
+	padding-inline: 30px;
+}
+
+.page-banner-content.alignment-left {
+	justify-content: flex-start;
+	text-align: start;
+}
+
+.page-banner-content.alignment-center {
+	justify-content: center;
+	text-align: center;
+}
+
+.page-banner-content.alignment-right {
+	justify-content: flex-end;
+	text-align: end;
+}
+
+.page-banner-content-inner {
+	width: 100%;
+}
+
+.page-banner-heading+.page-banner-description {
+	margin-top: 12px;
+}

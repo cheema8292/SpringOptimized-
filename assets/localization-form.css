@@ -1,0 +1,96 @@
+ .localization-heading-box {
+    padding: 20px;
+    border-bottom: var(--borderWidth) var(--borderStyle) var(--borderColor);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .popup-back {
+    width: 24px;
+    height: 24px;
+    --svgSize: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .localization-heading-box .popup-close {
+    position: static;
+  }
+  .localization-popup .popup-content {
+    padding: 0;
+  }
+  .localization-form-content {
+    padding: 20px;
+    position: relative;
+  }
+  .localization-selector {
+    display: flex;
+    align-content: center;
+    gap: 10px;
+    padding-block: 8px 15px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .localization-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .countries-list-wrapper,
+  .languages-list-wrapper {
+    position: absolute;
+    top: 20px;
+    width: calc(100% - 40px);
+    background: var(--alternateBackground);
+    left: 0;
+    padding: 8px 10px;
+    right: 0;
+    border-radius: 6px;
+    z-index: 1;
+    border: var(--borderWidth) var(--borderStyle) var(--borderColor);
+    margin: 0 auto;
+    max-height: 165px;
+    min-height: 165px;
+    overflow: hidden;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: transform 0.4s ease-in-out;
+  }
+  .localization-form-box.open .countries-list-wrapper,
+  .localization-form-box.open .languages-list-wrapper {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0px);
+  }
+  .country-item + .country-item,
+  .language-item + .language-item {
+    margin-top: 5px;
+  }
+  .country-link,
+  .language-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 10px;
+    border-radius: 50px;
+    @media (min-width: 1025px) {
+      &:hover {
+        background: var(--background);
+      }
+    }
+  }
+  .country-item.selected .country-link,
+  .language-item.selected .language-link {
+    background: var(--background);
+  }
+  .localization-form-box + .localization-form-box {
+    margin-top: 25px;
+  }
+  .localization-form-box fieldset {
+    border-radius: var(--formRadius);
+    padding-block: 0;
+    padding-inline: 15px;
+  }

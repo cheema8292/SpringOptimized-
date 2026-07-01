@@ -1,0 +1,439 @@
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign sort_by = results.sort_by | default: results.default_sort_by
+
+  if results.url
+    assign results_url = results.url
+  else
+    assign terms = results.terms | escape
+    assign results_url = '?q=' | append: terms | append: '&type=product&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+  endif
+-%}
+
+<facet-filters-form
+  data-type="vertical"
+  class="collection-filters"
+  data-open="{{ section.settings.open_by_default }}"
+  tabindex="0"
+  role="dialog" 
+>
+  <div class="drawer-backdrop"></div>
+  <div class="collection-filters-list">
+    <form id="FacetFiltersFormMobile" class="filter-sidebar-content">
+      {%- if results.terms -%}
+        <input type="hidden" name="q" value="{{ results.terms | escape }}">
+        <input name="options[prefix]" type="hidden" value="last">
+      {%- endif -%}
+      {% if section_id == 'main-search' %}
+        <input type="hidden" name="type" value="product">
+      {% endif %}
+      <div class="filter-sidebar-header">
+        <p class="filter-sidebar-heading heading-font text-large heading-color">Filter and sort</p>
+        <button type="button" class="drawer-close-btn" aria-label="Close" drawer-close-btn>
+          {% render 'svg-icons', icon_type: 'cross-icon' %}
+        </button>
+      </div>
+      <div class="filter-sidebar-body">
+        {%- if results.terms -%}
+          <input type="hidden" name="q" value="{{ results.terms | escape }}">
+          <input name="options[prefix]" type="hidden" value="last">
+        {%- endif -%}
+        {% if enable_filtering %}
+          {% if applied_filter_style == 'filters' or applied_filter_style == 'both' %}
+            <div class="active-facets-desktop" active-facets-mobile>
+              {% liquid
+                assign is_active_filter_values = false
+                for filter in results.filters
+                  if filter.active_values.size > 0
+                    assign is_active_filter_values = true
+                  endif
+                  if filter.type == 'price_range'
+                    if filter.min_value.value != null or filter.max_value.value != null
+                      assign is_active_filter_values = true
+                    endif
+                  endif
+                endfor
+              %}
+              {% if is_active_filter_values == true %}
+                <div class="collection-filter collection-filter-clear ">
+                  <facet-remove class="collection-filter-clear-all md-block d-none">
+                    <a href="{{ results_url }}" class="text-underline">Clear all filters</a>
+                  </facet-remove>
+                  <ul class="collection-filter-tags">
+                    {%- for filter in results.filters -%}
+                      {%- for value in filter.active_values -%}
+                        <li class="collection-filter-tag">
+                          <facet-remove>
+                            <a href="{{ value.url_to_remove }}" class="colleciton-filter-link">
+                              {{ value.label }}
+                              {% render 'svg-icons', icon_type: 'cross-icon' %}
+                            </a>
+                          </facet-remove>
+                        </li>
+                      {% endfor %}
+                      {% if filter.type == 'price_range' %}
+                        {% assign min = filter.min_value.value %}
+                        {% assign max = filter.max_value.value %}
+                        {%- if min != null or max != null -%}
+                          <facet-remove>
+                            <a href="{{ filter.url_to_remove }}" class="colleciton-filter-link">
+                              <span>
+                                {{ min | default: 0 | money }} - {{ max | default: filter.range_max | money }}
+                              </span>
+                              {% render 'svg-icons', icon_type: 'cross-icon' %}
+                            </a>
+                          </facet-remove>
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+        {% if enable_sorting %}
+          <details
+            id="Details-mobile-SortBy-{{ filter.param_name | escape }}-{{ section.id }}"
+            class="collection-filter collection-filter-sort"
+            data-js-filter
+            data-index="mobile-"
+          >
+            <summary class="collection-filter-title">
+              <span class="heading-font text">Sort By</span>
+              {% render 'svg-icons', icon_type: 'plus-icon' %}
+            </summary>
+            <div class="collection-filter-tags-wrapper">
+              <ul class="collection-filter-tags">
+                {%- for option in results.sort_options -%}
+                  <li class="collection-filter-tag">
+                    <input
+                      type="radio"
+                      name="sort_by"
+                      value="{{ option.value | escape }}"
+                      id="sort_by-mobile-{{ forloop.index0 }}"
+                      {% if option.value == sort_by %}
+                        checked
+                      {% endif %}
+                    >
+                    <label class="text-small" for="sort_by-mobile-{{ forloop.index0 }}">{{ option.name }}</label>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </details>
+        {% endif %}
+        {% if enable_filtering %}
+          {%- for filter in results.filters -%}
+            {% liquid
+              assign availability_class = ''
+              assign is_swatch = false
+              if filter.param_name == 'filter.v.availability'
+                assign availability_class = 'collection-filter-availability'
+              endif
+              if filter.presentation == 'swatch' or filter.presentation == 'image'
+                assign is_swatch = true
+              endif
+            %}
+
+            <details
+              id="Details-Mobile-{{ filter.param_name | escape }}-{{ section.id }}"
+              class="collection-filter{% if is_swatch %} collection-filter-color{% endif %} {{ availability_class }}"
+              data-js-filter
+              data-index="{{ forloop.index }}"
+            >
+              <summary class="collection-filter-title" data-drawer-filter-summary-count>
+                <span class="heading-font text" filter-btn>{{ filter.label }}
+                {% if applied_filter_style == 'count' or applied_filter_style == 'both' %}
+                  {% if filter.active_values.size > 0 %}
+                    <span>({{ filter.active_values.size }})</span>
+                  {%  elsif filter.min_value.value != null or filter.max_value.value != null %}
+                    <span>(1)</span>
+                  {% endif %}
+                {% endif %}
+                </span>
+                {% render 'svg-icons', icon_type: 'plus-icon' %}
+              </summary>
+
+              <div class="collection-filter-tags-wrapper">
+                {% case filter.type %}
+                  {% when 'boolean', 'list' %}
+
+                    {% liquid 
+                      assign filter_max_show = section.settings.visible_options_per_filter
+                      assign check_filter_for_button = false
+
+                      if section.settings.filter_to_show_as_buttons != blank
+                        assign filter_for_buttons = section.settings.filter_to_show_as_buttons | split: ','
+                        assign current_filter_name = filter.label | downcase | escape
+                        for filtername in filter_for_buttons
+                          assign filter_label = filtername | downcase | escape 
+                          if filter_label == current_filter_name
+                            assign check_filter_for_button = true                          
+                          endif
+                        endfor
+                      endif
+                    %}
+
+                    <ul class="collection-filter-tags{% if check_filter_for_button and is_swatch == false %} filter-style-button{% endif %}">
+                      {% for value in filter.values %}
+                        {% assign input_id = 'Filter-'
+                          | append: filter.param_name
+                          | escape
+                          | append: '-mobile-'
+                          | append: forloop.index
+                        %}
+
+                        <li class="collection-filter-tag{% if forloop.index > filter_max_show %} js-hidden{% endif %}"{% if forloop.index > filter_max_show %} data-show-less-more-li{% endif %}>
+                          <label class="visually-hidden" for="{{ input_id }}">Collection filter</label> 
+                          <input
+                            type="checkbox"
+                            class="{% if is_swatch %}hidden{% endif %}"
+                            name="{{ filter.param_name }}"
+                            value="{{ value.value }}"
+                            id="{{ input_id }}"
+                            {% if value.active %}
+                              checked
+                            {% endif %}
+                            {% if value.count == 0 and value.active == false %}
+                              disabled
+                            {% endif %}
+                          >
+
+                          {% if is_swatch %}
+                            {% liquid
+                              assign swatch_value = null
+                              if value.swatch.image
+                                assign image_url = value.swatch.image | image_url: width: 50
+                                assign swatch_value = 'url(' | append: image_url | append: ')'
+                              elsif value.swatch.color
+                                assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+                              endif
+                            %}
+                            <label class="filter-swatch-label text-small" for="{{ input_id }}" tabindex="0">
+                              <div class="filter-swatch-color" style="--swatchBackground: {{ swatch_value }}"></div>
+                              <span>{{ value.label }}</span>
+                              <div class="close-arrow-button">
+                                {% render 'svg-icons', icon_type: 'cross-icon' %}
+                              </div>
+                            </label>
+
+                          {% else %}
+                            <label class="text-small" for="{{ input_id }}">
+                              {{ value.label }}
+                              <span>[{{ value.count }}]</span>
+                            </label>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                    {% if filter.values.size > filter_max_show %}
+                      <div class="filter-show-more-wrapper">
+                        <button type="button" class="filter-more js-show-more text-underline text-small" data-more-text="{{ 'products.facets.show_more' | t }}" data-less-text="{{ 'products.facets.show_less' | t }}" aria-label="Filter show more" data-show-less-more-wrapper>{{ 'products.facets.show_more' | t }}</button>
+                      </div>
+                    {% endif %}
+                  {% when 'price_range' %}
+                    {%- liquid
+                      assign currencies_using_comma_decimals = 'ANG,ARS,BRL,BYN,BYR,CLF,CLP,COP,CRC,CZK,DKK,EUR,HRK,HUF,IDR,ISK,MZN,NOK,PLN,RON,RUB,SEK,TRY,UYU,VES,VND' | split: ','
+                      assign uses_comma_decimals = false
+                      if currencies_using_comma_decimals contains cart.currency.iso_code
+                        assign uses_comma_decimals = true
+                      endif
+                    -%}
+                    {%- liquid
+                      if uses_comma_decimals
+                        assign max_value = filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.' | floor
+                        assign min_value = filter.range_min | money_without_currency | replace: '.', '' | replace: ',', '.' | floor
+                      else
+                        assign max_value = filter.range_max | money_without_currency
+                        assign min_value = filter.range_min | money_without_currency
+                      endif
+
+                      if filter.max_value.value
+                        assign max_value = filter.max_value.value | money_without_currency
+                      endif
+                      if filter.min_value.value
+                        assign min_value = filter.min_value.value | money_without_currency
+                      endif
+                    -%}
+                    <price-range class="d-grid price-range-wrapper">
+                      {% liquid
+                        if uses_comma_decimals
+                          assign range_min_value = filter.range_min | money_without_currency | replace: '.', '' | replace: ',', '.' | floor
+                          assign range_max_value = filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.' | floor
+                          assign min_input_current_value = min_value | replace: '.', '' | replace: ',', '.' | floor
+                          assign max_input_current_value = max_value | replace: '.', '' | replace: ',', '.' | floor
+                        else
+                          assign range_min_value = filter.range_min | money_without_currency | replace: ',', '' | floor
+                          assign range_max_value = filter.range_max | money_without_currency | replace: ',', '' | floor
+                          assign min_input_current_value = min_value | replace: ',', '' | floor
+                          assign max_input_current_value = max_value | replace: ',', '' | floor
+                        endif
+
+                        assign range_value = range_max_value | minus: range_min_value
+                        if range_value == 0
+                          assign min_bar_percentage = 0
+                          assign max_bar_percentage = 0
+                        else
+                          assign min_bar_percentage = min_input_current_value | minus: range_min_value | times: 100.0 | divided_by: range_value | round: 2
+                          assign max_bar_percentage = max_input_current_value | minus: range_min_value | times: 100.0 | divided_by: range_value | round: 2
+                          assign max_bar_percentage = 100.0
+                        endif
+                      %}
+                      <span class="text-small price-text">The highest price is {{ filter.range_max | money }}</span>
+                      <div
+                        class="facet-range-wrapper pos-relative"
+                        data-filter-progress
+                        style="--rangeMin: {{ min_bar_percentage | append : '%'}}; --rangeMax: {{ max_bar_percentage | append : '%' }};"
+                      >
+                        {%- if uses_comma_decimals -%}
+                          <label class="visually-hidden" for="FacetFormRangeFromPrice-vertical">Price</label>
+                          <input
+                            class="facet-range facet-range-min width-100 pointer-events-none"
+                            type="range"
+                            min="{{ filter.range_min | money_without_currency | replace: '.', '' | replace: ',', '.' | floor }}"
+                            max="{{ filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.' | floor }}"
+                            value="{{ min_value | replace: '.', '' | replace: ',', '.' | floor }}"
+                            step="1"
+                            id="FacetFormRangeFromPrice-vertical"
+                            facet-price-min-range
+                            data-range-type="range_min"
+                            aria-label="Minimum price"
+                          >
+                          <label class="visually-hidden" for="FacetFormRangeFromPrice-vertical">Price</label>
+                          <input
+                            class="facet-range facet-range-max width-100 pointer-events-none pos-absolute"
+                            type="range"
+                            min="{{ filter.range_min | money_without_currency | replace: '.', '' | replace: ',', '.' | floor }}"
+                            max="{{ filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.' | floor }}"
+                            value="{{ max_value | replace: '.', '' | replace: ',', '.' | floor }}"
+                            step="1"
+                            id="FacetFormRangeFromPrice-vertical"
+                            facet-price-max-range
+                            data-range-type="range_max"
+                            aria-label="Maximum price"
+                          >
+                        {%- else -%}
+                          <label class="visually-hidden" for="FacetFormRangeFromPrice-vertical">Price</label>
+                          <input
+                            class="facet-range facet-range-min width-100 pointer-events-none"
+                            type="range"
+                            min="{{ filter.range_min | money_without_currency | replace: ',', '' | floor }}"
+                            max="{{ filter.range_max | money_without_currency | replace: ',', '' | floor }}"
+                            value="{{ min_value | replace: ',', '' | floor }}"
+                            step="1"
+                            id="FacetFormRangeFromPrice-vertical"
+                            facet-price-min-range
+                            data-range-type="range_min"
+                            aria-label="Minimum price"
+                          >
+                          <label class="visually-hidden" for="FacetFormRangeFromPrice-vertical">Price</label>
+                          <input
+                            class="facet-range facet-range-max width-100 pointer-events-none pos-absolute"
+                            type="range"
+                            min="{{ filter.range_min | money_without_currency | replace: ',', '' | floor }}"
+                            max="{{ filter.range_max | money_without_currency | replace: ',', '' | floor }}"
+                            value="{{ max_value | replace: ',', '' | floor }}"
+                            step="1"
+                            id="FacetFormRangeFromPrice-vertical"
+                            facet-price-max-range
+                            data-range-type="range_max"
+                            aria-label="Maximum price"
+
+                          >
+                        {% endif %}
+                      </div>
+                      <div class="facet-input-wrapper d-flex align-items-center">
+                        <div class="facet-input-item d-flex align-items-center flex-grow pos-relative">
+                          <span class="facet-range-symbol">{{ cart.currency.symbol }}</span>
+                          <label class="visually-hidden" for="Filter-{{ filter.label | escape }}-LTE">Price</label>
+                          <input
+                            class="facet-range-input"
+                            type="number"
+                            id="Filter-{{ filter.label | escape }}-LTE"
+                            name="{{ filter.min_value.param_name }}"
+                            autocomplete="off"
+                            min="0"
+                            {%- if uses_comma_decimals -%}
+                              max="{{ filter.range_max | money_without_currency | replace: ',', '.' | floor }}"
+                              placeholder="{{ min_value | replace: ',', '.' | floor }}"
+                              {% if filter.min_value.value %}
+                                value="{{ min_value | replace: ',', '.' | floor }}"
+                                data-min-value="{{ min_value | replace: ',', '.' | floor }}"
+                              {% endif %}
+                            {%- else -%}
+                              max="{{ filter.range_max | money_without_currency | replace: ',', '' | floor }}"
+                              placeholder="{{ min_value | replace: ',', '' | floor }}"
+                              {% if filter.min_value.value %}
+                                value="{{ min_value | replace: ',', '' | floor }}"
+                                data-min-value="{{ min_value | replace: ',', '' | floor }}"
+                              {% endif %}
+                            {% endif %}
+                            step="1"
+                            aria-label="Minimum price"
+                          >
+                        </div>
+                        <span class="svg-wrapper">
+                          <svg viewBox="0 0 12 2" fill="none">
+                            <rect width="12" height="2" fill="currentColor"/>
+                          </svg>
+                        </span>
+                        <div class="facet-input-item d-flex align-items-center flex-grow pos-relative">
+                          <span class="facet-range-symbol">{{ cart.currency.symbol }}</span>
+                          <label class="visually-hidden" for="Filter-{{ filter.label | escape }}-GTE">Price</label>
+                          <input
+                            class="facet-range-input"
+                            type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            autocomplete="off"
+                            id="Filter-{{ filter.label | escape }}-GTE"
+                            min="0"
+                            {% if uses_comma_decimals %}
+                              max="{{ filter.range_max | money_without_currency | replace: ',', '.' | floor }}"
+                              placeholder="{{ max_value | replace: ',', '.' | floor }}"
+                              {% if filter.max_value.value %}
+                                value="{{ max_value | replace: ',', '.' | floor }}"
+                                data-max-value="{{ max_value | replace: ',', '.' | floor }}"
+                              {% endif %}
+                            {% else %}
+                              max="{{ filter.range_max | money_without_currency | replace: ',', '' | floor }}"
+                              placeholder="{{ max_value | replace: ',', '' | floor }}"
+                              {% if filter.min_value.value %}
+                                value="{{ max_value | replace: ',', '' | floor }}"
+                                data-max-value="{{ max_value | replace: ',', '' | floor }}"
+                              {% endif %}
+                            {% endif %}
+                            step="1"
+                            aria-label="Maximum price"
+                          >
+                        </div>
+                      </div>
+                    </price-range>
+                {% endcase %}
+              </div>
+            </details>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="filter-sidebar-footer">
+        <div class="filter-drawer-actions">
+          <button class="button primary-button" aria-label="Apply filter" data-apply-filters>
+            <span class="button-text">Apply Now</span>
+            <span class="button-icon">
+              {% render 'svg-icons', icon_type: 'arrow-right' %}
+            </span>
+          </button>
+
+          <facet-remove class="d-block">
+            <a href="{{ results_url }}" class="button secondary-button full-button">
+              <span class="button-text">Clear Now</span>
+              <span class="button-icon">
+                {% render 'svg-icons', icon_type: 'arrow-right' %}
+              </span>
+            </a>
+          </facet-remove>
+        </div>
+      </div>
+    </form>
+  </div>
+</facet-filters-form>

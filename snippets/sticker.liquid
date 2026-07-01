@@ -1,0 +1,48 @@
+{% liquid
+    assign loading = 'lazy'
+    assign fetch_priority = 'auto'
+    if section.index <= 2
+        assign loading = 'eager'
+        assign fetch_priority = 'high'
+    endif
+    assign default_alt = 'default_alt.media_card_image' | t
+    assign image_alt = block.settings.sticker_custom_image.alt | default: default_alt
+%}
+{% if block.settings.enable_sticker %} 
+            {% if block.settings.sticker_custom_image != blank  %}
+                <div class="sticker-wrapper sticker-wrapper-img">
+                    {{ block.settings.sticker_custom_image | image_url: width: 600, format: 'webp' | image_tag:
+                        sizes: '(max-width: 400px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1440px) 25vw, 1200px',
+                        widths: '223, 320, 400, 446, 600, 669, 800, 1000, 1200',
+                        decoding: 'async',
+                        class: 'sticker-custom-image',
+                        loading: loading,
+                        fetchpriority: fetch_priority,
+                        alt: image_alt
+                    }}                     
+                </div>
+             {% else %} 
+                    
+                <div class="sticker-wrapper sticker-wrapper-shape" style="clip-path: url(#myshape{{ block.settings.sticker }});">
+                    {% if block.settings.text != blank %}
+                        {% liquid
+                            assign plain_text = block.settings.text | strip_newlines | strip_html | strip
+                            assign highlight_text_class = 'text-highlight-color'
+                            assign highlight_start = '<span class="text-highlight ' | append: highlight_text_class | append: ' ' | append: '">'
+                            assign highlight_end = '</span>' 
+                         %}
+                        <div class="sticker-text text-center">
+                            {{
+                                plain_text
+                                | replace: '[', highlight_start 
+                                | replace: ']', highlight_end
+                                | replace: '++', '<br/>'
+                                | replace: '<a', '<a class="text-underline"'
+                                | newline_to_br 
+                                }}
+                        </div>
+                        {% endif %}
+                    {% render 'sticker-svg',sticker_type:block.settings.sticker %}
+                </div>
+    {% endif %} 
+{% endif %}

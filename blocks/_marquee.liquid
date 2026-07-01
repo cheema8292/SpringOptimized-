@@ -1,0 +1,162 @@
+{% liquid
+  assign base_value = 6
+  assign speed = base_value | divided_by: block.settings.marquee_speed
+%}
+
+<style>
+  #shopify-block-{{ block.id }}{
+   --horizontalSpacing:{{ block.settings.horizontal_spacing }}px;
+   --verticalSpacing:{{ block.settings.vertical_spacing }}px;
+   --duration:{{ speed }}s;
+  {% if block.settings.marquee_style == 'gradient' %}  
+    --marqueeBackground: {{ block.settings.marquee_gradient }};
+  {% else %}
+    --marqueeBackground: {{ block.settings.marquee_solid }};
+  {% endif %}
+  }
+</style>
+{% if block.settings.marquee_lines %}
+<div class="cstm-slider-heading">
+      <span class="cstm-slider-line"></span>
+      <p class="cstm-spn-heading">AS SEEN ON</p>
+      <span class="cstm-slider-line"></span>
+    </div>
+  {% endif %}
+<scrolling-text class="scrolling-text-inner{% if block.settings.marquee_direction == 'bidir' %} bidirection-enabled{% endif %} text-{{ block.settings.marquee_style }} {% if section.settings %}{% if section.settings.rounded_corners == 'all' %} {{ section.settings.rounded_corners_type }}{% endif %}{% endif %} d-block">
+  <div class="marquee-wrapper marquee-direction-{{ block.settings.marquee_direction }}{% if block.settings.pause_hover %} pause-on-hover{% endif %}"  scrolling-main-wrapper >
+    <div class="marquee-node" scrolling-text-node>
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</scrolling-text>
+{% if block.settings.marquee_lines %}
+<div class="cstm-slider-heading">
+      <span class="cstm-slider-line"></span>
+      <p class="cstm-spn-heading">& OVER 200 NEWS SITES</p>
+      <span class="cstm-slider-line"></span>
+    </div>
+  {% endif %}
+{% schema %}
+{
+  "name": "t:sections.scrolling-text.blocks.marquee.name",
+  "class": "scrolling-text-block",
+  "blocks": [
+    {
+      "type": "_marquee_text"
+    },
+    {
+      "type": "_image"
+    },
+    {
+      "type": "_separator"
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "marquee_lines",
+      "label": "Show Vertical Headings",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "marquee_style",
+      "label": "t:sections.all.settings.color_background.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.color_background.options.background_solid",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.color_background.options.background_gradiant",
+          "value": "gradient"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color_background",
+      "id": "marquee_gradient",
+      "label": "t:sections.all.headers.color",
+      "default": "linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.04) 100%)",
+      "visible_if": "{{ block.settings.marquee_style == 'gradient' }}"
+    },
+    {
+        "type": "color",
+        "id": "marquee_solid",
+        "label": "t:sections.all.headers.color",
+        "default": "#000000",
+        "visible_if": "{{ block.settings.marquee_style == 'solid' }}"
+    },
+    {
+      "type": "select",
+      "id": "marquee_direction",
+      "label": "t:sections.scrolling-text.blocks.marquee.settings.direction.label",
+      "default": "ltr",
+      "options": [
+        {
+          "label": "t:sections.scrolling-text.blocks.marquee.settings.direction.option_0.label",
+          "value": "ltr"
+        },
+        {
+          "label": "t:sections.scrolling-text.blocks.marquee.settings.direction.option_1.label",
+          "value": "rtl"
+        },
+        {
+          "label": "t:sections.scrolling-text.blocks.marquee.settings.direction.option_2.label",
+          "value": "bidir"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "horizontal_spacing",
+      "label": "t:sections.scrolling-text.blocks.marquee.settings.horizontal_spacing.label",
+      "default": 15,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "vertical_spacing",
+      "label": "t:sections.scrolling-text.blocks.marquee.settings.vertical_spacing.label",
+      "default": 15,
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "min": 0.1,
+      "max": 3,
+      "step": 0.1,
+      "unit": "x",
+      "label": "t:sections.scrolling-text.blocks.marquee.settings.marquee_speed.label",
+      "default": 0.2
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_hover",
+      "label": "t:sections.scrolling-text.blocks.marquee.settings.pause_hover.label",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.scrolling-text.blocks.marquee.name",
+      "blocks": [
+        { 
+          "type": "_marquee_text" 
+        },
+        { 
+          "type": "_separator" 
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

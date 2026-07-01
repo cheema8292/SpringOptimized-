@@ -1,0 +1,147 @@
+{% comment %} <!-- navidium script start -->
+		<script>
+		const nvdShop = 'jersey-art-glass.myshopify.com';
+		const nvdShopCurrency = '{{ shop.money_with_currency_format | strip_html }}';
+		const nvdControls = {
+			subtotal_item: '.cart-total.text-medium span:last-child,.amp-cart__footer-row--subtotal',
+			CheckoutBtns: '[name="checkout"],.amp-cart__footer-checkout-button,.amp-cart__footer-checkout-button *',
+			clickTriggers: '[name="add"],[name="add"] *,[href="/cart"],[href="/cart"] *,.quantity-button,.quantity-button *,.remove-btn,.remove-btn *',
+			changeTrigger: '.quantity-input',
+			cursorControl: '.nvd-mini',
+			showConsoleMessage: false,
+			iosDeviceListener:'click',
+			trackWidget: false,
+			forceClick: true,
+			forceCheckout: true,
+			redirectCheckout: {
+				upsaleOff: true,
+				noProtection: false
+			},
+		nvdInject:{
+			status:false, // Inject nvd-mini div
+			parent:'parent_class', // parent class for nvd-mini div
+			container:'checkout_button_div' // nvd-mini will added before this div/button
+			}
+		}
+		</script>
+		 <script  src="https://cdn.navidiumapp.com/navidium-widgets/js/nvd-js-asset.js"></script>
+		 <script src="https://cdn.navidiumapp.com/navidium-widgets/js/nvd-widget-v-n-1.min.js" defer></script>
+	{% comment %} <script  src="https://cdn.navidiumapp.com/navidium-widgets/js/nvd-widget-v-jquery.js" defer></script> {% endcomment %}
+<!-- navidium script end --> {% endcomment %}
+
+<!-- Navidium script start -->
+		<script>
+		const nvdShop = 'jersey-art-glass.myshopify.com';
+		const nvdShopCurrency = '{{ shop.money_with_currency_format | strip_html }}';
+		const nvdControls = {
+			cartCounter: '.header-cart-count', //cart item count
+			subtotal: '.cart-total.text-medium span:last-child,.amp-cart__footer-row--subtotal,strong.order-subtotal-price.h5', // cart subtotal amount
+			lineAttribute: 'data-index', // cart item line
+			cartItemNodes: 'cart_nodes', // Cart items loop
+			quantityMinus: 'qty_minus', // Quantity decrase button
+			quantityPlus: 'qty_plus', // Quantity incrase button
+			removeItem: 'cart_remove_class', // Cart item remove btn class
+			qtybtnAttribute: 'data-href', // Cart item btn line update
+			qtyrmvAttribute: 'href', // Cart item remove line update
+			clickTriggers: '[name="add"],[name="add"] *,[href="/cart"],[href="/cart"] *,.quantity-button,.quantity-button *,.remove-btn,.remove-btn *,.amp-cart__upsell-item-button,.amp-cart__upsell-item-button *', // Onclick widget update
+			changeTrigger: '.quantity-input', // Onchange widget update
+			cursorControl: '.nvd-mini', // Disabled/Enabled cursor pointer event
+			onLoadTrigger: false, // window.onload nvd_init function call
+			cartReload: false, // Cart reload for /cart page
+			showConsoleMessage:false, // Console message show/hide
+			trackWidget:false, // Track widget on realtime
+			forceClick: true, // forceclick for onclickTrigger event
+			autoHide: false, // Hide by JS according to cartItemNodes
+			initiateTime: 2000, //milisecond
+			nvdInject:{
+				status:false, // Inject nvd-mini div
+				parent:'parent_class', // parent class for nvd-mini div
+				container:'checkout_button_div' // nvd-mini will added before this div/button
+		  }
+		}
+		</script>
+	<script src="https://cdn.navidiumapp.com/navidium-widgets/js/nvd-widget-stable-1.js" defer></script>
+
+<!-- End of Navidium script -->
+
+
+	<style>
+		input#shippingProtectionCheckBox::after {
+    display: none;
+}
+.cart-item:has([href*="navidium"]) {
+    display: none;
+}
+	</style>
+{% comment %} 
+
+	<script>
+  const hideNavidium = setInterval(function() {
+    const cartLines = document.querySelectorAll('.amp-cart__cart-line');
+
+    cartLines.forEach(line => {
+      const titleEl = line.querySelector('.amp-cart__cart-line-title');
+      if(titleEl && titleEl.textContent.trim() === "Navidium Shipping Protection") {
+        line.style.display = "none";
+      }
+    });
+
+    if(cartLines.length > 0) {
+      clearInterval(hideNavidium);
+    }
+  }, 500);
+</script> {% endcomment %}
+
+<script>
+(function() {
+
+  function hideNavidiumProduct() {
+    document.querySelectorAll('.amp-cart__cart-line').forEach(line => {
+      const title = line.querySelector('.amp-cart__cart-line-title');
+      if (title && title.textContent.trim() === 'Navidium Shipping Protection') {
+        line.style.display = 'none';
+      }
+    });
+  }
+
+  function initObserver() {
+    const cartDrawer = document.querySelector('.amp-cart-drawer');
+    if (!cartDrawer) return;
+
+    // observer cart open/close changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        // cart open হলে hide trigger হবে
+        if (cartDrawer.classList.contains('amp-cart--open')) {
+          hideNavidiumProduct();
+        }
+      });
+    });
+
+    observer.observe(cartDrawer, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
+
+  const waitForCart = setInterval(() => {
+    if (document.querySelector('.amp-cart-drawer')) {
+      clearInterval(waitForCart);
+      initObserver();
+    }
+  }, 300);
+
+})();
+</script>
+
+
+
+
+<script>
+window.addEventListener('nvd_cart_changed', (e) => {
+  if (e.detail?.added?.length != 0 || e?.detail?.removed?.length != 0) {
+    console.log('Cart changed::', e.detail)
+    setTimeout(nvd_init,1500)
+  }
+})
+</script>

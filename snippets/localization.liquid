@@ -1,0 +1,34 @@
+
+{%- if settings.enable_country_selector or settings.enable_language_selector-%}
+  {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+    {{ 'localization.css' | asset_url | stylesheet_tag }}
+    {{ 'localization-form.css' | asset_url | stylesheet_tag }}
+    <div class="localization {{ staticclass }}" data-localization-wrapper>
+      <div class="localization-wrap">  
+        <localization-trigger
+          tabindex="0"
+          type="button"
+          class="localization-toggler text-small"
+          is="localization-trigger"
+          role="button"
+          aria-expanded="false"
+          aria-label="Change localization"
+        >
+          {%- if settings.enable_country_selector -%}
+            <span class="localization-country-flag">
+              {{ localization.country | image_url: width: 14 | image_tag }}
+            </span>
+            {{ localization.country.iso_code }}
+          {%- endif -%}
+
+          {%- if settings.enable_language_selector -%}
+            {%- if settings.enable_country_selector %} / {% endif -%}
+            {{ localization.language.iso_code | upcase }}
+          {%- endif -%}
+
+          {% render 'svg-icons', icon_type: 'angle-down' %}
+        </localization-trigger>
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}

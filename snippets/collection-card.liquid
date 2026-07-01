@@ -1,0 +1,65 @@
+{% liquid
+  assign aspect_ratio_image = image_size
+  if block.settings.image != blank
+    assign collection_img = block.settings.image
+  elsif collection.featured_image != blank
+    assign collection_img = collection.featured_image
+  endif
+  if aspect_ratio_image == 'auto' and collection_img != blank
+    assign aspect_ratio_image = collection_img.aspect_ratio
+  elsif aspect_ratio_image == 'auto'
+    assign aspect_ratio_image = '1/1'
+  endif
+  if block.settings.title != blank
+    assign collection_title = block.settings.title
+  elsif collection != blank
+    assign collection_title = collection.title
+  else
+    assign collection_title = 'onboarding.collection_title' | t
+  endif
+%}
+{% liquid
+  assign loading = 'lazy'
+  assign fetch_priority = 'auto'
+%}
+<div class="collection-list-item {{ extra_class }}" {{ block.shopify_attributes }}>
+  {% if collection.url != blank %}
+    <a href="{{ collection.url }}" class="collection-list-card d-block pos-relative img-hover">
+  {% else %}
+    <div href="{{ collection.url }}" class="collection-list-card d-block pos-relative img-hover">
+  {% endif %}
+  <div class="collection-list-media">
+    <div class="media-card media-adapt media-card-overlay" style="--imageRatio:{{  aspect_ratio_image }};">
+      {% if collection_img != blank %}
+        {% liquid
+          assign collection_card_default_alt = collection.title | default: 'Collection card image'
+          assign image_alt = collection_img.alt | default: collection_card_default_alt
+    
+          assign image_sizes = '(max-width: 767px) 100vw, (max-width: 1024px) 100vw, (max-width: 1367px) 100vw, (max-width: 1599px) 100vw, 100vw'
+          assign image_widths = '320, 1160, 1200, 1500, 1800, 2100, 2400, 2700, 3000'
+        %}
+        {{
+          collection_img
+          | image_url: width: 3000, format: 'webp'
+          | image_tag:
+            sizes: image_sizes,
+            widths: image_widths,
+            decoding: 'async',
+            loading: loading,
+            fetchpriority: fetch_priority,
+            alt: image_alt
+        }}
+      {% else %}
+        {% echo placeholder_image | placeholder_svg_tag: 'placeholder-svg' %}
+      {% endif %}
+    </div>
+  </div>
+  <p class="collection-list-heading heading-font text-{{ section.settings.content_alignment | default: "center" }} {{ section.settings.title_size }}">
+    <span>{{ collection_title }}</span>
+  </p>
+  {% if collection.url != blank %}
+    </a>
+  {% else %}
+    </div>
+  {% endif %}
+</div>

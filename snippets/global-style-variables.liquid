@@ -1,0 +1,301 @@
+{% style %}
+  {%- liquid
+    assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
+    assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
+    assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+
+    assign header_font_bold = settings.type_header_font | font_modify: 'weight', 'bold'
+    assign header_font_italic = settings.type_header_font | font_modify: 'style', 'italic'
+    assign header_font_bold_italic = header_font_bold | font_modify: 'style', 'italic'
+
+    assign accent_font_bold = settings.type_accent_font | font_modify: 'weight', 'bold'
+    assign accent_font_italic = settings.type_accent_font | font_modify: 'style', 'italic'
+    assign accent_font_bold_italic = accent_font_bold | font_modify: 'style', 'italic'
+  %}
+  {{ settings.type_body_font | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ body_font_italic | font_face: font_display: 'swap' }}
+  {{ body_font_bold_italic | font_face: font_display: 'swap' }}
+
+  {{ settings.type_header_font | font_face: font_display: 'swap' }}
+  {{ header_font_bold | font_face: font_display: 'swap' }}
+  {{ header_font_italic | font_face: font_display: 'swap' }}
+  {{ header_font_bold_italic | font_face: font_display: 'swap' }}
+
+  {{ settings.type_accent_font | font_face: font_display: 'swap' }}
+  {{ accent_font_bold | font_face: font_display: 'swap' }}
+  {{ accent_font_italic | font_face: font_display: 'swap' }}
+  {{ accent_font_bold_italic | font_face: font_display: 'swap' }}
+
+  :root {
+      --bodyFontFamily: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+      --bodyFontWeight: {{ settings.type_body_font.weight }};
+      --bodyFontWeightBold: {{ settings.type_body_font.weight | plus: 300 | at_most: 1000 }};
+      --bodyFontStyle: {{ settings.type_body_font.style }};
+      --bodyFontLineHeight: {{ settings.body_font_line_height }};
+      --bodyFontScale: {{ settings.body_scale  | times: 1.0 | divided_by: 100 }};
+
+      --headingFontFamily: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+      --headingFontStyle: {{ settings.type_header_font.style }};
+      --headingFontWeight: {{ settings.type_header_font.weight }};
+      --headingFontLineHeight: 1.2;
+      --headingFontScale:  {{ settings.heading_scale | times: 1.0 | divided_by: 100  }};
+      --headingFontScaleMobile: {{ settings.mobile_heading_scale | times: 1.0 | divided_by: 100 }};
+      --headingLetterSpacing : {{ settings.heading_letter_spacing }};
+
+      --accentFontFamily: {{ settings.type_accent_font.family }}, {{ settings.type_accent_font.fallback_families }};
+      --accentFontWeight:{{ settings.type_accent_font.weight }};
+      --accentFontStyle: {{ settings.type_accent_font.style }};
+      --accentLetterSpacing : {{ settings.accent_heading_letter_spacing }};
+
+      --soldBackground:{{settings.soldout_badge_color}};
+      --soldTextColor:{{settings.soldout_badge_text_color}};
+      --saleBackground:{{settings.sale_badge_color}};
+      --saleTextColor:{{settings.sale_badge_text_color}};
+      --preorderBackground:{{settings.preorder_badge_color}};
+      --preorderTextColor:{{settings.preorder_badge_text_color}};
+      --newBackground:{{settings.new_badge_color}};
+      --newTextColor:{{settings.new_badge_text_color}};
+      --customBackground:{{settings.custom_badge_color}};
+      --customTextColor:{{settings.custom_badge_text_color}};
+
+      --overlayBackground: {{ settings.overlay_background_color }};
+      --overlayOpacity: {{ settings.overlay_opacity }};
+
+      --bubbleBackground:{{ settings.header_cart_bubble_bg }};
+      --bubbleText:{{ settings.header_cart_bubble_text }};
+
+      --keyboardFocus: {{ settings.keyboard_focus }};
+
+      {% if settings.button_font_family == 'heading' %}
+        --buttonFontFamily: var(--headingFontFamily);
+        --buttonFontWeight:var(--headingFontWeight);
+        --buttonFontStyle:var(--headingFontStyle);
+      {% elsif settings.button_font_family == 'body' %}
+        --buttonFontFamily: var(--bodyFontFamily);
+        --buttonFontWeight:var(--bodyFontWeight);
+        --buttonFontStyle:var(--bodyFontStyle); 
+      {% elsif settings.button_font_family == 'accent' %}
+        --buttonFontFamily: var(--accentFontFamily);
+        --buttonFontWeight:var(--accentFontWeight);
+        --buttonFontStyle:var(--accentFontStyle);
+        {% endif %}
+      --buttonRadius: {{settings.buttons_radius}}px;
+      --buttonTextTransform: {{settings.buttons_text_transform}};
+
+      --formRadius: {{ settings.input_border_radius }}px ;
+      --productCardRadius: {{ settings.product_card_border_radius }}px ;
+
+      --headerBackground: rgba({{ settings.header_menu_navigation_background_color.rgba }});
+      --headerTextColor:  rgba({{ settings.header_menu_navigation_text_color.rgba }});
+      --headerTextHover:rgba({{ settings.header_menu_navigation_text_hover_color.rgba }});
+      --headerBorderColor:rgba({{ settings.header_menu_navigation_border_color.rgba }});
+      --submenuBackground:rgba({{ settings.header_submenus_navigation_background_color.rgba }});
+      --submenuTextColor:rgba({{ settings.header_submenus_navigation_text_color.rgba }});
+      --submenuTextHover:rgba({{ settings.header_submenus_navigation_text_hover_color.rgba }});
+      --transparentTextColor:rgba({{ settings.transparent_header_text_color.rgba }});
+      --searchFormBackground:{{ settings.search_with_categories_input_color }};
+      --searchFormColor:{{ settings.search_with_categories_input_text_color }};
+      --searchTextColor:{{ settings.search_with_categories_input_text_color }};
+      --searchFormBorder: {{ settings.search_with_categories_input_border_color }};
+      --searchCategoriesDropdownBg:rgba({{ settings.header_submenus_navigation_background_color.rgba }});
+      --searchCategoriesDropdownText:rgba({{ settings.header_submenus_navigation_text_color.rgba }});
+      --borderWidth:1px;
+      --arrowButtonWidth:36px;
+      --borderStyle:solid;
+      --svgSize: 24px;
+      --hd2: calc(var(--headingFontScale) * 228px);
+      --hd1: calc(var(--headingFontScale) * 100px);
+      --h0: calc(var(--headingFontScale) * 80px);
+      --h1: calc(var(--headingFontScale) * 50px);
+      --h2: calc(var(--headingFontScale) * 40px);
+      --h3: calc(var(--headingFontScale) * 30px);
+      --h4: calc(var(--headingFontScale) * 26px); 
+      --h5: calc(var(--headingFontScale) * 22px);
+      --h6: calc(var(--headingFontScale) * 18px);
+      --textXsmall: calc(var(--bodyFontScale) * 10px);
+      --textSmall: calc(var(--bodyFontScale) * 12px);
+      --text: calc(var(--bodyFontScale) * 14px);
+      --textMedium: calc(var(--bodyFontScale) * 16px);
+      --textLarge: calc(var(--bodyFontScale) * 18px);
+      --textXlarge: calc(var(--bodyFontScale) * 20px);
+      --textXxlarge: calc(var(--bodyFontScale) * 24px);
+      --animation-nav: .5s cubic-bezier(.6, 0, .4, 1);
+      --animation-default: .5s cubic-bezier(.3, 1, .3, 1);
+      --animation-fast: .3s cubic-bezier(.7, 0, .3, 1);
+      --swiperNavigationSize: 24px;
+      --buttonHeight: 42px;
+      --blockRadiusSmall: {{ settings.other_border_radius }}px;
+      --popupRadius: {{ settings.popup_border_radius }}px;
+      --LightDarkColor: rgba({{ settings.color_mode_color.rgba }});
+      --LightDarkIcon: rgba({{ settings.color_mode_icon.rgba }});
+      
+       {%  if settings.cart_type == "notification" %}
+        #cart-notification{
+          --cartNotificationText: rgba({{ settings.notification_text_color.rgba }});
+          --cartNotificationBg :rgba({{ settings.notification_bg_color.rgba }});
+        }
+        {% endif %} 
+      --success: {{ settings.success_messages_color }};
+      --success-lighter-10: color-mix(in srgb, var(--success) 10%, transparent 0%);
+      --success-lighter-30: color-mix(in srgb, var(--success) 30%, transparent 0%);
+      --success-lighter-40: color-mix(in srgb, var(--success) 40%, transparent 0%);
+      --success-lighter-70: color-mix(in srgb, var(--success) 70%, transparent 0%);
+      --success-lighter-90: color-mix(in srgb, var(--success) 90%, transparent 0%);
+      --error: {{ settings.error_messages_color }};
+      --error-lighter-10: color-mix(in srgb, var(--error) 10%, transparent 0%);
+      --error-lighter-30: color-mix(in srgb, var(--error) 30%, transparent 0%);
+      --error-lighter-40: color-mix(in srgb, var(--error) 40%, transparent 0%);
+      --error-lighter-70: color-mix(in srgb, var(--error) 70%, transparent 0%);
+      --error-lighter-90: color-mix(in srgb, var(--error) 90%, transparent 0%);
+      --info: {{ settings.info_messages_color }};
+      --info-lighter-10: color-mix(in srgb, var(--info) 10%, transparent 0%);
+      --info-lighter-30: color-mix(in srgb, var(--info) 30%, transparent 0%);
+      --info-lighter-40: color-mix(in srgb, var(--info) 40%, transparent 0%);
+      --info-lighter-70: color-mix(in srgb, var(--info) 70%, transparent 0%);
+      --info-lighter-90: color-mix(in srgb, var(--info) 90%, transparent 0%);
+  }
+  {% for scheme in settings.color_schemes %}
+       {% if scheme.id == settings.default_color_scheme.id -%}:root,{% endif %} 
+        .{{ scheme.id }},[color-mode="light"] .{{ scheme.id }} {
+        --background: rgba({{ scheme.settings.background.rgba }});
+        {% if scheme.settings.background_gradient != empty %}
+          --gradientBackground: {{ scheme.settings.background_gradient }};
+        {% else %}
+          --gradientBackground: rgba({{ scheme.settings.background.rgba }});
+        {% endif %}
+        --alternateBackground: rgba({{ scheme.settings.alternate_background.rgba }});
+        --textColor: rgba({{ scheme.settings.text_color.rgba }}) ;
+        --headingColor: rgba({{ scheme.settings.heading_color.rgba }});
+        --borderColor:  rgba({{ scheme.settings.border_color.rgba }});
+        --textColorLight: color-mix(in srgb, var(--textColor) 60%, transparent);
+        --textColorXLight: color-mix(in srgb, rgb(var(--textColor)) 10%, transparent); 
+        --buttonBackground: rgba({{ scheme.settings.button_background.rgba }});
+        --buttonColor: rgba({{ scheme.settings.button_label.rgba }});
+        --buttonBorder:rgba({{ scheme.settings.button_border.rgba }});
+        --secondaryButtonBackground: rgba({{ scheme.settings.secondary_button_background.rgba }});
+        --secondaryButtonColor: rgba({{ scheme.settings.secondary_button_label.rgba }});
+        --secondaryButtonBorder:rgba({{ scheme.settings.secondary_button_border.rgba }});
+        --buttonBackgroundHover: rgba({{ scheme.settings.button_background_hover.rgba }});
+        --buttonColorHover:rgba({{ scheme.settings.button_color_hover.rgba }});
+        --buttonBorderHover:rgba({{ scheme.settings.button_border_hover.rgba }});
+        --secondaryButtonBackgroundHover: rgba({{ scheme.settings.sec_button_background_hover.rgba }});
+        --secondaryButtonColorHover: rgba({{ scheme.settings.sec_button_color_hover.rgba }});
+        --secondaryButtonBorderHover:rgba({{ scheme.settings.sec_button_border_hover.rgba }});
+        --imageBackground:rgba({{ scheme.settings.image_background.rgba }});
+        --overlayTextColor: rgba({{ scheme.settings.overlay_text_color.rgba }});
+        --cardBackground: rgba({{ scheme.settings.card_background.rgba }});
+        --cardHeading: rgba({{ scheme.settings.card_heading.rgba }});
+        --cardText: rgba({{ scheme.settings.card_text.rgba }});
+        --cardBorder: rgba({{ scheme.settings.card_border.rgba }});
+        --swiperNavigationBackground:rgba({{ scheme.settings.swiper_navigation_background.rgba }});
+        --swiperNavigationColor:rgba({{ scheme.settings.swiper_navigation_color.rgba }});
+        --formBorder: rgba({{ scheme.settings.form_border.rgba }});
+        --formBackground: rgba({{ scheme.settings.form_background.rgba }});
+        --formColor: rgba({{ scheme.settings.form_Color.rgba }});
+        --productBackground: rgba( {{ scheme.settings.product_card_background.rgba }});
+        --productTextColor: rgba( {{ scheme.settings.product_card_text.rgba }});
+        --productIconBackground: rgba( {{ scheme.settings.product_card_icon_bg.rgba }});
+        --productIconColor: rgba( {{ scheme.settings.product_card_icon_color.rgba }});
+       }
+        {% if forloop.first %}
+          [color-mode="dark"] header {
+            --headerBackground: #212020;
+            --headerTextColor:  #ffffff;
+            --headerTextHover: #cccccc;
+            --headerBorderColor: #383737;
+            --submenuBackground: #212020;
+            --submenuTextColor: #ffffff;
+            --submenuTextHover: #cccccc;
+            
+          }
+          [color-mode="dark"] .header-search{
+            --searchFormBackground:#262525;
+            --searchFormColor:#ffffff;
+            --searchFormBorder: #383737;
+            --formBackground:#262525;
+            --formColor:#ffffff;
+            --formBorder: #383737;
+            --textColor: var(--formBorder);
+            --searchCategoriesDropdownBg:#212020;
+            --searchCategoriesDropdownText:#ffffff;
+          }
+          [color-mode="dark"] body,
+          [color-mode="dark"] .{{ scheme.id }}:not(.color-gradient) {
+            --background: #000000;
+            --alternateBackground: #212020;
+            --textColor: #cccccc;
+            --headingColor: #ffffff;
+            --borderColor: #292929;
+            --textColorLight: color-mix(in srgb, var(--textColor) 60%, transparent);
+            --textColorXLight: color-mix(in srgb, rgb(var(--textColor)) 10%, transparent); 
+            --buttonBackground: #292929;
+            --buttonColor: #ffffff;
+            --buttonBorder: #292929;
+            --secondaryButtonBackground: #D2D2D2;
+            --secondaryButtonColor: #000000;
+            --secondaryButtonBorder: #D2D2D2;
+            --buttonBackgroundHover: #D2D2D2;
+            --buttonColorHover: #000000;
+            --buttonBorderHover: #D2D2D2;
+            --secondaryButtonBackgroundHover: #292929;
+            --secondaryButtonColorHover: #ffffff;
+            --secondaryButtonBorderHover: #292929;
+            --imageBackground: #000000;
+            --overlayTextColor: #ffffff;
+            --cardBackground: #000000;
+            --cardHeading: #FFFFFF;
+            --cardText: #CCCCCC;
+            --cardBorder: #292929;
+            --swiperNavigationBackground: #000000;
+            --swiperNavigationColor: #ffffff;
+            --formBorder: #292929;
+            --formBackground: #000000;
+            --formColor: #ffffff;
+            --productBackground: #212020;
+            --productTextColor: #fff;
+            --productIconBackground: #ffffff;
+            --productIconColor: #000000;
+            --outerBackground: #000000;
+        }
+        {% else %}
+          [color-mode="dark"] .{{ scheme.id }}:not(.color-gradient) {
+            --background: #212020;
+            --alternateBackground: #000000;
+            --textColor: #cccccc;
+            --headingColor: #ffffff;
+            --borderColor: #292929;
+            --textColorLight: color-mix(in srgb, var(--textColor) 60%, transparent);
+            --textColorXLight: color-mix(in srgb, rgb(var(--textColor)) 10%, transparent); 
+            --buttonBackground: #292929;
+            --buttonColor: #ffffff;
+            --buttonBorder: #292929;
+             --secondaryButtonBackground: #D2D2D2;
+            --secondaryButtonColor: #000000;
+            --secondaryButtonBorder: #D2D2D2;
+            --buttonBackgroundHover: #D2D2D2;
+            --buttonColorHover: #000000;
+            --buttonBorderHover: #D2D2D2;
+            --secondaryButtonBackgroundHover: #292929;
+            --secondaryButtonColorHover: #ffffff;
+            --secondaryButtonBorderHover: #292929;
+            --imageBackground: #212020;
+            --overlayTextColor: #FFFFFF;
+            --cardBackground: #212020;
+            --cardHeading: #FFFFFF;
+            --cardText: #CCCCCC;
+            --cardBorder: #292929;
+            --swiperNavigationBackground: #000000;
+            --swiperNavigationColor: #ffffff;
+            --formBorder: #292929;
+            --formBackground: #212020;
+            --formColor: #FFFFFF;
+            --productBackground: #212020;
+            --productTextColor: #fff;
+            --productIconBackground: #ffffff;
+            --productIconColor: #000000;
+            --outerBackground: #000000;
+          }
+        {% endif %}
+    {% endfor %}
+{% endstyle %}

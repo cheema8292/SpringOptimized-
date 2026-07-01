@@ -1,0 +1,613 @@
+{%- liquid
+  assign loading = 'lazy'
+  assign fetch_priority = 'auto'
+  if section.index <= 2
+    assign loading = 'eager'
+    assign fetch_priority = 'high'
+  endif
+-%}
+{{ 'step-by-step-guide.css' | asset_url | stylesheet_tag }}
+<div class="section-wrapper color-scheme {{ section.settings.color_scheme }} color-{{ section.settings.color_type }} section-spacing">
+  <div class="{{ section.settings.container_width }}">
+    {% if section.blocks.size > 0 %}
+      <step-by-step-guide
+        class="step-by-step-element d-block steps-{{ section.settings.change_steps }}"
+        {% if section.blocks.size > 1 and section.settings.change_steps == 'on-scroll' %}
+          animatedSection="true"
+          methodSection="stepByStepGuide"
+          data-section="{{ section.id }}"
+          data-block-size="{{ section.blocks.size }}"
+          data-layout-style="{{ section.settings.step_position }}"
+        {% endif %}
+        data-steps-change="{{ section.settings.change_steps }}"
+      >
+        <div class="step-guide-wrapper layout-style-{{ section.settings.step_position }}">
+          <div class="step-guide-images-wrapper {%  if section.settings.rounded_corners == "all" %}layout-rounded{% endif %}">
+            {% for block in section.blocks %}
+              <div
+                class="step-guide-image {% if forloop.first %}image-active{% endif %}"
+                step-image-item
+                data-step-index="{{ forloop.index0 }}"
+                {{ block.shopify_attributes }}
+              >
+                <div
+                  class="media-card media-fixed-height"
+                  {% if settings.image_animation_type != 'none' %}
+                    animate-element="true"
+                    data-animate="{{ settings.image_animation_type }}"
+                    data-zoom-initial="1.1"
+                    data-zoom-final="1.0"
+                    data-zoom-duration="1.5"
+                    data-zoom-ease="power3.out"
+                    data-delay="0.3"
+                  {% endif %}
+                >
+                  {% if block.settings.media_type == 'image' %}
+                    {% liquid
+                      capture current
+                        cycle 1, 2
+                      endcapture
+                    %}
+                    {%- if block.settings.image_picker != blank -%}
+                      {% liquid
+                        assign default_alt = 'Step -' | append: forloop.index
+                        assign image_alt = block.settings.image_picker.alt | default: default_alt
+                      %}
+                      {{
+                        block.settings.image_picker
+                        | image_url: width: 3840, format: 'webp'
+                        | image_tag:
+                          sizes: '(max-width: 480px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, (max-width: 1366px) 100vw, (max-width: 1920px) 100vw, 420px',
+                          widths: '360,540,900,1080,1200,1500,1600,2000,2200,2500,2700,3000,3300,3840',
+                          decoding: 'async',
+                          loading: loading,
+                          fetchpriority: fetch_priority,
+                          alt: image_alt
+                      }}
+                    {% else %}
+                      {{ 'hero-apparel-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                    {% endif %}
+                  {% else %}
+                    {%- if block.settings.video != blank -%}
+                      {{ block.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false }}
+                    {% else %}
+                      {{ 'hero-apparel-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="step-guide-content-wrapper" step-tab-wrapper>
+            {% for block in section.blocks %}
+              <div
+                class="step-guide-content-item {% if forloop.first and section.settings.change_steps == 'on-click' %}active{% endif %}"
+                step-tab-item
+                data-steps-index="{{ forloop.index0 }}"
+                {{ block.shopify_attributes }}
+              >
+                <div class="step-guide-content-item-inner">
+                  <div class="step-guide-icon-box">
+                    <div class="vc-slideshow-thumb-progress" step-progress-bar>
+                      <span class="step-guide-zoom-circle" step-progress-circle>
+                        {% render 'svg-icons', icon_type: 'right-tick' %}
+                      </span>
+                    </div>
+                  </div>
+                  {% if block.settings.heading != blank or block.settings.description != blank %}
+                    <div class="step-guide-title-box">
+                      {% if block.settings.heading != blank %}
+                        <{{ block.settings.heading_tag }} class="step-guide-title {{ block.settings.heading_size }} heading-font">
+                          {{- block.settings.heading -}}
+                        </{{ block.settings.heading_tag }}>
+                      {% endif %}
+                      {% if block.settings.description != blank %}
+                        <p class="step-guide-desc {{ block.settings.description_size }}">
+                          {{ block.settings.description | newline_to_br }}
+                        </p>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <div class="step-guide-title-box">
+                      <{{ block.settings.heading_tag }} class="step-guide-title {{ block.settings.heading_size }} heading-font">
+                        Step heading
+                      </{{ block.settings.heading_tag }}>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </step-by-step-guide>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+    #shopify-section-{{ section.id }}{
+       --topSpacer: {{ section.settings.top_space_desktop }}px;
+     --bottomSpacer:{{ section.settings.bottom_space_desktop }}px;
+     --sectionRadius:{{ section.settings.border_radius }}px;
+     --blockRadius: {{ section.settings.card_radius }}px;
+      {% if section.settings.desktop_media_height == "100vh" %}
+        --mediaHeight: {{ section.settings.desktop_media_height }}
+      {% else %}
+        --mediaHeight: {{ section.settings.desktop_custom_height }}px
+      {% endif %}
+    }
+    @media only screen and (max-width: 767px) {
+      #shopify-section-{{ section.id }} {
+         --topSpacer: {{ section.settings.top_space_mobile }}px;
+        --bottomSpacer: {{ section.settings.bottom_space_mobile }}px;
+        {% if section.settings.border_radius > 30 %}
+          --sectionRadius: calc({{ section.settings.border_radius }}px / 2);
+        {% else %}
+          --sectionRadius:{{ section.settings.border_radius }}px;
+        {% endif %}
+        {% if section.settings.card_radius > 20 %}
+            --blockRadius: calc( {{ section.settings.card_radius }}px / 2);
+          {% else %}
+            --blockRadius: {{ section.settings.card_radius }}px ;
+          {% endif %}
+         {% if section.settings.mobile_media_height == "100vh" %}
+        --mediaHeight: {{ section.settings.mobile_media_height }};
+      {% else %}
+        --mediaHeight: {{ section.settings.mobile_custom_height }}px
+      {% endif %}
+      }
+    }
+    {% if section.settings.section_visibility == 'large' %}
+      @media(max-width: 767px) {
+        #shopify-section-{{ section.id }} {
+          display: none !important;
+        }
+      }
+    {% elsif section.settings.section_visibility == 'small' %}
+    @media(min-width: 768px) {
+      #shopify-section-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {% endif %}
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.step-by-step-guide.name",
+  "class": "step-by-step-guide-section",
+  "tag": "section",
+  "disabled_on": { "groups": ["header", "footer", "custom.Overlay"] },
+  "blocks": [
+    {
+      "type": "steps",
+      "name": "t:sections.step-by-step-guide.blocks.steps.name",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "t:sections.all.settings.media_type.label",
+          "options": [
+            {
+              "label": "t:sections.all.settings.media_type.option_0.label",
+              "value": "image"
+            },
+            {
+              "label": "t:sections.all.settings.media_type.option_1.label",
+              "value": "video"
+            }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_picker",
+          "label": "t:sections.all.settings.media_type.option_0.label",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
+        },
+        {
+          "type": "video",
+          "label": "t:sections.all.settings.media_type.option_1.label",
+          "id": "video",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.all.headers.heading",
+          "default": "Step heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "t:sections.all.settings.heading_tag.label",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            },
+            {
+              "value": "h4",
+              "label": "H4"
+            },
+            {
+              "value": "h5",
+              "label": "H5"
+            },
+            {
+              "value": "h6",
+              "label": "H6"
+            },
+            {
+              "value": "div",
+              "label": "Div"
+            },
+            {
+              "value": "span",
+              "label": "Span"
+            },
+            {
+              "value": "p",
+              "label": "P"
+            }
+          ],
+          "default": "h6"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "t:sections.all.settings.heading_size.label",
+          "options": [
+            {
+              "value": "h1",
+              "label": "t:sections.all.settings.heading_size.options.heading_xl"
+            },
+            {
+              "value": "h2",
+              "label": "t:sections.all.settings.heading_size.options.heading_l"
+            },
+            {
+              "value": "h3",
+              "label": "t:sections.all.settings.heading_size.options.heading_m"
+            },
+            {
+              "value": "h4",
+              "label": "t:sections.all.settings.heading_size.options.heading_s"
+            },
+            {
+              "value": "h5",
+              "label": "t:sections.all.settings.heading_size.options.heading_xs"
+            },
+            {
+              "value": "h6",
+              "label": "t:sections.all.settings.heading_size.options.heading_xxs"
+            }
+          ],
+          "default": "h6"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "t:sections.all.headers.description",
+          "default": "Add short description for this block."
+        },
+        {
+          "type": "select",
+          "id": "description_size",
+          "label": "t:sections.all.settings.description_size.label",
+          "options": [
+            {
+              "value": "text-xlarge",
+              "label": "t:sections.all.settings.description_size.options.text-xlarge"
+            },
+            {
+              "value": "text-large",
+              "label": "t:sections.all.settings.description_size.options.text-large"
+            },
+            {
+              "value": "text-medium",
+              "label": "t:sections.all.settings.description_size.options.text-medium"
+            },
+            {
+              "value": "text",
+              "label": "t:sections.all.settings.description_size.options.text"
+            },
+            {
+              "value": "text-small",
+              "label": "t:sections.all.settings.description_size.options.text-small"
+            },
+            {
+              "value": "text-xsmall",
+              "label": "t:sections.all.settings.description_size.options.text-xsmall"
+            }
+          ],
+          "default": "text-small"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.general"
+    },
+    {
+      "type": "select",
+      "id": "section_visibility",
+      "label": "t:sections.all.settings.section_visibility.label",
+      "default": "always",
+      "options": [
+        {
+          "label": "t:sections.all.settings.section_visibility.always.label",
+          "value": "always"
+        },
+        {
+          "label": "t:sections.all.settings.section_visibility.small_devices.label",
+          "value": "small"
+        },
+        {
+          "label": "t:sections.all.settings.section_visibility.large_devices.label",
+          "value": "large"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.settings.colors.label"
+    },
+    {
+      "type": "select",
+      "id": "color_type",
+      "label": "t:sections.all.settings.color_background.label",
+      "default": "solid",
+      "options": [
+        {
+          "label": "t:sections.all.settings.color_background.options.background_solid",
+          "value": "solid"
+        },
+        {
+          "label": "t:sections.all.settings.color_background.options.background_gradiant",
+          "value": "gradient"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "t:sections.all.settings.container_width.label",
+      "default": "container-narrow",
+      "options": [
+        {
+          "label": "t:sections.all.settings.container_width.small.label",
+          "value": "container-small"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.standard.label",
+          "value": "container"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_wide.label",
+          "value": "container-wide"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.container_edge.label",
+          "value": "container-narrow"
+        },
+        {
+          "label": "t:sections.all.settings.container_width.full_width.label",
+          "value": "container-full"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "rounded_corners",
+      "label": "t:sections.all.settings.rounded_corners.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.rounded_corners.sharp.label",
+          "value": "none"
+        },
+        {
+          "label": "t:sections.all.settings.rounded_corners.rounded.label",
+          "value": "all"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:sections.all.settings.corner_radius.label",
+      "min": 2,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 10,
+      "visible_if": "{{ section.settings.rounded_corners == 'all' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.section_spacing"
+    },
+    {
+      "type": "select",
+      "id": "select_type",
+      "label": "t:sections.all.settings.section_spacing.choose_from.label",
+      "options": [
+        {
+          "label": "t:sections.all.settings.section_spacing.choose_from.options.desktop.label",
+          "value": "desktop"
+        },
+        {
+          "label": "t:sections.all.settings.section_spacing.choose_from.options.mobile.label",
+          "value": "mobile"
+        }
+      ],
+      "default": "desktop"
+    },
+    {
+      "type": "range",
+      "id": "top_space_desktop",
+      "label": "t:sections.all.settings.section_spacing.top_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom_space_desktop",
+      "label": "t:sections.all.settings.section_spacing.bottom_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'desktop' }}"
+    },
+    {
+      "type": "range",
+      "id": "top_space_mobile",
+      "label": "t:sections.all.settings.section_spacing.top_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'mobile' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom_space_mobile",
+      "label": "t:sections.all.settings.section_spacing.bottom_spacing.label",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "visible_if": "{{ section.settings.select_type == 'mobile' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.headers.desktop_layout"
+    },
+    {
+      "type": "select",
+      "id": "step_position",
+      "default": "V1",
+      "label": "t:sections.step-by-step-guide.settings.step_position.name",
+      "options": [
+        {
+          "label": "t:sections.step-by-step-guide.settings.step_position.option_1",
+          "value": "V1"
+        },
+        {
+          "label": "t:sections.step-by-step-guide.settings.step_position.option_2",
+          "value": "V2"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "desktop_media_height",
+      "label": "t:sections.all.settings.media_height.image_height",
+      "default": "100vh",
+      "visible_if": "{{ section.settings.step_position == 'V2' }}",
+      "options": [
+        {
+          "label": "t:sections.all.settings.media_height.custom_height",
+          "value": "custom"
+        },
+        {
+          "label": "t:sections.all.settings.media_height.full_screen",
+          "value": "100vh"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "desktop_custom_height",
+      "label": "t:sections.all.settings.media_height.custom_height",
+      "min": 400,
+      "max": 1000,
+      "default": 700,
+      "step": 10,
+      "unit": "px",
+      "visible_if": "{{ section.settings.step_position == 'V2' and section.settings.desktop_media_height == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "change_steps",
+      "label": "t:sections.step-by-step-guide.settings.steps_changes.name",
+      "default": "on-scroll",
+      "options": [
+        {
+          "label": "t:sections.step-by-step-guide.settings.steps_changes.option_1",
+          "value": "on-scroll"
+        },
+        {
+          "label": "t:sections.step-by-step-guide.settings.steps_changes.option_2",
+          "value": "on-click"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "t:sections.all.settings.card_radius.label",
+      "info": "t:sections.all.settings.card_radius.info",
+      "min": 0,
+      "max": 30,
+      "default": 5,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.settings.mobile_layout.header"
+    },
+    {
+      "type": "range",
+      "id": "mobile_custom_height",
+      "label": "t:sections.all.settings.media_height.custom_height",
+      "min": 200,
+      "max": 800,
+      "default": 400,
+      "step": 10,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.step-by-step-guide.presets.name",
+      "category": "Storytelling",
+      "blocks": [
+        {
+          "type": "steps"
+        },
+        {
+          "type": "steps"
+        },
+        {
+          "type": "steps"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

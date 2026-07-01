@@ -1,0 +1,52 @@
+{% unless product.selected_or_first_available_variant.inventory_policy == 'continue' %}
+{% if product.selected_or_first_available_variant.inventory_quantity < 101 %}
+{% capture instock_icon %}
+    {% render 'svg-icons', icon_type: 'icon-in-stock', extra_class: 'product-inventory-icon' %}
+{% endcapture %}
+{%- if product.selected_or_first_available_variant.inventory_management == 'shopify' -%}
+<div class="product-block product-block-inventory" product-inventory {{ block.shopify_attributes }}>
+  <div class="product-inventory" id="Inventory-{{ section.id }}-{{ product.id }}">
+      {%- if product.selected_or_first_available_variant.inventory_quantity > 0 -%}
+        {%- if product.selected_or_first_available_variant.inventory_quantity <= block.settings.inventory_threshold -%}
+            {% render 'svg-icons', icon_type: 'icon-low-stock', extra_class: 'product-inventory-icon' %}
+          <span class="product-inventory-text text-small">
+            {%- if block.settings.show_inventory_quantity -%}
+              {{-
+                'products.product.inventory.low_stock_html'
+                | t: count: product.selected_or_first_available_variant.inventory_quantity
+              -}}
+            {%- else -%}
+              {{- 'products.product.inventory_low_stock' | t -}}
+            {%- endif -%}
+          </span>
+        {%- else -%}
+          {{ instock_icon }}
+          <span class="product-inventory-text text-small">
+            {%- if block.settings.show_inventory_quantity -%}
+              {{-
+                'products.product.inventory_in_stock_show_count'
+                | t: quantity: product.selected_or_first_available_variant.inventory_quantity
+              -}}
+            {%- else -%}
+              {{- 'products.product.inventory.in_stock' | t -}}
+            {%- endif -%}
+          </span>
+        {%- endif -%}
+      {%- else -%}
+        {%- if product.selected_or_first_available_variant.inventory_policy == 'continue' -%}
+          {{ instock_icon }}
+        <span class="product-inventory-text text-small">
+          {{- 'products.product.inventory_out_of_stock_continue_selling' | t -}}
+        </span>
+        {%- else -%}
+            {% render 'svg-icons', icon_type: 'icon-outof-stock', extra_class: 'product-inventory-icon' %}
+          <span class="product-inventory-text text-small">
+            {{- 'products.product.inventory_out_of_stock' | t -}}
+          </span>
+        {%- endif -%}
+      {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+{% endif %}
+{% endunless %}

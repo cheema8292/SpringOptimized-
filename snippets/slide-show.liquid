@@ -1,0 +1,84 @@
+{{ 'slide-show.css' | asset_url | stylesheet_tag }}
+<slide-show
+  class="d-block slideshow-wrapper{%  if roundedCorner == "all" %} {{ rounded_corner_type }} {% endif %}{% if blockSize > 1 %} swiper{% endif %} slideshow-swiper"
+  data-id="{{ section_id }}"
+  {% if blockSize > 1 %}
+    data-swiper='
+      {
+        "loop": true,
+        "speed":1000,
+        "effect": "{{ effect }}",
+        "autoplay":{
+        "enabled" : {{ autoplay }},
+        "delay":{{ delay | times:1000 }}
+           },
+        "navigation": {
+                      "nextEl": ".swiper-nav-next-{{ section_id }}",
+                      "prevEl": ".swiper-nav-prev-{{ section_id }}"
+                    },
+        "pagination": {
+        "el": ".swiper-pagination-{{ section_id }}",
+        "type": "{%- if navigation == 'progress-bar' or navigation == 'arrows-with-progress-bar' or navigation == 'floation-arrows-with-progress-bar' -%}progressbar {%- elsif navigation == 'dots' or navigation == 'floation-arrows-with-dots' or navigation == 'arrows-with-dots' -%}bullets{%- endif -%}",
+         "clickable": true
+             },
+        "autoHeight": false, 
+        "slidesPerView":1
+      }
+    '
+  {% endif %}
+>
+  <div class="{% if blockSize > 1 %} swiper-wrapper {% endif %} height-100">
+    {{ slides }}
+  </div>
+
+  {%- if blocks.size > 1
+    and navigation == 'progress-bar'
+    or navigation == 'arrows-with-progress-bar'
+    or navigation == 'floation-arrows-with-progress-bar'
+  -%}
+    <div class="swiper-pagination-count {% if navigation == "arrows-with-progress-bar" %}progress-bar-center {% endif %} {{ pagination_color }}">
+      <div class="swiper-pagination-text" active-progressive-slide>01</div>
+      <div class="swiper-pagination-{{ section_id }} swiper-pagination-progressbar">
+        <span class="swiper-pagination-progressbar-fill"></span>
+      </div>
+      <div class="swiper-pagination-text">0{{ blocks.size }}</div>
+    </div>
+  {%- endif -%}
+  {%- if blocks.size > 1
+    and navigation == 'floation-arrows'
+    or navigation == 'floation-arrows-with-progress-bar'
+    or navigation == 'floation-arrows-with-dots'
+  -%}
+    <div class="floating-arrow-btn hidden custom-cursor md-block d-none {{ pagination_color }}" floating-arrow-btn>
+      <div floating-arrow>
+        {% render 'svg-icons', icon_type: 'navigation-right' %}
+      </div>
+    </div>
+    <div  class="floating-arrow-btn mobile-floating-btn-prev custom-cursor {{ pagination_color }} d-flex md-none" mobile-floating-arrow-btn-prev>
+        {% render 'svg-icons', icon_type: 'navigation-left' %}
+    </div>
+     <div  class="floating-arrow-btn mobile-floating-btn-next custom-cursor {{ pagination_color }} d-flex md-none" mobile-floating-arrow-btn-next>
+        {% render 'svg-icons', icon_type: 'navigation-right' %}
+    </div>
+  {%- endif -%}
+  {% if blocks.size > 1
+    and navigation == 'dots'
+    or navigation == 'arrows-with-dots'
+    or navigation == 'floation-arrows-with-dots'
+  %}
+    <div class="swiper-pagination bullet-center swiper-pagination-{{ section_id }} {{ pagination_color }}"></div>
+  {% endif %}
+  {%- if blocks.size > 1
+    and navigation == 'arrows'
+    or navigation == 'arrows-with-progress-bar'
+    or navigation == 'arrows-with-dots'
+  -%}
+  {% liquid
+      assign extra_classes = ''
+    if navigation == 'arrows-with-dots' or navigation == 'arrows-with-progress-bar' or navigation == "arrows"
+      assign extra_classes = "swiper-navigation-expand nav-bottom d-flex"  | append:" " | append:  pagination_color 
+    endif
+  %}
+    {%- render 'swiper-navigation', id: section_id, extra_class: extra_classes -%}
+  {%- endif -%}
+</slide-show>

@@ -1,0 +1,18 @@
+  {% comment %}
+  Renders a list of button apearance
+
+  Accepts:
+  - button_text: {string} button text
+  - button_url: {string} button url
+  - button_style: {string} button class
+  - is_open_in_new_tab: {Boolean} open in new tab
+  - class : {string} extra class
+
+  Usage:
+  {% render 'button-text-icon', button_text: 'Button text %}
+{% endcomment %}
+  
+<span class="button-text">{{ button_text }}</span>
+<span class="button-icon">
+{% render 'svg-icons', icon_type: 'arrow-right' %}
+</span>

@@ -1,0 +1,79 @@
+ .countdown-wrapper {
+    display: grid;
+    overflow: hidden;
+    min-height: var(--mediaHeight);height: 100%;
+  }
+
+  .countdown-media,
+  .countdown-content {
+    grid-area: 1/1/2/2;
+  }
+  /* .countdown-wrapper .media-card-overlay {
+    height: var(--mediaHeight);
+  } */
+ .countdown-time-inner {
+    display: flex;
+    max-width: max-content;
+     flex-wrap: nowrap; 
+    --borderColor: var(--countdown-box-border-color); 
+ }
+  .countdown-time-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-block: 12px;
+    padding-inline: 15px; 
+     @media (max-width: 767px) {   
+       padding-inline: 10px; 
+       flex-wrap: wrap;  
+       flex: 0 0 auto;
+    }   
+  }  
+  .countdown-time-block:not(:first-child) { 
+      border-left: var(--borderWidth) var(--borderStyle) var(--countdown-box-border-color); 
+  } 
+  .countdown-time-block * {
+    color: var(--countdown-box-color) !important;
+  }
+  .countdown-time-unit{
+    line-height: 1.2;
+    color: var(--countdown-box-units-color) !important;
+    @media (min-width: 768px) {
+      white-space: nowrap;
+    }
+  }
+  .countdown-content{
+    &.text-right .countdown-time-timer { 
+        margin-left: auto;
+    }
+    &.text-center .countdown-time-timer { 
+        margin-inline: auto;
+    }
+  }
+   
+    .countdown-time-timer {
+        max-width: max-content;
+    } 
+  
+  .countdown-timer-section .countdown-content {
+    padding-block: 1.5rem;
+    padding-inline: 1.5rem;  
+    @media (min-width: 1400px) {
+      padding-block: 10rem;
+      padding-inline: 10rem; 
+    }
+    @media (min-width: 1200px) {
+      padding-block: 6rem;
+      padding-inline: 6rem; 
+    }
+    @media (min-width: 768px) {
+      padding-block: 4rem;
+      padding-inline: 4rem; 
+    }
+  }   
+ .countdown-time-inner:has(.countdown-time-block) {   
+        overflow: auto;   
+  }    
+ .countdown-wrapper .button.button-underline {
+    margin-left: 5px;
+}

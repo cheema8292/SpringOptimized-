@@ -1,0 +1,69 @@
+
+.explore-categories-box-wrapper{
+     padding-block: 20px;
+}
+.explore-categories-box-wrapper:not([class*='container-']) {
+    padding-inline: 15px;
+    @media (min-width:768px){
+      padding-inline: 24px;
+    }
+    @media (min-width:1200px){
+      padding-inline: 40px;
+    }
+}
+.layout-stackec .explore-categories-wrapper{
+    display: grid;
+    grid-template-columns: repeat(var(--columnCount), 1fr);
+    gap: var(--columnGap, 0px);
+    align-items: flex-start;
+}
+  .explore-categories-item {
+    position: relative;
+    @media (min-width: 1025px) {
+      &:hover {
+        .explore-categories-content {
+          bottom: 50%;
+          transform: translateY(50%);
+          transform-origin: center;
+        }
+      }
+    }
+  }
+
+  .explore-categories-media {
+    border-radius: var(--blockRadius);
+    overflow: hidden;
+  }
+
+  .explore-categories-content {
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 75%;
+    max-height:80%;
+    margin: 0 auto;
+    transition: 0.3s ease-out;
+    &.button {
+      position: absolute;
+      text-transform: unset;
+    }
+    @media (max-width: 1200px) {
+      bottom: 10px;
+      max-width: 90%;
+    }
+  }
+
+  .explore-categories-title {
+    padding-left: 15px;
+    font-size: 14px;
+    @media (max-width: 767px) {
+      padding-left: 10px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .explore-categories-icon.button-icon .svg-wrapper {
+      --svgSize: 12px;
+    }
+  }

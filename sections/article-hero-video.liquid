@@ -1,0 +1,524 @@
+<section class="article-hero-video section-{{ section.id }}">
+  <div class="article-hero-video__inner {{ section.settings.container }}">
+<div class="article-hero-video__header">
+
+  <span class="article-hero-video__caption">
+    {% if article.metafields.custom.caption != blank %}
+      <span class="growth-arrow">
+        <img src="https://cdn.shopify.com/s/files/1/0454/4358/0068/files/grow-up.png?v=1769775299">
+      </span>
+      {{ article.metafields.custom.caption }}
+    {% endif %}
+  </span>
+
+  <div class="article-hero-video__actions">
+    <button aria-label="Share">
+      <img src="https://cdn.shopify.com/s/files/1/0454/4358/0068/files/icons8-share-60.png?v=1769774509">
+    </button>
+    <button aria-label="Save">
+      <img src="https://cdn.shopify.com/s/files/1/0454/4358/0068/files/icons8-save-64.png?v=1769774510">
+    </button>
+  </div>
+
+</div>
+
+    {% if section.settings.show_title %}
+      <h1 class="article-hero-video__title">
+        {{ article.title }}
+      </h1>
+    {% endif %}
+
+    {% if section.settings.show_meta %}
+      <div class="article-hero-video__meta">
+
+  {% if article.metafields.custom.author_image %}
+    <img
+      class="article-hero-video__avatar"
+      src="{{ article.metafields.custom.author_image | image_url: width: 60 }}"
+      alt="{{ article.author }}"
+      loading="lazy"
+    >
+  {% endif %}
+
+  <span class="article-hero-video__author-name">
+    {{ article.author }}
+  </span>
+
+  <span class="article-hero-video__dot">·</span>
+
+  <span class="article-hero-video__date">
+    <span class="cal_img"><img src="https://cdn.shopify.com/s/files/1/0454/4358/0068/files/calendar.png?v=1770199531"></span>
+  {% assign now_ts = 'now' | date: '%s' %}
+  {% assign published_ts = article.published_at | date: '%s' %}
+  {% assign days_ago = now_ts | minus: published_ts | divided_by: 86400 %}
+
+  {% if days_ago < 1 %}
+    Today
+  {% elsif days_ago < 2 %}
+    Yesterday
+  {% else %}
+    {{ days_ago }} days ago
+  {% endif %}
+</span>
+
+
+  <span class="article-hero-video__dot">·</span>
+
+
+
+  <span class="article-hero-video__stars">
+    ★★★★★
+  </span>
+
+</div>
+
+    {% endif %}
+
+    {% if section.settings.show_excerpt and article.excerpt != blank %}
+      <div class="article-hero-video__excerpt">
+        {{ article.excerpt }}
+      </div>
+    {% endif %}
+
+    
+
+<div class="vd__container">
+  <div class="ing__container">
+     <div class="recipe-meta">
+    <div class="meta-card">
+      <small>Prep time</small>
+      <strong>{{ section.settings.prep_time }}</strong>
+    </div>
+    <div class="meta-card">
+      <small>Cook time</small>
+      <strong>{{ section.settings.cook_time }}</strong>
+    </div>
+    <div class="meta-card">
+      <small>Servings</small>
+      <strong>{{ section.settings.servings }}</strong>
+    </div>
+  </div>
+          <h2 class="ing__heading">Ingredients</h2>
+
+      {% assign recipe_1_title = article.metafields.custom.recipe_1_title.value %}
+{% assign recipe_1_ingredients = article.metafields.custom.recipe_1_ingredient_list.value %}
+{% assign recipe_2_title = article.metafields.custom.recipe_2_title.value %}
+{% assign recipe_2_ingredients = article.metafields.custom.recipe_2_ingredient_list.value %}
+{% assign instructions_title = article.metafields.custom.instructions_title.value %}
+{% assign instructions_list = article.metafields.custom.instructions_list.value %}
+
+{% if recipe_1_title != blank %}
+  <h4>{{ recipe_1_title }}</h4>
+
+  {% if recipe_1_ingredients != blank %}
+    <ul class="ingredient-list">
+      {% for ingredient in recipe_1_ingredients %}
+        <li>
+          <span class="dot"></span>{{ ingredient }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endif %}
+
+{% if recipe_2_title != blank %}
+  <h4>{{ recipe_2_title }}</h4>
+
+  {% if recipe_2_ingredients != blank %}
+    <ul class="ingredient-list">
+      {% for ingredient in recipe_2_ingredients %}
+        <li>
+          <span class="dot"></span>{{ ingredient }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endif %}
+  </div>
+<div class="article-hero-video__media" data-video-wrapper>
+  {% assign hero_video = article.metafields.custom.featured_video %}
+  {% if hero_video != blank %}
+    <video
+      preload="none"
+      playsinline
+      muted
+      poster="{{ article.image | image_url: width: 1600 }}"
+      data-video
+    >
+      <source src="{{ hero_video | file_url }}" type="video/mp4">
+    </video>
+
+    <button
+      class="article-hero-video__play"
+      aria-label="Play video"
+      data-play-button
+    >
+      <img src="https://cdn.shopify.com/s/files/1/0454/4358/0068/files/icons8-play-100.png?v=1769773680">
+    </button>
+
+  {% elsif article.image %}
+    {{ article.image | image_url: width: 1600 | image_tag }}
+  {% endif %}
+</div>
+</div>
+
+  </div>
+</section>
+
+<style>
+  body{
+  background: #fff;}
+.section-{{ section.id }} {
+  padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+}
+.article-hero-video__author-name{
+  font-weight: 700;
+}
+.article-hero-video__inner {
+  max-width: 1110px;
+  margin: 0 auto;
+}
+
+.article-hero-video__title {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.cal_img img{
+  width: 20px;
+    display: inline;
+    position: relative;
+    top: -2px;
+    margin-left: 12px;
+}
+.article-hero-video__meta {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+.article-hero-video__excerpt {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.article-hero-video__media {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.article-hero-video__media video,
+.article-hero-video__media img {
+  width: 100%;
+  display: block;
+}
+.article-hero-video__media {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.article-hero-video__media video {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: pointer;
+}
+
+/* Play button */
+.article-hero-video__play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 28px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.article-hero-video__play:hover {
+  transform: scale(1.05);
+  {% comment %} background: rgba(0, 0, 0, 0.7); {% endcomment %}
+}
+
+/* Hide play button once playing */
+.article-hero-video__media.is-playing .article-hero-video__play {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Header row */
+.article-hero-video__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 12px;
+}
+
+.article-hero-video__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.article-hero-video__actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 28px;
+}
+
+/* Meta row */
+.article-hero-video__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+.article-hero-video__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.article-hero-video__dot {
+  opacity: 0.5;
+}
+
+.article-hero-video__stars {
+  color: #e5533d;
+  font-size: 20px;
+  display: block;
+    position: relative;
+    margin-left: 10px;
+}
+.article-hero-video__caption{
+  font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.growth-arrow{
+  width: 24px;
+}
+@media (max-width: 1120px){
+.article-hero-video__inner{
+  padding: 0 24px;
+}
+}
+@media (max-width: 749px){
+  .article-hero-video__caption{
+    font-size: 14px;
+  }
+  .growth-arrow {
+    width: 20px;
+}
+.article-hero-video__actions{
+  gap: 3px;
+}
+.article-hero-video__actions button{
+  width: 24px;
+}
+.article-hero-video__avatar{
+  width: 32px;
+    height: 32px;
+}
+.article-hero-video__author-name{
+  font-size: 12px;
+}
+.article-hero-video__stars{
+  font-size: 16px;
+    display: block;
+    position: relative;
+    margin-left: 0px;
+}
+.article-hero-video__date{
+  font-size: 12px;
+}
+.cal_img img{
+  width: 16px;
+  margin-left: 0px;
+  top: 0px;
+}
+.article-hero-video__excerpt{
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.recipe-adv{
+  padding: 60px 24px!important;
+    padding-top: 0!important;
+}
+.article-hero-video{
+  padding: 40px 0 18px;
+}
+.recipe-meta{
+  display: grid!important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px!important;
+}
+.meta-card {
+    background: #f8f8f8;
+    padding: 14px 14px!important;
+    border-radius: 10px;
+    text-align: center;
+}
+.article-hero-video__play{
+  width: 58px;
+    height: 58px;
+}
+.vd__container{
+  flex-direction: column-reverse;
+    gap: 2rem;
+}
+.recipe-meta{
+margin-bottom: 12px!important;
+}
+.article-hero-video__media video{
+max-width: 100%!important;}
+}
+
+.vd__container{
+  display: flex;
+    justify-content: space-between;
+}
+.article-hero-video__media video{
+  aspect-ratio: 9 / 16;
+    max-width: 360px;
+ border-radius: 12px;
+    height: 100%;
+    object-fit: cover;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-video-wrapper]').forEach(wrapper => {
+    const video = wrapper.querySelector('[data-video]');
+    const button = wrapper.querySelector('[data-play-button]');
+
+    if (!video || !button) return;
+
+    button.addEventListener('click', () => {
+      wrapper.classList.add('is-playing');
+      video.setAttribute('controls', '');
+      video.play();
+    });
+  });
+});
+</script>
+
+
+{% schema %}
+{
+  "name": "Article Hero Video",
+  "tag": "section",
+  "class": "article-hero-video-section",
+  "settings": [
+     { "type": "text", "id": "prep_time", "label": "Prep time", "default": "15 min" },
+    { "type": "text", "id": "cook_time", "label": "Cook time", "default": "15 min" },
+    { "type": "text", "id": "servings", "label": "Servings", "default": "4 people" },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show article title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show excerpt",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_meta",
+      "label": "Show meta info",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show publish date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Mute video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "Show controls",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "container",
+      "label": "Content width",
+      "options": [
+        { "value": "page-width", "label": "Default" },
+        { "value": "page-width--narrow", "label": "Narrow" },
+        { "value": "page-width--wide", "label": "Wide" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Article Hero Video"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,11 @@
+{%- for item in cart.items -%}
+  <div id="cart-notification-product-{{ item.key }}" class="cart-item">
+    <div class="cart-notification-item-count">
+      {% render 'svg-icons', icon_type: 'cart' %}
+      <span class="cart-notification-item-count-text text">{{ item.quantity }} item</span>
+    </div>
+    <div class="cart-notification-item-price">
+        <span class="cart-notification-item-price-text text font-bold">{{ item.original_line_price | money }}</span>
+    </div>
+  </div>
+{%- endfor -%}

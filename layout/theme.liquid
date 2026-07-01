@@ -33,7 +33,9 @@
     {{ content_for_header }}
     {% render 'global-style-variables' %}
     {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag: preload: true }}
-    {{ 'photoswipe.min.css' | asset_url | stylesheet_tag: preload: true }}
+    {%- comment -%} Photoswipe styles only power the click-to-open product lightbox, so load them off the critical path instead of blocking first paint / competing with the LCP hero. {%- endcomment -%}
+    <link rel="stylesheet" href="{{ 'photoswipe.min.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript>{{ 'photoswipe.min.css' | asset_url | stylesheet_tag }}</noscript>
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'common.css' | asset_url | stylesheet_tag }}
     {{ 'theme.css' | asset_url | stylesheet_tag }}
@@ -121,6 +123,7 @@
 {% if template contains 'collection' or template contains 'index' %}
       <script>
 window.addEventListener('DOMContentLoaded', (event) => {
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
     const updateReviewCount = () => {
       document.querySelectorAll('.jdgm-prev-badge__text').forEach(text => {
         const number = parseInt(text.innerText.split(' ')[0]);
@@ -136,7 +139,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     const intervalId = setInterval(() => {
       checkCount++;
-      updateReviewCount();
+      // Run the DOM work during idle time so it doesn't add to Total Blocking Time on load.
+      idle(updateReviewCount);
 
       if (checkCount >= maxChecks) {
         clearInterval(intervalId);

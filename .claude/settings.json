@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import json;d=json.load\\(open\\('templates/index.json'\\)\\);print\\('\\\\n'.join\\(d.get\\('order',[]\\)\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\);console.log\\(d.order.join\\('\\\\n'\\)\\)\")",
+      "Bash(git --no-pager diff --stat)",
+      "Bash(git --no-pager diff)"
+    ]
+  }
+}

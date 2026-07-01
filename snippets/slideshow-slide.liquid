@@ -54,7 +54,12 @@
         {%- liquid
           assign default_alt = 'default_alt.banner_image' | t
           assign image_alt = desktop_image.alt | default: section.settings.heading | default: default_alt
-          assign desktop_sizes = '(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1366px) 25vw, (min-width: 1367px) 100vw'
+          comment
+            Slideshow slides are full-bleed banners (100vw). The previous value declared 25-50vw for
+            mid-size screens, so the browser fetched a too-small (blurry) hero, then jumped to a full
+            image above 1367px. A single monotonic 100vw lets the browser pick the correctly-sized file.
+          endcomment
+          assign desktop_sizes = '100vw'
           assign desktop_widths = '375,550,750,900,1200,1500,1800,2100,2400,2700,3000,3600,3840' | split: ','
           assign mobile_widths = '375,550,750,1080,1500' | split: ','
           assign fallback_image = mobile_image | default: desktop_image

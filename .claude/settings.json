@@ -4,7 +4,9 @@
       "Bash(python -c \"import json;d=json.load\\(open\\('templates/index.json'\\)\\);print\\('\\\\n'.join\\(d.get\\('order',[]\\)\\)\\)\")",
       "Bash(node -e \"const d=require\\('./templates/index.json'\\);console.log\\(d.order.join\\('\\\\n'\\)\\)\")",
       "Bash(git --no-pager diff --stat)",
-      "Bash(git --no-pager diff)"
+      "Bash(git --no-pager diff)",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\);const s=d.sections.custom_grid_NcFCDf;const b=s.blocks;for\\(const k in b\\){if\\(b[k].type&&b[k].type.includes\\('slideshow'\\)\\){console.log\\('slideshow block settings:',JSON.stringify\\(b[k].settings\\)\\)}}\")",
+      "Bash(git --no-pager log --oneline -3)"
     ]
   }
 }

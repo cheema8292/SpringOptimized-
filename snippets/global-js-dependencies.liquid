@@ -212,8 +212,33 @@ function removeTrapFocus(elementToFocus = null) {
 }
 </script>
 
-<script src="{{ 'photoswipe.min.js' | asset_url }}" defer="defer"></script>
-<script src="{{ 'photoswipe-lightbox.min.js' | asset_url }}" defer="defer"></script>
+{%- comment -%}
+  Photoswipe only powers the click-to-open image lightbox (see the lazy `get photoswipe()` getter in
+  theme-script.js). Loading ~69KB of JS up front adds to Total Blocking Time on pages that may never
+  open a lightbox. Instead, fetch it on the first user interaction (or shortly after load as a
+  fallback) so it is ready before any gallery click but off the critical path.
+{%- endcomment -%}
+<script>
+  (function () {
+    var loaded = false;
+    var events = ['pointerdown', 'keydown', 'touchstart'];
+    function loadPhotoswipe() {
+      if (loaded) return;
+      loaded = true;
+      events.forEach(function (e) { window.removeEventListener(e, loadPhotoswipe); });
+      ['{{ 'photoswipe.min.js' | asset_url }}', '{{ 'photoswipe-lightbox.min.js' | asset_url }}'].forEach(function (src) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = false; // preserve execution order: core before lightbox
+        document.head.appendChild(s);
+      });
+    }
+    events.forEach(function (e) { window.addEventListener(e, loadPhotoswipe, { once: true, passive: true }); });
+    window.addEventListener('load', function () {
+      (window.requestIdleCallback || function (cb) { setTimeout(cb, 1500); })(loadPhotoswipe);
+    });
+  })();
+</script>
 <script src="{{ 'common-function.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'theme-script.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'animation-engine.js' | asset_url }}" defer="defer"></script>

@@ -5578,3 +5578,27 @@ document.addEventListener("DOMContentLoaded", function () {
     
     console.log('✅ Script blocker activated!');
   })();
+
+  // Defer all third-party scripts
+  document.addEventListener('DOMContentLoaded', function() {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(function() {
+        // Defer Klaviyo
+        document.querySelectorAll('script[src*="klaviyo"]').forEach(function(s) {
+          s.async = true;
+          s.defer = true;
+        });
+        // Defer Judge.me
+        document.querySelectorAll('script[src*="judgeme"]').forEach(function(s) {
+          s.async = true;
+          s.defer = true;
+        });
+        // Defer any other heavy scripts
+        document.querySelectorAll('script[src*="cdn.shopify.com/extensions"]').forEach(function(s) {
+          s.async = true;
+          s.defer = true;
+        });
+        console.log('✅ All third-party scripts deferred');
+      }, { timeout: 3000 });
+    }
+  });

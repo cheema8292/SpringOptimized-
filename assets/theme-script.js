@@ -5509,12 +5509,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });  
-// Disable ALL video autoplay for speed test
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('video[autoplay]').forEach(v => {
-      v.removeAttribute('autoplay');
-      v.setAttribute('preload', 'none');
-      v.load();
-    });
-    console.log('✅ Videos disabled for speed test');
-  });

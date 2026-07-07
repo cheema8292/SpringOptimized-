@@ -5509,3 +5509,72 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });  
+
+  // Block specific Google scripts from loading
+  (function() {
+    // List of scripts to block (partial URLs)
+    const scriptsToBlock = [
+      'analytics.js',
+      'gtag/js',
+      'googletagmanager',
+      'UA-186053218-2',
+      'GTM-PZBPJH6',
+      'GT-WKG6THG'
+    ];
+    
+    // Store the original createElement method
+    const originalCreateElement = document.createElement;
+    
+    // Override createElement to intercept script tags
+    document.createElement = function(tagName, options) {
+      const element = originalCreateElement.call(document, tagName, options);
+      
+      if (tagName.toLowerCase() === 'script') {
+        // Intercept src attribute setting
+        const originalSetAttribute = element.setAttribute;
+        element.setAttribute = function(name, value) {
+          if (name === 'src' && value) {
+            const shouldBlock = scriptsToBlock.some(block => value.includes(block));
+            if (shouldBlock) {
+              console.log('🔴 Blocked script:', value);
+              // Return without setting src - script won't load
+              return;
+            }
+          }
+          return originalSetAttribute.call(this, name, value);
+        };
+        
+        // Also intercept direct property assignment
+        Object.defineProperty(element, 'src', {
+          set: function(value) {
+            const shouldBlock = scriptsToBlock.some(block => value.includes(block));
+            if (shouldBlock) {
+              console.log('🔴 Blocked script (src):', value);
+              return;
+            }
+            this._src = value;
+            originalSetAttribute.call(this, 'src', value);
+          },
+          get: function() {
+            return this._src || '';
+          }
+        });
+      }
+      
+      return element;
+    };
+    
+    // Also block scripts already in the DOM
+    setTimeout(function() {
+      document.querySelectorAll('script[src]').forEach(function(script) {
+        const src = script.src || '';
+        const shouldBlock = scriptsToBlock.some(block => src.includes(block));
+        if (shouldBlock) {
+          console.log('🔴 Removing existing blocked script:', src);
+          script.remove();
+        }
+      });
+    }, 100);
+    
+    console.log('✅ Script blocker activated!');
+  })();

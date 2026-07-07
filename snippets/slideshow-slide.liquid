@@ -1,0 +1,114 @@
+<style>
+  #shopify-block-{{block.id}}{
+    {% if block.settings.enable_overlay %}
+      {% if block.settings.overlay_style == 'gradient' %}  
+        --imageOverlay: {{ block.settings.overlay_gradient }};
+      {% else %}
+        --imageOverlay: rgba({{ block.settings.overlay_solid.rgba }});
+      {% endif %}
+    {% endif %}
+    {% if block.settings.desktop_image != blank %}
+     --slideshowMaskImage : url('{{ block.settings.desktop_image  | image_url: width: 600, format: 'webp' }}');
+    {% endif %}
+  }
+  {% if block.settings.mobile_image != blank %}
+    @media only screen and (max-width: 767px) {
+      #shopify-block-{{block.id}}{
+        --slideshowMaskImage : url('{{ block.settings.mobile_image  | image_url: width: 600, format: 'webp' }}');
+      }
+    }
+  {% endif %}
+</style>
+
+{% liquid
+  assign loading = 'lazy' 
+  assign fetch_priority = 'auto'
+  if section.index <= 1
+    assign loading = 'eager'
+    assign fetch_priority = 'high'
+  endif
+%}
+
+{% assign desktop_image = block.settings.desktop_image %}
+{% assign mobile_image = block.settings.mobile_image | default: desktop_image %}
+<div class="slideshow-media media-card-overlay media-wrapper">
+  <div
+    class="media-card {{ imageHeight }}"
+    {% if block.settings.media_type == 'video' %}
+      slideshow-video
+    {% endif %}
+    {% if settings.image_animation_type != 'none' %}
+      animate-element="true" 
+      data-animate="{{ settings.image_animation_type }}"
+      data-zoom-initial="1.1" 
+      data-zoom-final="1.0" 
+      data-zoom-duration="1.5"
+      data-zoom-ease="power3.out"
+      data-delay="0.3"
+    {% endif %}
+  >
+    {% if block.settings.media_type == 'image' %}
+      {% if desktop_image == blank and mobile_image == blank %}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% else %}
+        {%- liquid
+          assign default_alt = 'default_alt.banner_image' | t
+          assign image_alt = desktop_image.alt | default: section.settings.heading | default: default_alt
+          comment
+            Slideshow slides are full-bleed banners (100vw). The previous value declared 25-50vw for
+            mid-size screens, so the browser fetched a too-small (blurry) hero, then jumped to a full
+            image above 1367px. A single monotonic 100vw lets the browser pick the correctly-sized file.
+          endcomment
+          assign desktop_sizes = '100vw'
+          assign desktop_widths = '375,550,750,900,1200,1500,1800,2100,2400,2700,3000,3600,3840' | split: ','
+          assign mobile_widths = '375,550,750,1080,1500' | split: ','
+          assign fallback_image = mobile_image | default: desktop_image
+        -%}
+        {%- capture desktop_srcset -%}
+          {%- for w in desktop_widths -%}{{ desktop_image | image_url: width: w, format: 'webp' }} {{ w }}w{% unless forloop.last %}, {% endunless %}{%- endfor -%}
+        {%- endcapture -%}
+        {%- capture mobile_srcset -%}
+          {%- for w in mobile_widths -%}{{ mobile_image | image_url: width: w, format: 'webp' }} {{ w }}w{% unless forloop.last %}, {% endunless %}{%- endfor -%}
+        {%- endcapture -%}
+        <picture>
+          {%- if desktop_image != blank -%}
+            <source media="(min-width: 768px)" srcset="{{ desktop_srcset | strip }}" sizes="{{ desktop_sizes }}">
+          {%- endif -%}
+          {%- if mobile_image != blank -%}
+            <source media="(max-width: 767px)" srcset="{{ mobile_srcset | strip }}" sizes="100vw">
+          {%- endif -%}
+          <img
+            src="{{ fallback_image | image_url: width: 750, format: 'webp' }}"
+            width="{{ fallback_image.width }}"
+            height="{{ fallback_image.height }}"
+            alt="{{ image_alt | escape }}"
+            decoding="async"
+            loading="{{ loading }}"
+            fetchpriority="{{ fetch_priority }}"
+            class="media-card-image">
+        </picture>
+      {% endif %}
+    {% else %}
+      {% if block.settings.desktop_video != blank or block.settings.mobile_video != blank %}
+              {%  render 'video',
+                  desktop_video:block.settings.desktop_video,
+                  mobile_video:block.settings.mobile_video,
+                  autoplay:true,
+                  isHeight:true,
+                  loading:loading,
+                  fetchpriority: fetch_priority,
+                  control:false,
+                  loop: true
+                 %}
+      {% else %}
+      
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    {% endif %}
+  </div>
+
+</div>
+
+  <div class="slideshow-content-wrapper text-{{ block.settings.alignment }} content-{{ block.settings.position }}">
+  {{ slides }}
+</div> 

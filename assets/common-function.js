@@ -104,3 +104,40 @@ function debounce(fn, wait) {
     t = setTimeout(() => fn.apply(this, args), wait);
   };
 }
+
+/*
+ * Product-card hover videos.
+ * The <video> is rendered with `preload="none"` and NO autoplay, so the file is
+ * not downloaded until the shopper actually hovers the card (previously autoplay
+ * forced every card video to download on page load, slowing the home page and
+ * mega-menu). We start playback on hover and pause/reset on leave. Uses event
+ * delegation on document so it also covers cards injected later (mega-menu,
+ * quick-view, infinite scroll).
+ */
+(function () {
+  function cardVideo(target) {
+    const card = target && target.closest && target.closest('.product-card-media');
+    if (!card) return null;
+    return card.querySelector('.product-card-hover-video');
+  }
+
+  document.addEventListener('mouseover', (event) => {
+    const video = cardVideo(event.target);
+    if (video && video.paused) {
+      video.muted = true;
+      video.playsInline = true;
+      video.play().catch(() => {});
+    }
+  });
+
+  document.addEventListener('mouseout', (event) => {
+    const card = event.target.closest && event.target.closest('.product-card-media');
+    // Ignore moves between children of the same card.
+    if (!card || (event.relatedTarget && card.contains(event.relatedTarget))) return;
+    const video = card.querySelector('.product-card-hover-video');
+    if (video && !video.paused) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  });
+})();

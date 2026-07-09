@@ -108,8 +108,7 @@
                             {{ 
                               second_media_video | media_tag:
                               loading: 'lazy',
-                              class: '',
-                              autoplay: true,
+                              class: 'product-card-hover-video',
                               loop: true,
                               mute: true,
                               controls: false,
@@ -209,10 +208,16 @@
          {% endif %}
 
         <!-- Start of Judge.me code -->
+  {%- comment -%} TEST: hide Judge.me rating badges on the home page to measure the speed impact.
+     The .jdgm-widget elements are what trigger Judge.me's widget JS to load, so skipping them on
+     index stops that load here. Remove this `unless` (or switch to Judge.me's badge-only app setting)
+     once the test is confirmed. {%- endcomment -%}
+  {%- unless request.page_type == 'index' -%}
   <div class='jdgm-widget jdgm-preview-badge'>
     {{ product_card.metafields.judgeme.badge }}
   </div>
-  
+  {%- endunless -%}
+
 
           <div class="product-card-content-holder pos-relative">
           {% render 'product-card-price', product: product_card, section:section, use_variant: true, price_context: 'card', source:"product_card" %}

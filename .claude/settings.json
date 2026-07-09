@@ -6,7 +6,10 @@
       "Bash(git --no-pager diff --stat)",
       "Bash(git --no-pager diff)",
       "Bash(node -e \"const d=require\\('./templates/index.json'\\);const s=d.sections.custom_grid_NcFCDf;const b=s.blocks;for\\(const k in b\\){if\\(b[k].type&&b[k].type.includes\\('slideshow'\\)\\){console.log\\('slideshow block settings:',JSON.stringify\\(b[k].settings\\)\\)}}\")",
-      "Bash(git --no-pager log --oneline -3)"
+      "Bash(git --no-pager log --oneline -3)",
+      "Bash(grep -rniE \"gtag\\\\\\(|googletagmanager|google-analytics|analytics\\\\.js|gtm-|UA-[0-9]|AW-[0-9]|G-[A-Z0-9]{8,}|dataLayer\" sections snippets layout templates config)",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\); for\\(const k in d.sections\\){const s=d.sections[k]; if\\(s.type&&s.type.includes\\('apps'\\)\\) console.log\\(k,'=>',s.type\\)}\")",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\); for\\(const k of ['1769789532bac920f9','17697958375105b1fa']\\){console.log\\(k,'=>', d.sections[k] && d.sections[k].type\\)}\")"
     ]
   }
 }

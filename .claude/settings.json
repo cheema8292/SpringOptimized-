@@ -9,7 +9,10 @@
       "Bash(git --no-pager log --oneline -3)",
       "Bash(grep -rniE \"gtag\\\\\\(|googletagmanager|google-analytics|analytics\\\\.js|gtm-|UA-[0-9]|AW-[0-9]|G-[A-Z0-9]{8,}|dataLayer\" sections snippets layout templates config)",
       "Bash(node -e \"const d=require\\('./templates/index.json'\\); for\\(const k in d.sections\\){const s=d.sections[k]; if\\(s.type&&s.type.includes\\('apps'\\)\\) console.log\\(k,'=>',s.type\\)}\")",
-      "Bash(node -e \"const d=require\\('./templates/index.json'\\); for\\(const k of ['1769789532bac920f9','17697958375105b1fa']\\){console.log\\(k,'=>', d.sections[k] && d.sections[k].type\\)}\")"
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\); for\\(const k of ['1769789532bac920f9','17697958375105b1fa']\\){console.log\\(k,'=>', d.sections[k] && d.sections[k].type\\)}\")",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\); for\\(const k of d.order\\){const s=d.sections[k]; console.log\\(\\(s.disabled?'[OFF] ':'[ON]  '\\)+k+'  =>  '+s.type\\)}\")",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\); const s=d.sections['1769789532bac920f9']; console.log\\(JSON.stringify\\(s\\).slice\\(0,600\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./templates/index.json'\\); console.log\\('JSON valid ✓'\\); for\\(const k of d.order\\){const s=d.sections[k]; console.log\\(\\(s.disabled?'[OFF] ':'[ON]  '\\)+k+'  =>  '+s.type\\)}\")"
     ]
   }
 }
